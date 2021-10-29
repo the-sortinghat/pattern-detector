@@ -1,13 +1,15 @@
 import { Database } from './Database'
+import { DatabaseUsage } from './DatabaseUsage'
+import { Service } from './Service'
 
 describe(Database, () => {
+  let database: Database
+
+  beforeEach(() => {
+    database = Database.create('foo')
+  })
+
   describe('create', () => {
-    let database: Database
-
-    beforeEach(() => {
-      database = Database.create('foo')
-    })
-
     it('returns a Database instance', () => {
       expect(database).toBeInstanceOf(Database)
     })
@@ -18,6 +20,20 @@ describe(Database, () => {
 
     it('returns a Database with ID', () => {
       expect(database.id).toBeDefined()
+    })
+  })
+
+  describe('addUsage', () => {
+    let usage: DatabaseUsage
+
+    beforeEach(() => {
+      const from = Service.create('from')
+
+      usage = DatabaseUsage.create(from, database)
+    })
+
+    it('adds a reference to the usage', () => {
+      expect(database.usages).toContain(usage)
     })
   })
 })

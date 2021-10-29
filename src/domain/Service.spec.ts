@@ -1,3 +1,5 @@
+import { Database } from './Database'
+import { DatabaseUsage } from './DatabaseUsage'
 import { HTTPVerb, Operation } from './Operation'
 import { Service } from './Service'
 
@@ -32,6 +34,20 @@ describe(Service, () => {
 
     it('adds the operation to the service', () => {
       expect(service.operations).toContain(operation)
+    })
+  })
+
+  describe('addUsage', () => {
+    let usage: DatabaseUsage
+
+    beforeEach(() => {
+      const of = Database.create('of-db')
+
+      usage = DatabaseUsage.create(service, of)
+    })
+
+    it('adds a reference to the usage', () => {
+      expect(service.usages).toContain(usage)
     })
   })
 })
