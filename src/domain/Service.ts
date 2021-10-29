@@ -1,5 +1,6 @@
 import { randomUUID as uuid } from 'crypto'
 import { DatabaseUsage } from './DatabaseUsage'
+import { MeasuresVessel } from './MeasuresVessel'
 import { Operation } from './Operation'
 
 export class Service {
@@ -9,6 +10,7 @@ export class Service {
 
   private ops: Operation[]
   private _usages: DatabaseUsage[]
+  public readonly measuresVessel = new MeasuresVessel()
 
   private constructor(public readonly name: string, public readonly id = uuid()) {
     this.ops = []

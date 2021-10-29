@@ -1,5 +1,6 @@
 import { Database } from './Database'
 import { DatabaseUsage } from './DatabaseUsage'
+import { MeasuresVessel } from './MeasuresVessel'
 import { Service } from './Service'
 
 describe(Database, () => {
@@ -20,6 +21,12 @@ describe(Database, () => {
 
     it('returns a Database with ID', () => {
       expect(database.id).toBeDefined()
+    })
+  })
+
+  describe('measuresVessel', () => {
+    it('exists', () => {
+      expect(database.measuresVessel).toBeInstanceOf(MeasuresVessel)
     })
   })
 
