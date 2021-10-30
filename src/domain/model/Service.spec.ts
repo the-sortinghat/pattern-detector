@@ -1,6 +1,6 @@
 import { Database } from './Database'
 import { DatabaseUsage } from './DatabaseUsage'
-import { MeasuresVessel } from './MeasuresVessel'
+import { MeasuresVessel } from '../metrics/MeasuresVessel'
 import { HTTPVerb, Operation } from './Operation'
 import { Service } from './Service'
 
