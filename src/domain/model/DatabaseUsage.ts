@@ -12,5 +12,7 @@ export class DatabaseUsage {
     ofDatabase.addUsage(this)
   }
 
-  public accept(collector: MetricsCollector): void {}
+  public accept(collector: MetricsCollector): void {
+    collector.collectFromDatabaseUsage(this)
+  }
 }

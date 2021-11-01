@@ -110,4 +110,32 @@ describe(MetricsCollector, () => {
       expect(database.measuresVessel.nOperations).toEqual(0)
     })
   })
+
+  describe('the integrated operation', () => {
+    let service: Service
+    let database: Database
+
+    beforeEach(() => {
+      const system = System.create('Integration System')
+      service = Service.create('Service')
+      system.addService(service)
+      service.addOperation(Operation.create(HTTPVerb.GET, '/foo'))
+      database = Database.create('DatabaseDB')
+      DatabaseUsage.create(service, database)
+
+      system.accept(MetricsCollector.create())
+    })
+
+    it('counts nOperations = 1 for the service', () => {
+      expect(service.measuresVessel.nOperations).toEqual(1)
+    })
+
+    it('counts nDatabaseUsing = 1 for the service', () => {
+      expect(service.measuresVessel.nDatabaseUsing).toEqual(1)
+    })
+
+    it('counts nUsageClients = 1 for the database', () => {
+      expect(database.measuresVessel.nUsageClients).toEqual(1)
+    })
+  })
 })

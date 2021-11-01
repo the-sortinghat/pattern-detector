@@ -23,5 +23,7 @@ export class Database {
     return Object.assign([], this._usages)
   }
 
-  public accept(collector: MetricsCollector): void {}
+  public accept(collector: MetricsCollector): void {
+    collector.collectFromDatabase(this)
+  }
 }

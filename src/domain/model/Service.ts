@@ -1,8 +1,8 @@
-import { randomUUID as uuid } from 'crypto'
-import { DatabaseUsage } from './DatabaseUsage'
-import { MeasuresVessel } from '../metrics/MeasuresVessel'
-import { Operation } from './Operation'
-import { MetricsCollector } from '../metrics/MetricsCollector'
+import {randomUUID as uuid} from 'crypto'
+import {DatabaseUsage} from './DatabaseUsage'
+import {MeasuresVessel} from '../metrics/MeasuresVessel'
+import {Operation} from './Operation'
+import {MetricsCollector} from '../metrics/MetricsCollector'
 
 export class Service {
   static create(name: string): Service {
@@ -34,5 +34,7 @@ export class Service {
     return Object.assign([], this._usages)
   }
 
-  public accept(collector: MetricsCollector): void {}
+  public accept(collector: MetricsCollector): void {
+    collector.collectFromService(this)
+  }
 }
