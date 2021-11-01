@@ -1,5 +1,5 @@
 import { randomUUID as uuid } from 'crypto'
-import { IVisitor } from 'domain/utils/visitor.interface'
+import { IVisitor } from 'domain/utils/Visitor.interface'
 import { Service } from './Service'
 
 export class System {

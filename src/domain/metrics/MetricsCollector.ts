@@ -1,4 +1,4 @@
-import { IVisitor } from '../utils/visitor.interface'
+import { IVisitor } from '../utils/Visitor.interface'
 import { Database } from '../model/Database'
 import { DatabaseUsage } from '../model/DatabaseUsage'
 import { Operation } from '../model/Operation'

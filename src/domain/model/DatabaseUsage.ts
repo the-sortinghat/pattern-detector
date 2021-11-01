@@ -1,4 +1,4 @@
-import { IVisitor } from 'domain/utils/visitor.interface'
+import { IVisitor } from 'domain/utils/Visitor.interface'
 import { Database } from './Database'
 import { Service } from './Service'
 

@@ -1,4 +1,4 @@
-import { IVisitor } from '../utils/visitor.interface'
+import { IVisitor } from '../utils/Visitor.interface'
 
 export enum HTTPVerb {
   GET,

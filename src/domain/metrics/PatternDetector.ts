@@ -3,7 +3,7 @@ import { Service } from 'domain/model/Service'
 import { Operation } from 'domain/model/Operation'
 import { Database } from 'domain/model/Database'
 import { DatabaseUsage } from 'domain/model/DatabaseUsage'
-import { IVisitor } from '../utils/visitor.interface'
+import { IVisitor } from '../utils/Visitor.interface'
 
 export class PatternDetector implements IVisitor {
   public static create(): PatternDetector {

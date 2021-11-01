@@ -2,7 +2,7 @@ import { randomUUID as uuid } from 'crypto'
 import { DatabaseUsage } from './DatabaseUsage'
 import { MeasuresVessel } from '../metrics/MeasuresVessel'
 import { Operation } from './Operation'
-import { IVisitor } from 'domain/utils/visitor.interface'
+import { IVisitor } from 'domain/utils/Visitor.interface'
 
 export class Service {
   static create(name: string): Service {
