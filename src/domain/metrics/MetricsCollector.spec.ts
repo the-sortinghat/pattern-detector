@@ -71,5 +71,26 @@ describe(MetricsCollector, () => {
     })
   })
 
-  describe('collectFromDatabase', () => {})
+  describe('collectFromDatabase', () => {
+    let database: Database
+
+    beforeEach(() => {
+      database = Database.create('MockDB')
+      const from = Service.create('from')
+      DatabaseUsage.create(from, database)
+      collector.collectFromDatabase(database)
+    })
+
+    it('marks the metrics vessel of the database with nUsageClients = 1', () => {
+      expect(database.measuresVessel.nUsageClients).toEqual(1)
+    })
+
+    it("does not change nDatabaseUsing of the database's metrics vessel", () => {
+      expect(database.measuresVessel.nDatabaseUsing).toEqual(0)
+    })
+
+    it("does not change nOperations of the database's metrics vessel", () => {
+      expect(database.measuresVessel.nOperations).toEqual(0)
+    })
+  })
 })

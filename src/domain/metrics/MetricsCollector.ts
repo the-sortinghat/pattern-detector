@@ -1,3 +1,4 @@
+import { Database } from '../model/Database'
 import { DatabaseUsage } from '../model/DatabaseUsage'
 import { Operation } from '../model/Operation'
 import { Service } from '../model/Service'
@@ -24,5 +25,9 @@ export class MetricsCollector {
       service.measuresVessel.increment(Metrics.nDatabaseUsing)
       dbUsage.accept(this)
     })
+  }
+
+  collectFromDatabase(database: Database): void {
+    database.usages.forEach(() => database.measuresVessel.increment(Metrics.nUsageClients))
   }
 }
