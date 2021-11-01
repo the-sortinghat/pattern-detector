@@ -1,3 +1,4 @@
+import { MetricsCollector } from '../metrics/MetricsCollector'
 import { Database } from './Database'
 import { Service } from './Service'
 
@@ -10,4 +11,6 @@ export class DatabaseUsage {
     fromService.addUsage(this)
     ofDatabase.addUsage(this)
   }
+
+  public accept(collector: MetricsCollector): void {}
 }

@@ -1,5 +1,8 @@
-import { Service } from 'domain/model/Service'
-import { System } from 'domain/model/System'
+import { DatabaseUsage } from '../model/DatabaseUsage'
+import { Operation } from '../model/Operation'
+import { Service } from '../model/Service'
+import { System } from '../model/System'
+import { Metrics } from './MeasuresVessel'
 
 export class MetricsCollector {
   static create(): MetricsCollector {
@@ -9,7 +12,17 @@ export class MetricsCollector {
   protected constructor() {}
 
   collectFromSystem(system: System): void {
-    // @ts-ignore
     system.services.forEach((svc: Service) => svc.accept(this))
+  }
+
+  collectFromService(service: Service): void {
+    service.operations.forEach((op: Operation) => {
+      service.measuresVessel.increment(Metrics.nOperations)
+      op.accept(this)
+    })
+    service.usages.forEach((dbUsage: DatabaseUsage) => {
+      service.measuresVessel.increment(Metrics.nDatabaseUsing)
+      dbUsage.accept(this)
+    })
   }
 }

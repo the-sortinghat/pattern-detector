@@ -1,3 +1,5 @@
+import { MetricsCollector } from '../metrics/MetricsCollector'
+
 export enum HTTPVerb {
   GET,
   PUT,
@@ -12,4 +14,6 @@ export class Operation {
   }
 
   private constructor(public readonly verb: HTTPVerb, public readonly path: string) {}
+
+  public accept(collector: MetricsCollector): void {}
 }
