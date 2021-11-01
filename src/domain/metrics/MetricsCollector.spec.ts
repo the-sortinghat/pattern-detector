@@ -71,6 +71,23 @@ describe(MetricsCollector, () => {
     })
   })
 
+  describe('collectFromDatabaseUsage', () => {
+    let usage: DatabaseUsage
+    let database: Database
+
+    beforeEach(() => {
+      const from = Service.create('mock')
+      database = Database.create('MockDB')
+      database.accept = jest.fn()
+      usage = DatabaseUsage.create(from, database)
+      collector.collectFromDatabaseUsage(usage)
+    })
+
+    it('visits the services of the system', () => {
+      expect(database.accept).toHaveBeenCalledWith(collector)
+    })
+  })
+
   describe('collectFromDatabase', () => {
     let database: Database
 

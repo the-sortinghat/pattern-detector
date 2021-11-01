@@ -1,6 +1,7 @@
 import { randomUUID as uuid } from 'crypto'
 import { DatabaseUsage } from './DatabaseUsage'
 import { MeasuresVessel } from '../metrics/MeasuresVessel'
+import { MetricsCollector } from '../metrics/MetricsCollector'
 
 export class Database {
   static create(make: string): Database {
@@ -21,4 +22,6 @@ export class Database {
   public get usages(): DatabaseUsage[] {
     return Object.assign([], this._usages)
   }
+
+  public accept(collector: MetricsCollector): void {}
 }

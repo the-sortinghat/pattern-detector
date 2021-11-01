@@ -27,6 +27,10 @@ export class MetricsCollector {
     })
   }
 
+  collectFromDatabaseUsage(usage: DatabaseUsage): void {
+    usage.ofDatabase.accept(this)
+  }
+
   collectFromDatabase(database: Database): void {
     database.usages.forEach(() => database.measuresVessel.increment(Metrics.nUsageClients))
   }
