@@ -1,5 +1,5 @@
 import { randomUUID as uuid } from 'crypto'
-import { MetricsCollector } from '../metrics/MetricsCollector'
+import { IVisitor } from 'domain/utils/visitor.interface'
 import { Service } from './Service'
 
 export class System {
@@ -21,7 +21,7 @@ export class System {
     return Object.assign([], this._services)
   }
 
-  public accept(collector: MetricsCollector): void {
-    collector.collectFromSystem(this)
+  public accept(visitor: IVisitor): void {
+    visitor.visitSystem(this)
   }
 }

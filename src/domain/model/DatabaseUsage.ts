@@ -1,4 +1,4 @@
-import { MetricsCollector } from '../metrics/MetricsCollector'
+import { IVisitor } from 'domain/utils/visitor.interface'
 import { Database } from './Database'
 import { Service } from './Service'
 
@@ -12,7 +12,7 @@ export class DatabaseUsage {
     ofDatabase.addUsage(this)
   }
 
-  public accept(collector: MetricsCollector): void {
-    collector.collectFromDatabaseUsage(this)
+  public accept(visitor: IVisitor): void {
+    visitor.visitDatabaseUsage(this)
   }
 }

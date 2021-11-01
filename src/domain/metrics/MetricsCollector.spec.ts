@@ -12,7 +12,7 @@ describe(MetricsCollector, () => {
     collector = MetricsCollector.create()
   })
 
-  describe('collectFromSystem', () => {
+  describe('visitSystem', () => {
     let system: System
     let mockedService: Service
 
@@ -21,7 +21,7 @@ describe(MetricsCollector, () => {
       mockedService = Service.create('TotalMock')
       mockedService.accept = jest.fn()
       system.addService(mockedService)
-      collector.collectFromSystem(system)
+      collector.visitSystem(system)
     })
 
     it('visits the services of the system', () => {
@@ -29,7 +29,7 @@ describe(MetricsCollector, () => {
     })
   })
 
-  describe('collectFromService', () => {
+  describe('visitService', () => {
     let service: Service
     let operation: Operation
     let dbUsage: DatabaseUsage
@@ -47,7 +47,7 @@ describe(MetricsCollector, () => {
       operation.accept = jest.fn()
       dbUsage.accept = jest.fn()
 
-      collector.collectFromService(service)
+      collector.visitService(service)
     })
 
     it('visits the operations of the service', () => {
@@ -71,7 +71,7 @@ describe(MetricsCollector, () => {
     })
   })
 
-  describe('collectFromDatabaseUsage', () => {
+  describe('visitDatabaseUsage', () => {
     let usage: DatabaseUsage
     let database: Database
 
@@ -80,7 +80,7 @@ describe(MetricsCollector, () => {
       database = Database.create('MockDB')
       database.accept = jest.fn()
       usage = DatabaseUsage.create(from, database)
-      collector.collectFromDatabaseUsage(usage)
+      collector.visitDatabaseUsage(usage)
     })
 
     it('visits the services of the system', () => {
@@ -88,14 +88,14 @@ describe(MetricsCollector, () => {
     })
   })
 
-  describe('collectFromDatabase', () => {
+  describe('visitDatabase', () => {
     let database: Database
 
     beforeEach(() => {
       database = Database.create('MockDB')
       const from = Service.create('from')
       DatabaseUsage.create(from, database)
-      collector.collectFromDatabase(database)
+      collector.visitDatabase(database)
     })
 
     it('marks the metrics vessel of the database with nUsageClients = 1', () => {

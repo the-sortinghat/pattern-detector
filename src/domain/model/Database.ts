@@ -1,7 +1,7 @@
 import { randomUUID as uuid } from 'crypto'
 import { DatabaseUsage } from './DatabaseUsage'
 import { MeasuresVessel } from '../metrics/MeasuresVessel'
-import { MetricsCollector } from '../metrics/MetricsCollector'
+import { IVisitor } from 'domain/utils/visitor.interface'
 
 export class Database {
   static create(make: string): Database {
@@ -23,7 +23,7 @@ export class Database {
     return Object.assign([], this._usages)
   }
 
-  public accept(collector: MetricsCollector): void {
-    collector.collectFromDatabase(this)
+  public accept(visitor: IVisitor): void {
+    visitor.visitDatabase(this)
   }
 }

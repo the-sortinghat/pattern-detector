@@ -1,4 +1,4 @@
-import { MetricsCollector } from '../metrics/MetricsCollector'
+import { IVisitor } from '../utils/visitor.interface'
 
 export enum HTTPVerb {
   GET,
@@ -15,5 +15,5 @@ export class Operation {
 
   private constructor(public readonly verb: HTTPVerb, public readonly path: string) {}
 
-  public accept(collector: MetricsCollector): void {}
+  public accept(visitor: IVisitor): void {}
 }

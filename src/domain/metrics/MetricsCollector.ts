@@ -1,3 +1,4 @@
+import { IVisitor } from '../utils/visitor.interface'
 import { Database } from '../model/Database'
 import { DatabaseUsage } from '../model/DatabaseUsage'
 import { Operation } from '../model/Operation'
@@ -5,18 +6,18 @@ import { Service } from '../model/Service'
 import { System } from '../model/System'
 import { Metrics } from './MeasuresVessel'
 
-export class MetricsCollector {
+export class MetricsCollector implements IVisitor {
   static create(): MetricsCollector {
     return new MetricsCollector()
   }
 
   protected constructor() {}
 
-  collectFromSystem(system: System): void {
+  visitSystem(system: System): void {
     system.services.forEach((svc: Service) => svc.accept(this))
   }
 
-  collectFromService(service: Service): void {
+  visitService(service: Service): void {
     service.operations.forEach((op: Operation) => {
       service.measuresVessel.increment(Metrics.nOperations)
       op.accept(this)
@@ -27,11 +28,13 @@ export class MetricsCollector {
     })
   }
 
-  collectFromDatabaseUsage(usage: DatabaseUsage): void {
+  visitDatabaseUsage(usage: DatabaseUsage): void {
     usage.ofDatabase.accept(this)
   }
 
-  collectFromDatabase(database: Database): void {
+  visitDatabase(database: Database): void {
     database.usages.forEach(() => database.measuresVessel.increment(Metrics.nUsageClients))
   }
+
+  visitOperation(operation: Operation): void {}
 }
