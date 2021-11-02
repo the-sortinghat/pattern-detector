@@ -1,4 +1,4 @@
-import { Message } from 'kafka-node'
+import { KafkaController } from './reactive/KafkaController'
 import { Kafka } from './reactive/Kafka'
 
 const kafka = Kafka.inst
@@ -6,11 +6,11 @@ const kafka = Kafka.inst
 const consumer = kafka.createConsumer('hackathon')
 const producer = kafka.createProducer()
 
-consumer.on('message', (msg: Message) => {
-  console.log(JSON.parse(msg.value as string))
-})
+const kafkaCtrl = new KafkaController()
 
-consumer.on('error', (err) => console.log(err))
+consumer.on('message', kafkaCtrl.printMessage.bind(kafkaCtrl))
+
+consumer.on('error', kafkaCtrl.printError.bind(kafkaCtrl))
 
 function newMessage(topic: string, payload: Record<string, any>) {
   return {
