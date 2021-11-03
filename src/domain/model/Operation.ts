@@ -25,5 +25,7 @@ export class Operation {
 
   private constructor(public readonly verb: HTTPVerb, public readonly path: string) {}
 
-  public accept(visitor: IVisitor): void {}
+  public accept(visitor: IVisitor): void {
+    visitor.visitOperation(this)
+  }
 }
