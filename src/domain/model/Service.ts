@@ -3,9 +3,14 @@ import { DatabaseUsage } from './DatabaseUsage'
 import { MeasuresVessel } from '../metrics/MeasuresVessel'
 import { Operation } from './Operation'
 import { IVisitor } from 'domain/utils/Visitor.interface'
+import { InvalidStateError } from './errors/InvalidStateError'
 
 export class Service {
   static create(name: string): Service {
+    if (!name) throw new InvalidStateError('service name cannot be blank or undefined')
+    // @ts-ignore
+    const isString = typeof name === 'string' || name instanceof String
+    if (!isString) throw new InvalidStateError('service name must be a string')
     return new Service(name)
   }
 

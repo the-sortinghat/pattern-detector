@@ -1,3 +1,4 @@
+import { InvalidStateError } from './errors/InvalidStateError'
 import { Database } from './Database'
 import { DatabaseUsage } from './DatabaseUsage'
 import { MeasuresVessel } from '../metrics/MeasuresVessel'
@@ -21,6 +22,27 @@ describe(Database, () => {
 
     it('returns a Database with ID', () => {
       expect(database.id).toBeDefined()
+    })
+  })
+
+  describe('create with invalid names throwing InvalidStateError', () => {
+    test('when name is undefined', () => {
+      // @ts-ignore
+      expect(() => Database.create(undefined)).toThrowError(InvalidStateError)
+    })
+
+    test('when name is null', () => {
+      // @ts-ignore
+      expect(() => Database.create(null)).toThrowError(InvalidStateError)
+    })
+
+    test('when name is not a string', () => {
+      // @ts-ignore
+      expect(() => Database.create(4)).toThrowError(InvalidStateError)
+    })
+
+    test('when name is empty string', () => {
+      expect(() => Database.create('')).toThrowError(InvalidStateError)
     })
   })
 

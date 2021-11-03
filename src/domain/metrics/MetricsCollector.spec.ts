@@ -36,7 +36,7 @@ describe(MetricsCollector, () => {
 
     beforeEach(() => {
       service = Service.create('Target')
-      operation = Operation.create(HTTPVerb.GET, 'foo')
+      operation = Operation.create(HTTPVerb.GET, '/foo')
       service.addOperation(operation)
 
       const database = Database.create('MockDB')

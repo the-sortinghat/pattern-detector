@@ -1,9 +1,14 @@
 import { randomUUID as uuid } from 'crypto'
 import { IVisitor } from 'domain/utils/Visitor.interface'
+import { InvalidStateError } from './errors/InvalidStateError'
 import { Service } from './Service'
 
 export class System {
   static create(name: string): System {
+    if (!name) throw new InvalidStateError('System name cannot be blank or undefined')
+    // @ts-ignore
+    const isString = typeof name === 'string' || name instanceof String
+    if (!isString) throw new InvalidStateError('System name must be a string')
     return new System(name)
   }
 

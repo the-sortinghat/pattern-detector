@@ -37,7 +37,7 @@ describe(PatternDetector, () => {
 
     beforeEach(() => {
       service = Service.create('target')
-      op = Operation.create(HTTPVerb.GET, 'foo')
+      op = Operation.create(HTTPVerb.GET, '/foo')
       op.accept = jest.fn()
       service.addOperation(op)
       const database = Database.create('MockDB')

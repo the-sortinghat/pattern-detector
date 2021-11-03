@@ -1,3 +1,4 @@
+import { InvalidStateError } from './errors/InvalidStateError'
 import { Database } from './Database'
 import { DatabaseUsage } from './DatabaseUsage'
 import { MeasuresVessel } from '../metrics/MeasuresVessel'
@@ -22,6 +23,27 @@ describe(Service, () => {
 
     it('returns a Service with ID', () => {
       expect(service.id).toBeDefined()
+    })
+  })
+
+  describe('create with invalid names throwing InvalidStateError', () => {
+    test('when name is undefined', () => {
+      // @ts-ignore
+      expect(() => Service.create(undefined)).toThrowError(InvalidStateError)
+    })
+
+    test('when name is null', () => {
+      // @ts-ignore
+      expect(() => Service.create(null)).toThrowError(InvalidStateError)
+    })
+
+    test('when name is not a string', () => {
+      // @ts-ignore
+      expect(() => Service.create(4)).toThrowError(InvalidStateError)
+    })
+
+    test('when name is empty string', () => {
+      expect(() => Service.create('')).toThrowError(InvalidStateError)
     })
   })
 

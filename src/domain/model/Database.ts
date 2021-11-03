@@ -1,3 +1,4 @@
+import { InvalidStateError } from './errors/InvalidStateError'
 import { randomUUID as uuid } from 'crypto'
 import { DatabaseUsage } from './DatabaseUsage'
 import { MeasuresVessel } from '../metrics/MeasuresVessel'
@@ -5,6 +6,11 @@ import { IVisitor } from 'domain/utils/Visitor.interface'
 
 export class Database {
   static create(make: string): Database {
+    if (!make) throw new InvalidStateError('service make cannot be blank or undefined')
+    // @ts-ignore
+    const isString = typeof make === 'string' || make instanceof String
+    if (!isString) throw new InvalidStateError('service make must be a string')
+
     return new Database(make)
   }
 

@@ -1,3 +1,4 @@
+import { InvalidStateError } from './errors/InvalidStateError'
 import { Service } from './Service'
 import { System } from './System'
 
@@ -19,6 +20,27 @@ describe(System, () => {
 
     it('returns a System with ID', () => {
       expect(system.id).toBeDefined()
+    })
+  })
+
+  describe('create with invalid names throwing InvalidStateError', () => {
+    test('when name is undefined', () => {
+      // @ts-ignore
+      expect(() => System.create(undefined)).toThrowError(InvalidStateError)
+    })
+
+    test('when name is null', () => {
+      // @ts-ignore
+      expect(() => System.create(null)).toThrowError(InvalidStateError)
+    })
+
+    test('when name is not a string', () => {
+      // @ts-ignore
+      expect(() => System.create(4)).toThrowError(InvalidStateError)
+    })
+
+    test('when name is empty string', () => {
+      expect(() => System.create('')).toThrowError(InvalidStateError)
     })
   })
 
