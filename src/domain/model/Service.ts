@@ -6,12 +6,12 @@ import { IVisitor } from 'domain/utils/Visitor.interface'
 import { InvalidStateError } from './errors/InvalidStateError'
 
 export class Service {
-  static create(name: string): Service {
+  static create(name: string, id: string | undefined = undefined): Service {
     if (!name) throw new InvalidStateError('service name cannot be blank or undefined')
     // @ts-ignore
     const isString = typeof name === 'string' || name instanceof String
     if (!isString) throw new InvalidStateError('service name must be a string')
-    return new Service(name)
+    return new Service(name, id)
   }
 
   protected ops: Operation[]
