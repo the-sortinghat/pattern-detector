@@ -5,6 +5,11 @@ import { Database } from '../model/Database'
 import { DatabaseUsage } from '../model/DatabaseUsage'
 import { IVisitor } from '../utils/Visitor.interface'
 
+export interface IDatabasePerServiceResult {
+  serviceID: string
+  databaseID: string
+}
+
 export class DatabasePerServiceDetector implements IVisitor {
   public static readonly maxOperationsThreshold = 10
 
@@ -14,7 +19,7 @@ export class DatabasePerServiceDetector implements IVisitor {
 
   private svcCandidates: Service[]
   private dbCandidates: Database[]
-  private _results: any[] | undefined
+  private _results: IDatabasePerServiceResult[] | undefined
 
   private constructor() {
     this.svcCandidates = []
@@ -72,7 +77,7 @@ export class DatabasePerServiceDetector implements IVisitor {
     }
   }
 
-  public get results(): any[] | undefined {
+  public get results(): IDatabasePerServiceResult[] | undefined {
     return this._results
   }
 }
