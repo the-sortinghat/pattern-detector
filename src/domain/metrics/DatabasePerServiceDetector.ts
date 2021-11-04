@@ -14,14 +14,18 @@ export class DatabasePerServiceDetector implements IVisitor {
 
   private svcCandidates: Service[]
   private dbCandidates: Database[]
+  private _results: any[] | undefined
 
   private constructor() {
     this.svcCandidates = []
     this.dbCandidates = []
+    this._results = undefined
   }
 
   public visitSystem(system: System): void {
     system.services.forEach((svc: Service) => svc.accept(this))
+
+    this.composeResults()
   }
 
   public visitService(svc: Service): void {
@@ -47,7 +51,28 @@ export class DatabasePerServiceDetector implements IVisitor {
   }
 
   public addCandidate(candidate: Service | Database): void {
-    if (candidate instanceof Service) this.svcCandidates.push(candidate)
-    else if (candidate instanceof Database) this.dbCandidates.push(candidate)
+    if (candidate instanceof Service) this.svcCandidates.push(candidate as Service)
+    else if (candidate instanceof Database) this.dbCandidates.push(candidate as Database)
+  }
+
+  public composeResults(): void {
+    this._results = []
+
+    while (this.svcCandidates.length > 0) {
+      const svc = this.svcCandidates.pop() as Service
+
+      const dbCandidateIndex = this.dbCandidates.findIndex((db: Database) =>
+        db.usages.some((usage: DatabaseUsage) => usage.fromService.id === svc.id),
+      )
+
+      if (dbCandidateIndex >= 0) {
+        const [db] = this.dbCandidates.splice(dbCandidateIndex, 1)
+        this._results.push({ serviceID: svc.id, databaseID: db.id })
+      }
+    }
+  }
+
+  public get results(): any[] | undefined {
+    return this._results
   }
 }
