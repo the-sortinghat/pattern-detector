@@ -9,6 +9,12 @@ services:
       - ./:/usr/src/app
     env_file:
       - .env
+    depends_on:
+      - kafka-topics-generator
+      - db
+
+  db:
+    image: mongo:4.4.1-bionic
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest

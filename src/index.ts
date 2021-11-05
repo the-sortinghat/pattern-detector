@@ -1,7 +1,8 @@
 import { KafkaController } from './application/reactive/KafkaController'
 import { Kafka } from './application/reactive/Kafka'
 import { ISystemRepository } from './domain/utils/SystemRepository.interface'
-import { System } from 'domain/model/System'
+import { System } from './domain/model/System'
+import { setupDB } from './application/database/Mongo'
 
 const kafka = Kafka.inst
 
@@ -27,7 +28,17 @@ class InMemorySystemRepository implements ISystemRepository {
       }
     })
   }
+
+  public findOne(sID: string): Promise<System> {
+    const sys = this.systems.find(({ id }: System) => id === sID)
+    return new Promise((res, rej) => {
+      if (!sys) rej('not found')
+      else res(sys)
+    })
+  }
 }
+
+setupDB()
 
 const kafkaCtrl = new KafkaController(new InMemorySystemRepository())
 
