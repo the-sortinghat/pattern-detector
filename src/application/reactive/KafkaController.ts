@@ -1,11 +1,11 @@
 import { Message } from 'kafka-node'
 
-import { ISystemRepository } from '../domain/utils/SystemRepository.interface'
-import { InvalidStateError } from '../domain/model/errors/InvalidStateError'
-import { System } from '../domain/model/System'
-import { Service } from '../domain/model/Service'
-import { Database } from '../domain/model/Database'
-import { HTTPVerb, Operation } from '../domain/model/Operation'
+import { ISystemRepository } from '../../domain/utils/SystemRepository.interface'
+import { InvalidStateError } from '../../domain/model/errors/InvalidStateError'
+import { System } from '../../domain/model/System'
+import { Service } from '../../domain/model/Service'
+import { Database } from '../../domain/model/Database'
+import { HTTPVerb, Operation } from '../../domain/model/Operation'
 
 export class KafkaController {
   constructor(private readonly systemRepository: ISystemRepository) {}

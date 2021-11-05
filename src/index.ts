@@ -1,5 +1,5 @@
-import { KafkaController } from './reactive/KafkaController'
-import { Kafka } from './reactive/Kafka'
+import { KafkaController } from './application/reactive/KafkaController'
+import { Kafka } from './application/reactive/Kafka'
 import { ISystemRepository } from './domain/utils/SystemRepository.interface'
 import { System } from 'domain/model/System'
 
