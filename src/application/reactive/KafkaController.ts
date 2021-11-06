@@ -6,9 +6,16 @@ import { System } from '../../domain/model/System'
 import { Service } from '../../domain/model/Service'
 import { Database } from '../../domain/model/Database'
 import { HTTPVerb, Operation } from '../../domain/model/Operation'
+import { DatabaseUsage } from '../../domain/model/DatabaseUsage'
+import { IServiceDAO } from '../utils/ServiceDAO.interface'
+import { IDatabaseDAO } from '../utils/DatabaseDAO.interface'
 
 export class KafkaController {
-  constructor(private readonly systemRepository: ISystemRepository) {}
+  constructor(
+    private readonly systemRepository: ISystemRepository,
+    private readonly serviceDAO: IServiceDAO,
+    private readonly databaseDAO: IDatabaseDAO,
+  ) {}
   public printMessage(msgString: Message): void {
     const msg = this.parseMessageValue(msgString)
     console.log(msg)
@@ -34,7 +41,7 @@ export class KafkaController {
       const system = await this.systemRepository.findOne(systemID)
       const service = Service.create(name, id)
       system.addService(service)
-      await this.systemRepository.update(system.id, system)
+      await this.systemRepository.save(system)
     } catch (e) {
       if (e instanceof InvalidStateError) console.log(e)
     }
@@ -45,11 +52,9 @@ export class KafkaController {
     try {
       const actualVerb = this.parseVerb(verb)
       const operation = Operation.create(actualVerb, path)
-      console.log(operation)
-      console.log(serviceID)
-      // find service by id
-      // plug op to service
-      // update system
+      const { system, service } = await this.serviceDAO.findOne(serviceID)
+      service.addOperation(operation)
+      await this.systemRepository.save(system)
     } catch (e) {
       if (e instanceof InvalidStateError) console.log(e.message)
     }
@@ -59,8 +64,7 @@ export class KafkaController {
     const { make, id } = this.parseMessageValue(msgString)
     try {
       const database = Database.create(make, id)
-      console.log(database)
-      // how to persist this?
+      await this.databaseDAO.store(database)
     } catch (e) {
       if (e instanceof InvalidStateError) console.log(e.message)
     }
@@ -69,10 +73,10 @@ export class KafkaController {
   public async createDatabaseUsage(msgString: Message): Promise<void> {
     const { serviceID, databaseID } = this.parseMessageValue(msgString)
     try {
-      console.log(serviceID, databaseID)
-      // find service by id
-      // find database by id
-      // create DatabaseUsage
+      const { system, service } = await this.serviceDAO.findOne(serviceID)
+      const database = await this.databaseDAO.findOne(databaseID)
+      DatabaseUsage.create(service, database)
+      await this.systemRepository.save(system)
     } catch (e) {
       if (e instanceof InvalidStateError) console.log(e.message)
     }
