@@ -10,6 +10,6 @@ export interface IScopedService {
 
 export interface IServiceDAO {
   findOne: (serviceID: string) => Promise<IScopedService>
-  store: (service: Service, systemID: string) => Promise<void>
   docToService: (doc: Document) => Service
+  serviceToDoc: (service: Service) => any
 }

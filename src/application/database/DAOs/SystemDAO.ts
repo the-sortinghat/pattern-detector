@@ -12,8 +12,9 @@ export class SystemDAO implements ISystemDAO {
     this.systemCollection = db.collection('systems')
   }
 
-  store(system: System): Promise<void> {
-    throw new Error('not implemented')
+  public async store(system: System): Promise<void> {
+    const sysDoc = this.systemToDoc(system)
+    await this.systemCollection.updateOne({ uuid: system.id }, sysDoc, { upsert: true })
   }
 
   public async findOne(id: string): Promise<System> {
@@ -32,5 +33,13 @@ export class SystemDAO implements ISystemDAO {
       .forEach((svc: Service) => sys.addService(svc))
 
     return sys
+  }
+
+  public systemToDoc(system: System): any {
+    return {
+      name: system.name,
+      uuid: system.id,
+      services: system.services.map((svc: Service): any => this.svcDao.serviceToDoc(svc)),
+    }
   }
 }

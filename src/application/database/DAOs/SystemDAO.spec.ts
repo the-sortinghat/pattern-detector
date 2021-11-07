@@ -1,6 +1,7 @@
 import { SystemDAO } from './SystemDAO'
 import { IServiceDAO } from '../../utils/ServiceDAO.interface'
 import { System } from '../../../domain/model/System'
+import { Service } from '../../../domain/model/Service'
 
 interface SystemMockConfig {
   services: boolean
@@ -8,6 +9,7 @@ interface SystemMockConfig {
 
 interface MockedCollection {
   findOne: jest.Mock
+  updateOne: jest.Mock
 }
 
 function generateSystemDocument({ services }: SystemMockConfig) {
@@ -22,17 +24,26 @@ function generateSystemDocument({ services }: SystemMockConfig) {
   }
 }
 
+function generateSystem({ services }: SystemMockConfig): System {
+  const system = System.create('Mock System', 'fake uuid')
+
+  if (services) system.addService(Service.create('Mock Service', 'fake uuid'))
+
+  return system
+}
+
 function generateMockServiceDAO(): IServiceDAO {
   return {
-    store: jest.fn(),
     findOne: jest.fn(),
     docToService: jest.fn(),
+    serviceToDoc: jest.fn(),
   }
 }
 
 function generateMockCollection(): MockedCollection {
   return {
     findOne: jest.fn(),
+    updateOne: jest.fn(),
   }
 }
 
@@ -63,6 +74,10 @@ describe(SystemDAO, () => {
         expect(system.name).toEqual(doc.name)
       })
 
+      it('converts uuid into id', () => {
+        expect(system.id).toEqual(doc.uuid)
+      })
+
       it('calls serviceDAO docToService', () => {
         expect(svcDao.docToService).toHaveBeenCalled()
       })
@@ -78,8 +93,48 @@ describe(SystemDAO, () => {
         expect(system.name).toEqual(doc.name)
       })
 
-      it('calls serviceDAO docToService', () => {
+      it('does not call serviceDAO docToService', () => {
         expect(svcDao.docToService).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('systemToDoc', () => {
+    let system: System
+    let doc: any
+
+    describe('with underneath services', () => {
+      beforeEach(() => {
+        system = generateSystem({ services: true })
+        doc = sysDao.systemToDoc(system)
+      })
+
+      it('returns the right entity structure', () => {
+        expect(doc.name).toEqual(system.name)
+      })
+
+      it('converts id to uuid', () => {
+        expect(doc.uuid).toEqual(system.id)
+        expect(doc.id).toBeUndefined()
+      })
+
+      it('calls serviceDAO serviceToDoc', () => {
+        expect(svcDao.serviceToDoc).toHaveBeenCalled()
+      })
+    })
+
+    describe('without underneath services', () => {
+      beforeEach(() => {
+        system = generateSystem({ services: false })
+        doc = sysDao.systemToDoc(system)
+      })
+
+      it('returns the right entity structure', () => {
+        expect(doc.name).toEqual(system.name)
+      })
+
+      it('does not call serviceDAO serviceToDoc', () => {
+        expect(svcDao.serviceToDoc).not.toHaveBeenCalled()
       })
     })
   })
@@ -122,6 +177,25 @@ describe(SystemDAO, () => {
     })
   })
 
-  describe.skip('systemToDoc', () => {})
-  describe.skip('store', () => {})
+  describe('store', () => {
+    let system: System
+    let mockDoc: any
+
+    beforeEach(async () => {
+      system = generateSystem({ services: true })
+      mockDoc = { uuid: system.id }
+      sysDao.systemToDoc = jest.fn((_system: System) => mockDoc)
+      await sysDao.store(system)
+    })
+
+    it('parses the system to document', () => {
+      expect(sysDao.systemToDoc).toHaveBeenCalled()
+    })
+
+    it('upserts into the collection', () => {
+      expect(mockCollection.updateOne).toHaveBeenCalledWith({ uuid: system.id }, mockDoc, {
+        upsert: true,
+      })
+    })
+  })
 })
