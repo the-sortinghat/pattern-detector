@@ -3,7 +3,7 @@ import { Collection, Db } from 'mongodb'
 import { Service } from '../../../domain/model/Service'
 import { System } from '../../../domain/model/System'
 import { IServiceDAO } from '../../utils/ServiceDAO.interface'
-import { ISystemDAO } from '../../utils/SystemDAO.interface'
+import { IScopedService, ISystemDAO } from '../../utils/SystemDAO.interface'
 
 export class SystemDAO implements ISystemDAO {
   private readonly systemCollection: Collection
@@ -23,6 +23,18 @@ export class SystemDAO implements ISystemDAO {
     if (!result) return Promise.reject(`not found - System ${id}`)
 
     return this.docToSystem(result)
+  }
+
+  public async findOneService(svcID: string): Promise<IScopedService> {
+    const result = await this.systemCollection.findOne({ services: { uuid: svcID } })
+
+    if (!result) return Promise.reject(`not found - System ${svcID}`)
+
+    const system = this.docToSystem(result)
+
+    const service = system.services.find((svc: Service) => svc.id === svcID) as Service
+
+    return { parentSystem: system, service }
   }
 
   public docToSystem(doc: any): System {

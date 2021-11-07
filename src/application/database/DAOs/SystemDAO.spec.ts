@@ -1,6 +1,7 @@
 import { SystemDAO } from './SystemDAO'
 import { IServiceDAO } from '../../utils/ServiceDAO.interface'
 import { System } from '../../../domain/model/System'
+import { Service } from '../../../domain/model/Service'
 
 import {
   IMockedCollection,
@@ -8,7 +9,9 @@ import {
   generateMockServiceDAO,
   generateSystem,
   generateSystemDocument,
+  generateMockOperationDAO,
 } from './TestHelpers'
+import { ServiceDAO } from './ServiceDAO'
 
 describe(SystemDAO, () => {
   let sysDao: SystemDAO
@@ -132,6 +135,62 @@ describe(SystemDAO, () => {
 
       it('returns the properly reconstruction of System', () => {
         expect(sys.name).toEqual(mockDoc.name)
+      })
+
+      it('calls the docToSystem parser', () => {
+        expect(sysDao.docToSystem).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('findOneService', () => {
+    describe('when its empty', () => {
+      beforeEach(() => {
+        mockCollection.findOne.mockReturnValueOnce(null)
+      })
+
+      it('throws an error when not found', () => {
+        expect(() => sysDao.findOneService('whatever')).rejects.toMatch('not found')
+      })
+    })
+
+    describe('when it find', () => {
+      let sys: System
+      let svc: Service
+      let mockDoc: any
+      const svcID = 'fake svc uuid'
+
+      beforeEach(async () => {
+        const trueSvcDao = new ServiceDAO(generateMockOperationDAO())
+        // @ts-expect-error
+        svcDao.docToService.mockImplementationOnce(trueSvcDao.docToService.bind(trueSvcDao))
+        const originalParser = sysDao.docToSystem
+        sysDao.docToSystem = jest.fn(originalParser.bind(sysDao))
+
+        mockDoc = {
+          name: 'Mock system',
+          uuid: 'mock uuid',
+          services: [
+            {
+              name: 'ACHOU O SERVICE',
+              uuid: svcID,
+              operations: [],
+            },
+          ],
+        }
+        mockCollection.findOne.mockReturnValueOnce(mockDoc)
+        const resp = await sysDao.findOneService(svcID)
+        sys = resp.parentSystem
+        svc = resp.service
+      })
+
+      it('returns an instance of System and of Service', () => {
+        expect(sys).toBeInstanceOf(System)
+        expect(svc).toBeInstanceOf(Service)
+      })
+
+      it('returns the properly reconstruction of System', () => {
+        expect(svc.name).toEqual(mockDoc.services[0].name)
       })
 
       it('calls the docToSystem parser', () => {
