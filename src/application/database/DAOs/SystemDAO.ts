@@ -26,7 +26,9 @@ export class SystemDAO implements ISystemDAO {
   }
 
   public async findOneService(svcID: string): Promise<IScopedService> {
-    const result = await this.systemCollection.findOne({ services: { uuid: svcID } })
+    const result = await this.systemCollection.findOne({
+      services: { $elemMatch: { uuid: svcID } },
+    })
 
     if (!result) return Promise.reject(`not found - System ${svcID}`)
 
