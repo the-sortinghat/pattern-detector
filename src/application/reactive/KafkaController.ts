@@ -7,13 +7,13 @@ import { Service } from '../../domain/model/Service'
 import { Database } from '../../domain/model/Database'
 import { HTTPVerb, Operation } from '../../domain/model/Operation'
 import { DatabaseUsage } from '../../domain/model/DatabaseUsage'
-import { IServiceDAO } from '../utils/ServiceDAO.interface'
 import { IDatabaseDAO } from '../utils/DatabaseDAO.interface'
+import { ISystemDAO } from '../utils/SystemDAO.interface'
 
 export class KafkaController {
   constructor(
     private readonly systemRepository: ISystemRepository,
-    private readonly serviceDAO: IServiceDAO,
+    private readonly systemDao: ISystemDAO,
     private readonly databaseDAO: IDatabaseDAO,
   ) {}
   public printMessage(msgString: Message): void {
@@ -52,7 +52,7 @@ export class KafkaController {
     try {
       const actualVerb = this.parseVerb(verb)
       const operation = Operation.create(actualVerb, path)
-      const { system, service } = await this.serviceDAO.findOne(serviceID)
+      const { parentSystem: system, service } = await this.systemDao.findOneService(serviceID)
       service.addOperation(operation)
       await this.systemRepository.save(system)
     } catch (e) {
@@ -73,7 +73,7 @@ export class KafkaController {
   public async createDatabaseUsage(msgString: Message): Promise<void> {
     const { serviceID, databaseID } = this.parseMessageValue(msgString)
     try {
-      const { system, service } = await this.serviceDAO.findOne(serviceID)
+      const { parentSystem: system, service } = await this.systemDao.findOneService(serviceID)
       const database = await this.databaseDAO.findOne(databaseID)
       DatabaseUsage.create(service, database)
       await this.systemRepository.save(system)
