@@ -1,56 +1,19 @@
 import { SystemDAO } from './SystemDAO'
 import { IServiceDAO } from '../../utils/ServiceDAO.interface'
 import { System } from '../../../domain/model/System'
-import { Service } from '../../../domain/model/Service'
 
-interface SystemMockConfig {
-  services: boolean
-}
-
-interface MockedCollection {
-  findOne: jest.Mock
-  updateOne: jest.Mock
-}
-
-function generateSystemDocument({ services }: SystemMockConfig) {
-  let svcs: any[] = []
-
-  if (services) svcs = [{ name: 'Mock Service', uuid: 'fake uuid' }]
-
-  return {
-    name: 'Mock Document',
-    uuid: 'fake uuid',
-    services: svcs,
-  }
-}
-
-function generateSystem({ services }: SystemMockConfig): System {
-  const system = System.create('Mock System', 'fake uuid')
-
-  if (services) system.addService(Service.create('Mock Service', 'fake uuid'))
-
-  return system
-}
-
-function generateMockServiceDAO(): IServiceDAO {
-  return {
-    findOne: jest.fn(),
-    docToService: jest.fn(),
-    serviceToDoc: jest.fn(),
-  }
-}
-
-function generateMockCollection(): MockedCollection {
-  return {
-    findOne: jest.fn(),
-    updateOne: jest.fn(),
-  }
-}
+import {
+  IMockedCollection,
+  generateMockCollection,
+  generateMockServiceDAO,
+  generateSystem,
+  generateSystemDocument,
+} from './TestHelpers'
 
 describe(SystemDAO, () => {
   let sysDao: SystemDAO
   let svcDao: IServiceDAO
-  let mockCollection: MockedCollection
+  let mockCollection: IMockedCollection
 
   beforeEach(() => {
     mockCollection = generateMockCollection()
