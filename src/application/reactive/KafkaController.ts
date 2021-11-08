@@ -1,12 +1,15 @@
 import { Message } from 'kafka-node'
 
-import { ISystemRepository } from '../../domain/utils/SystemRepository.interface'
-import { InvalidStateError } from '../../domain/model/errors/InvalidStateError'
-import { System } from '../../domain/model/System'
-import { Service } from '../../domain/model/Service'
-import { Database } from '../../domain/model/Database'
-import { Operation } from '../../domain/model/Operation'
-import { DatabaseUsage } from '../../domain/model/DatabaseUsage'
+import {
+  Database,
+  DatabaseUsage,
+  InvalidStateError,
+  ISystemRepository,
+  Operation,
+  Service,
+  System,
+} from '../../domain'
+
 import { IDatabaseDAO } from '../utils/DatabaseDAO.interface'
 import { ISystemDAO } from '../utils/SystemDAO.interface'
 import { OperationDAO } from '../database/DAOs/OperationDAO'

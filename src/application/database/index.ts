@@ -12,7 +12,7 @@ import { IOperationDAO } from '../utils/OperationDAO.interface'
 import { IServiceDAO } from '../utils/ServiceDAO.interface'
 import { IDatabaseDAO } from '../utils/DatabaseDAO.interface'
 import { ISystemDAO } from '../utils/SystemDAO.interface'
-import { ISystemRepository } from '../../domain/utils/SystemRepository.interface'
+import { ISystemRepository } from '../../domain'
 
 export interface IPersistenceSetup {
   db: Db

@@ -1,7 +1,7 @@
 import { Collection, Db } from 'mongodb'
 
-import { Service } from '../../../domain/model/Service'
-import { System } from '../../../domain/model/System'
+import { Service, System } from '../../../domain'
+
 import { IServiceDAO } from '../../utils/ServiceDAO.interface'
 import { IScopedService, ISystemDAO } from '../../utils/SystemDAO.interface'
 

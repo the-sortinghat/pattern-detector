@@ -1,5 +1,7 @@
 import { Collection, Db } from 'mongodb'
-import { Database } from '../../../domain/model/Database'
+
+import { Database } from '../../../domain'
+
 import { IDatabaseDAO } from '../../utils/DatabaseDAO.interface'
 
 export class DatabaseDAO implements IDatabaseDAO {

@@ -1,14 +1,12 @@
 import { Db, MongoClient } from 'mongodb'
+
 import { SystemDAO } from '../../src/application/database/DAOs/SystemDAO'
 import { ServiceDAO } from '../../src/application/database/DAOs/ServiceDAO'
 import { OperationDAO } from '../../src/application/database/DAOs/OperationDAO'
 import { DatabaseUsageDAO } from '../../src/application/database/DAOs/DatabaseUsageDAO'
 import { DatabaseDAO } from '../../src/application/database/DAOs/DatabaseDAO'
-import { System } from '../../src/domain/model/System'
-import { Service } from '../../src/domain/model/Service'
-import { HTTPVerb, Operation } from '../../src/domain/model/Operation'
-import { Database } from '../../src/domain/model/Database'
-import { DatabaseUsage } from '../../src/domain/model/DatabaseUsage'
+
+import { Database, DatabaseUsage, HTTPVerb, Operation, Service, System } from '../../src/domain'
 
 describe(SystemDAO, () => {
   let mongoClient: MongoClient

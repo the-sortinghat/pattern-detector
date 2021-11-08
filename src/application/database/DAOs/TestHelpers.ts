@@ -1,12 +1,9 @@
+import { Database, DatabaseUsage, HTTPVerb, Operation, Service, System } from '../../../domain'
+
 import { IServiceDAO } from '../../utils/ServiceDAO.interface'
-import { System } from '../../../domain/model/System'
-import { Service } from '../../../domain/model/Service'
 import { IOperationDAO } from '../../utils/OperationDAO.interface'
-import { HTTPVerb, Operation } from '../../../domain/model/Operation'
 import { IDatabaseUsageDAO } from '../../utils/DatabaseUsageDAO.interface'
 import { IDatabaseDAO } from '../../utils/DatabaseDAO.interface'
-import { Database } from '../../../domain/model/Database'
-import { DatabaseUsage } from '../../../domain/model/DatabaseUsage'
 
 export interface ISystemMockConfig {
   services: boolean

@@ -1,4 +1,5 @@
-import { HTTPVerb, Operation } from '../../../domain/model/Operation'
+import { HTTPVerb, Operation } from '../../../domain'
+
 import { OperationDAO } from './OperationDAO'
 import { generateGetOperationDocument, generateGetOperation } from './TestHelpers'
 

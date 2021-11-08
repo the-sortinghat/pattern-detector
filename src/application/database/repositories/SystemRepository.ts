@@ -1,5 +1,5 @@
-import { ISystemRepository } from '../../../domain/utils/SystemRepository.interface'
-import { System } from '../../../domain/model/System'
+import { ISystemRepository } from '../../../domain'
+import { System } from '../../../domain'
 import { ISystemDAO } from '../../utils/SystemDAO.interface'
 
 export class SystemRepository implements ISystemRepository {

@@ -1,8 +1,8 @@
-import { SystemDAO } from './SystemDAO'
-import { IServiceDAO } from '../../utils/ServiceDAO.interface'
-import { System } from '../../../domain/model/System'
-import { Service } from '../../../domain/model/Service'
+import { Service, System } from '../../../domain'
 
+import { SystemDAO } from './SystemDAO'
+import { ServiceDAO } from './ServiceDAO'
+import { IServiceDAO } from '../../utils/ServiceDAO.interface'
 import {
   IMockedCollection,
   generateMockCollection,
@@ -12,7 +12,6 @@ import {
   generateMockOperationDAO,
   generateMockDatabaseUsageDAO,
 } from './TestHelpers'
-import { ServiceDAO } from './ServiceDAO'
 
 describe(SystemDAO, () => {
   let sysDao: SystemDAO

@@ -1,4 +1,5 @@
-import { Database } from '../../../domain/model/Database'
+import { Database } from '../../../domain'
+
 import { DatabaseDAO } from './DatabaseDAO'
 import {
   IMockedCollection,

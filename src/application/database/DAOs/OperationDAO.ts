@@ -1,4 +1,5 @@
-import { Operation, HTTPVerb } from '../../../domain/model/Operation'
+import { Operation, HTTPVerb } from '../../../domain'
+
 import { IOperationDAO } from '../../utils/OperationDAO.interface'
 
 export class OperationDAO implements IOperationDAO {

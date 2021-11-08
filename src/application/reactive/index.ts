@@ -1,6 +1,7 @@
+import { ISystemRepository } from '../../domain'
+
 import { IDatabaseDAO } from '../utils/DatabaseDAO.interface'
 import { ISystemDAO } from '../utils/SystemDAO.interface'
-import { ISystemRepository } from '../../domain/utils/SystemRepository.interface'
 import { Kafka } from './Kafka'
 import { KafkaController } from './KafkaController'
 

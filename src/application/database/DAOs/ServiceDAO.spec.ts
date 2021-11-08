@@ -1,5 +1,6 @@
+import { Service } from '../../../domain'
+
 import { IDatabaseUsageDAO } from '../../utils/DatabaseUsageDAO.interface'
-import { Service } from '../../../domain/model/Service'
 import { IOperationDAO } from '../../utils/OperationDAO.interface'
 import { ServiceDAO } from './ServiceDAO'
 import {

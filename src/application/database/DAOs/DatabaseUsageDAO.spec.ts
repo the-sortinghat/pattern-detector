@@ -1,6 +1,6 @@
-import { IDatabaseDAO } from 'application/utils/DatabaseDAO.interface'
-import { Database } from '../../../domain/model/Database'
-import { DatabaseUsage } from '../../../domain/model/DatabaseUsage'
+import { Database, DatabaseUsage } from '../../../domain'
+
+import { IDatabaseDAO } from '../../utils/DatabaseDAO.interface'
 import { DatabaseUsageDAO } from './DatabaseUsageDAO'
 import {
   generateDatabaseUsageDoc,

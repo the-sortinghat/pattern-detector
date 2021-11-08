@@ -1,6 +1,6 @@
+import { DatabaseUsage, Service } from '../../../domain'
+
 import { IDatabaseDAO } from '../../utils/DatabaseDAO.interface'
-import { DatabaseUsage } from '../../../domain/model/DatabaseUsage'
-import { Service } from '../../../domain/model/Service'
 import { IDatabaseUsageDAO } from '../../utils/DatabaseUsageDAO.interface'
 
 export class DatabaseUsageDAO implements IDatabaseUsageDAO {

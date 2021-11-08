@@ -1,9 +1,8 @@
+import { DatabaseUsage, Operation, Service } from '../../../domain'
+
 import { IOperationDAO } from '../../utils/OperationDAO.interface'
 import { IServiceDAO } from '../../utils/ServiceDAO.interface'
-import { Service } from '../../../domain/model/Service'
-import { Operation } from '../../../domain/model/Operation'
 import { IDatabaseUsageDAO } from '../../utils/DatabaseUsageDAO.interface'
-import { DatabaseUsage } from '../../../domain/model/DatabaseUsage'
 
 export class ServiceDAO implements IServiceDAO {
   constructor(
