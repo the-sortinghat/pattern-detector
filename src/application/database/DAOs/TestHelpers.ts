@@ -61,6 +61,13 @@ export function generateDatabaseUsageDoc(): string {
   return 'fake db uuid'
 }
 
+export function generateDatabaseDocument(): any {
+  return {
+    make: 'mock db',
+    uuid: 'fake db uuid',
+  }
+}
+
 export function generateSystem({ services }: ISystemMockConfig): System {
   const system = System.create('Mock System', 'fake uuid')
 
@@ -91,6 +98,10 @@ export function generateDatabaseUsage(): DatabaseUsage {
     Service.create('mock service', 'fake svc uuid'),
     Database.create('mock db', 'fake db uuid'),
   )
+}
+
+export function generateDatabase(): Database {
+  return Database.create('mock db', 'fake db uuid')
 }
 
 export function generateMockServiceDAO(): IServiceDAO {
