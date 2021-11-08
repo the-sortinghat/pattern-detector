@@ -219,9 +219,13 @@ describe(SystemDAO, () => {
     })
 
     it('upserts into the collection', () => {
-      expect(mockCollection.updateOne).toHaveBeenCalledWith({ uuid: system.id }, mockDoc, {
-        upsert: true,
-      })
+      expect(mockCollection.updateOne).toHaveBeenCalledWith(
+        { uuid: system.id },
+        { $set: mockDoc },
+        {
+          upsert: true,
+        },
+      )
     })
   })
 })

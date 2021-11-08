@@ -14,7 +14,7 @@ export class SystemDAO implements ISystemDAO {
 
   public async store(system: System): Promise<void> {
     const sysDoc = this.systemToDoc(system)
-    await this.systemCollection.updateOne({ uuid: system.id }, sysDoc, { upsert: true })
+    await this.systemCollection.updateOne({ uuid: system.id }, { $set: sysDoc }, { upsert: true })
   }
 
   public async findOne(id: string): Promise<System> {
