@@ -10,6 +10,8 @@ import {
   generateSystem,
   generateSystemDocument,
   generateMockOperationDAO,
+  generateMockDatabaseUsageDAO,
+  generateMockDatabaseDAO,
 } from './TestHelpers'
 import { ServiceDAO } from './ServiceDAO'
 
@@ -31,9 +33,9 @@ describe(SystemDAO, () => {
     let doc: any
 
     describe('with underneath services', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         doc = generateSystemDocument({ services: true })
-        system = sysDao.docToSystem(doc)
+        system = await sysDao.docToSystem(doc)
       })
 
       it('returns the right entity structure', () => {
@@ -50,9 +52,9 @@ describe(SystemDAO, () => {
     })
 
     describe('without underneath services', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         doc = generateSystemDocument({ services: false })
-        system = sysDao.docToSystem(doc)
+        system = await sysDao.docToSystem(doc)
       })
 
       it('returns the right entity structure', () => {
@@ -161,7 +163,11 @@ describe(SystemDAO, () => {
       const svcID = 'fake svc uuid'
 
       beforeEach(async () => {
-        const trueSvcDao = new ServiceDAO(generateMockOperationDAO())
+        const trueSvcDao = new ServiceDAO(
+          generateMockOperationDAO(),
+          generateMockDatabaseUsageDAO(),
+          generateMockDatabaseDAO(),
+        )
         // @ts-expect-error
         svcDao.docToService.mockImplementationOnce(trueSvcDao.docToService.bind(trueSvcDao))
         const originalParser = sysDao.docToSystem

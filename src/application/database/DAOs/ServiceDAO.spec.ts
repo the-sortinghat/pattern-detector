@@ -1,25 +1,69 @@
+import { IDatabaseUsageDAO } from '../../utils/DatabaseUsageDAO.interface'
 import { Service } from '../../../domain/model/Service'
 import { IOperationDAO } from '../../utils/OperationDAO.interface'
 import { ServiceDAO } from './ServiceDAO'
-import { generateMockOperationDAO, generateService, generateServiceDocument } from './TestHelpers'
+import { IDatabaseDAO } from '../../utils/DatabaseDAO.interface'
+import { Database } from '../../../domain/model/Database'
+import {
+  generateMockDatabaseDAO,
+  generateMockDatabaseUsageDAO,
+  generateMockOperationDAO,
+  generateService,
+  generateServiceDocument,
+} from './TestHelpers'
 
 describe(ServiceDAO, () => {
   let svcDao: ServiceDAO
   let opDao: IOperationDAO
+  let usageDao: IDatabaseUsageDAO
+  let dbDao: IDatabaseDAO
 
   beforeEach(() => {
     opDao = generateMockOperationDAO()
-    svcDao = new ServiceDAO(opDao)
+    usageDao = generateMockDatabaseUsageDAO()
+    dbDao = generateMockDatabaseDAO()
+    svcDao = new ServiceDAO(opDao, usageDao, dbDao)
   })
 
   describe('docToService', () => {
     let service: Service
     let doc: any
 
+    describe('with db usages', () => {
+      beforeEach(async () => {
+        doc = generateServiceDocument({ databaseUsages: true })
+        // @ts-expect-error
+        dbDao.findOne.mockImplementationOnce((id: string) =>
+          Promise.resolve(Database.create('mock db', id)),
+        )
+        service = await svcDao.docToService(doc)
+      })
+
+      it('calls databaseDAO findOne', () => {
+        expect(dbDao.findOne).toHaveBeenCalled()
+      })
+
+      it('returns a link with a database', () => {
+        expect(service.usages.length).toBeGreaterThan(0)
+        expect(service.usages[0].ofDatabase).toBeInstanceOf(Database)
+      })
+    })
+
     describe('with underneath operations', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         doc = generateServiceDocument({ operations: true })
-        service = svcDao.docToService(doc)
+        service = await svcDao.docToService(doc)
+      })
+
+      it('calls operationDAO docToOperation', () => {
+        expect(opDao.docToOperation).toHaveBeenCalled()
+      })
+    })
+
+    describe('without underneath operations nor db usages', () => {
+      beforeEach(async () => {
+        doc = generateServiceDocument({ operations: false, databaseUsages: false })
+        service = await svcDao.docToService(doc)
       })
 
       it('returns the right entity structure', () => {
@@ -28,17 +72,6 @@ describe(ServiceDAO, () => {
 
       it('converts uuid into id', () => {
         expect(service.id).toEqual(doc.uuid)
-      })
-
-      it('calls operationDAO docToOperation', () => {
-        expect(opDao.docToOperation).toHaveBeenCalled()
-      })
-    })
-
-    describe('without underneath operations', () => {
-      beforeEach(() => {
-        doc = generateServiceDocument({ operations: false })
-        service = svcDao.docToService(doc)
       })
 
       it('does not call operationDAO docToOperation', () => {
@@ -51,9 +84,9 @@ describe(ServiceDAO, () => {
     let service: Service
     let doc: any
 
-    describe('with underneath operations', () => {
+    describe('with underneath operations and db usages', () => {
       beforeEach(() => {
-        service = generateService({ operations: true })
+        service = generateService({ operations: true, databaseUsages: true })
         doc = svcDao.serviceToDoc(service)
       })
 
@@ -62,23 +95,30 @@ describe(ServiceDAO, () => {
       })
 
       it('converts id to uuid', () => {
-        expect(doc.uuid).toEqual(service.id)
         expect(doc.id).toBeUndefined()
       })
 
       it('calls operationDAO operationToDoc', () => {
         expect(opDao.operationToDoc).toHaveBeenCalled()
       })
+
+      it('calls databaseUsageDAO databaseUsageToDoc', () => {
+        expect(usageDao.databaseUsageToDoc).toHaveBeenCalled()
+      })
     })
 
-    describe('without underneath operations', () => {
+    describe('without underneath operations nor usages', () => {
       beforeEach(() => {
-        service = generateService({ operations: false })
+        service = generateService({ operations: false, databaseUsages: false })
         doc = svcDao.serviceToDoc(service)
       })
 
       it('does not call operationDAO operationToDoc', () => {
         expect(opDao.operationToDoc).not.toHaveBeenCalled()
+      })
+
+      it('does not call databaseUsageDAO databaseUsageToDoc', () => {
+        expect(usageDao.databaseUsageToDoc).not.toHaveBeenCalled()
       })
     })
   })

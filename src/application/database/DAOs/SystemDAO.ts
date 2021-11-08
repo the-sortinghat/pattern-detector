@@ -32,19 +32,20 @@ export class SystemDAO implements ISystemDAO {
 
     if (!result) return Promise.reject(`not found - System ${svcID}`)
 
-    const system = this.docToSystem(result)
+    const system = await this.docToSystem(result)
 
     const service = system.services.find((svc: Service) => svc.id === svcID) as Service
 
     return { parentSystem: system, service }
   }
 
-  public docToSystem(doc: any): System {
+  public async docToSystem(doc: any): Promise<System> {
     const sys = System.create(doc.name, doc.uuid)
 
-    doc.services
-      .map((docSvc: any): Service => this.svcDao.docToService(docSvc))
-      .forEach((svc: Service) => sys.addService(svc))
+    for (const docSvc of doc.services) {
+      const svc = await this.svcDao.docToService(docSvc)
+      sys.addService(svc)
+    }
 
     return sys
   }

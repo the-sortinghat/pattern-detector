@@ -12,6 +12,6 @@ export interface ISystemDAO {
   store: (system: System) => Promise<void>
   findOne: (sID: string) => Promise<System>
   findOneService: (svcID: string) => Promise<IScopedService>
-  docToSystem: (doc: Document) => System
+  docToSystem: (doc: Document) => Promise<System>
   systemToDoc: (system: System) => any
 }
