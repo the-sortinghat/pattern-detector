@@ -5,10 +5,11 @@ import { InvalidStateError } from '../../domain/model/errors/InvalidStateError'
 import { System } from '../../domain/model/System'
 import { Service } from '../../domain/model/Service'
 import { Database } from '../../domain/model/Database'
-import { HTTPVerb, Operation } from '../../domain/model/Operation'
+import { Operation } from '../../domain/model/Operation'
 import { DatabaseUsage } from '../../domain/model/DatabaseUsage'
 import { IDatabaseDAO } from '../utils/DatabaseDAO.interface'
 import { ISystemDAO } from '../utils/SystemDAO.interface'
+import { OperationDAO } from '../database/DAOs/OperationDAO'
 
 export class KafkaController {
   constructor(
@@ -50,7 +51,7 @@ export class KafkaController {
   public async createOperation(msgString: Message): Promise<void> {
     const { verb, path, serviceID } = this.parseMessageValue(msgString)
     try {
-      const actualVerb = this.parseVerb(verb)
+      const actualVerb = OperationDAO.verbStringToHTTPVerb(verb)
       const operation = Operation.create(actualVerb, path)
       const { parentSystem: system, service } = await this.systemDao.findOneService(serviceID)
       service.addOperation(operation)
@@ -84,24 +85,5 @@ export class KafkaController {
 
   private parseMessageValue(msg: Message): any {
     return JSON.parse(msg.value as string)
-  }
-
-  private parseVerb(verb: string): HTTPVerb {
-    const verbUpper = verb.toUpperCase()
-
-    switch (verbUpper) {
-      case 'GET':
-        return HTTPVerb.GET
-      case 'POST':
-        return HTTPVerb.POST
-      case 'PUT':
-        return HTTPVerb.PUT
-      case 'DELETE':
-        return HTTPVerb.DELETE
-      case 'PATCH':
-        return HTTPVerb.PATCH
-      default:
-        return HTTPVerb.GET
-    }
   }
 }

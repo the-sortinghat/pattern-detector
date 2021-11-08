@@ -41,6 +41,13 @@ export function generateServiceDocument({ operations }: IServiceMockConfig): any
   }
 }
 
+export function generateGetOperationDocument(): any {
+  return {
+    verb: 'GET',
+    path: '/foo',
+  }
+}
+
 export function generateSystem({ services }: ISystemMockConfig): System {
   const system = System.create('Mock System', 'fake uuid')
 
@@ -55,6 +62,10 @@ export function generateService({ operations }: IServiceMockConfig): Service {
   if (operations) service.addOperation(Operation.create(HTTPVerb.GET, '/foo'))
 
   return service
+}
+
+export function generateGetOperation(): Operation {
+  return Operation.create(HTTPVerb.GET, '/foo')
 }
 
 export function generateMockServiceDAO(): IServiceDAO {
