@@ -57,6 +57,10 @@ export function generateGetOperationDocument(): any {
   }
 }
 
+export function generateDatabaseUsageDoc(): string {
+  return 'fake db uuid'
+}
+
 export function generateSystem({ services }: ISystemMockConfig): System {
   const system = System.create('Mock System', 'fake uuid')
 
@@ -80,6 +84,13 @@ export function generateService({ operations, databaseUsages }: IServiceMockConf
 
 export function generateGetOperation(): Operation {
   return Operation.create(HTTPVerb.GET, '/foo')
+}
+
+export function generateDatabaseUsage(): DatabaseUsage {
+  return DatabaseUsage.create(
+    Service.create('mock service', 'fake svc uuid'),
+    Database.create('mock db', 'fake db uuid'),
+  )
 }
 
 export function generateMockServiceDAO(): IServiceDAO {

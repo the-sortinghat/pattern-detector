@@ -1,8 +1,7 @@
-import { Document } from 'mongodb'
-
 import { DatabaseUsage } from '../../domain/model/DatabaseUsage'
+import { Service } from '../../domain/model/Service'
 
 export interface IDatabaseUsageDAO {
-  docToDatabaseUsage: (doc: Document) => DatabaseUsage
+  docToDatabaseUsage: (doc: string, service: Service) => Promise<DatabaseUsage>
   databaseUsageToDoc: (usage: DatabaseUsage) => any
 }
