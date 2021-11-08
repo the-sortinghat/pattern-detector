@@ -11,7 +11,6 @@ import {
   generateSystemDocument,
   generateMockOperationDAO,
   generateMockDatabaseUsageDAO,
-  generateMockDatabaseDAO,
 } from './TestHelpers'
 import { ServiceDAO } from './ServiceDAO'
 
@@ -166,7 +165,6 @@ describe(SystemDAO, () => {
         const trueSvcDao = new ServiceDAO(
           generateMockOperationDAO(),
           generateMockDatabaseUsageDAO(),
-          generateMockDatabaseDAO(),
         )
         // @ts-expect-error
         svcDao.docToService.mockImplementationOnce(trueSvcDao.docToService.bind(trueSvcDao))

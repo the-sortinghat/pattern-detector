@@ -2,10 +2,7 @@ import { IDatabaseUsageDAO } from '../../utils/DatabaseUsageDAO.interface'
 import { Service } from '../../../domain/model/Service'
 import { IOperationDAO } from '../../utils/OperationDAO.interface'
 import { ServiceDAO } from './ServiceDAO'
-import { IDatabaseDAO } from '../../utils/DatabaseDAO.interface'
-import { Database } from '../../../domain/model/Database'
 import {
-  generateMockDatabaseDAO,
   generateMockDatabaseUsageDAO,
   generateMockOperationDAO,
   generateService,
@@ -16,13 +13,11 @@ describe(ServiceDAO, () => {
   let svcDao: ServiceDAO
   let opDao: IOperationDAO
   let usageDao: IDatabaseUsageDAO
-  let dbDao: IDatabaseDAO
 
   beforeEach(() => {
     opDao = generateMockOperationDAO()
     usageDao = generateMockDatabaseUsageDAO()
-    dbDao = generateMockDatabaseDAO()
-    svcDao = new ServiceDAO(opDao, usageDao, dbDao)
+    svcDao = new ServiceDAO(opDao, usageDao)
   })
 
   describe('docToService', () => {
@@ -32,20 +27,11 @@ describe(ServiceDAO, () => {
     describe('with db usages', () => {
       beforeEach(async () => {
         doc = generateServiceDocument({ databaseUsages: true })
-        // @ts-expect-error
-        dbDao.findOne.mockImplementationOnce((id: string) =>
-          Promise.resolve(Database.create('mock db', id)),
-        )
         service = await svcDao.docToService(doc)
       })
 
-      it('calls databaseDAO findOne', () => {
-        expect(dbDao.findOne).toHaveBeenCalled()
-      })
-
-      it('returns a link with a database', () => {
-        expect(service.usages.length).toBeGreaterThan(0)
-        expect(service.usages[0].ofDatabase).toBeInstanceOf(Database)
+      it('calls databaseUsageDAO docToDatabaseUsage', () => {
+        expect(usageDao.docToDatabaseUsage).toHaveBeenCalled()
       })
     })
 
