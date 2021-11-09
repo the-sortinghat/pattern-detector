@@ -46,7 +46,11 @@ services:
     command: >
       bash -c
       "sleep 5s &&
-      kafka-topics --create --topic=hackathon --if-not-exists --bootstrap-server=kafka:9092"
+      kafka-topics --create --topic=new.system --if-not-exists --bootstrap-server=kafka:9092 &&
+      kafka-topics --create --topic=new.service --if-not-exists --bootstrap-server=kafka:9092 &&
+      kafka-topics --create --topic=new.database --if-not-exists --bootstrap-server=kafka:9092 &&
+      kafka-topics --create --topic=new.operation --if-not-exists --bootstrap-server=kafka:9092 &&
+      kafka-topics --create --topic=new.usage --if-not-exists --bootstrap-server=kafka:9092"
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 

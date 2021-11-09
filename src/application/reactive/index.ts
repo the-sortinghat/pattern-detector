@@ -1,3 +1,5 @@
+import { Consumer } from 'kafka-node'
+
 import { ISystemRepository } from '../../domain'
 
 import { IDatabaseDAO } from '../utils/DatabaseDAO.interface'
@@ -5,11 +7,8 @@ import { ISystemDAO } from '../utils/SystemDAO.interface'
 import { Kafka } from './Kafka'
 import { KafkaController } from './KafkaController'
 
-function newMessage(topic: string, payload: Record<string, any>) {
-  return {
-    topic,
-    messages: JSON.stringify(payload),
-  }
+interface Consumers {
+  [key: string]: Consumer
 }
 
 export function setupReactiveApp(
@@ -19,29 +18,25 @@ export function setupReactiveApp(
 ): void {
   const kafka = Kafka.inst
 
-  const consumer = kafka.createConsumer('hackathon')
-  const producer = kafka.createProducer()
+  const consumers: Consumers = {
+    system: kafka.createConsumer('new.system'),
+    service: kafka.createConsumer('new.service'),
+    database: kafka.createConsumer('new.database'),
+    operation: kafka.createConsumer('new.operation'),
+    usage: kafka.createConsumer('new.usage'),
+  }
 
   const kafkaCtrl = new KafkaController(sysRepo, sysDao, dbDao)
 
-  consumer.on('message', kafkaCtrl.createSystem.bind(kafkaCtrl))
+  Object.keys(consumers).forEach((key: string) =>
+    consumers[key].on('error', kafkaCtrl.printError.bind(kafkaCtrl)),
+  )
 
-  consumer.on('error', kafkaCtrl.printError.bind(kafkaCtrl))
+  consumers.system.on('message', kafkaCtrl.createSystem.bind(kafkaCtrl))
+  consumers.service.on('message', kafkaCtrl.createService.bind(kafkaCtrl))
+  consumers.database.on('message', kafkaCtrl.createDatabase.bind(kafkaCtrl))
+  consumers.operation.on('message', kafkaCtrl.createOperation.bind(kafkaCtrl))
+  consumers.usage.on('message', kafkaCtrl.createDatabaseUsage.bind(kafkaCtrl))
 
-  const messages = [
-    newMessage('hackathon', {
-      name: 'padathon',
-    }),
-  ]
-
-  producer.on('ready', () => {
-    producer.send(messages, (error, data) => {
-      if (error) console.log(error)
-      else console.log(data)
-    })
-  })
-
-  producer.on('error', (err) => {
-    console.log(err)
-  })
+  console.log('Event consumers set up!')
 }
