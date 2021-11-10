@@ -16,14 +16,12 @@ export function setupReactiveApp(
   sysDao: ISystemDAO,
   dbDao: IDatabaseDAO,
 ): void {
-  const kafka = Kafka.inst
-
   const consumers: Consumers = {
-    system: kafka.createConsumer('new.system'),
-    service: kafka.createConsumer('new.service'),
-    database: kafka.createConsumer('new.database'),
-    operation: kafka.createConsumer('new.operation'),
-    usage: kafka.createConsumer('new.usage'),
+    system: new Kafka().createConsumer('new.system'),
+    service: new Kafka().createConsumer('new.service'),
+    database: new Kafka().createConsumer('new.database'),
+    operation: new Kafka().createConsumer('new.operation'),
+    usage: new Kafka().createConsumer('new.usage'),
   }
 
   const kafkaCtrl = new KafkaController(sysRepo, sysDao, dbDao)
