@@ -1,5 +1,3 @@
-import { Message } from 'kafka-node'
-
 import {
   Database,
   DatabaseUsage,
@@ -14,23 +12,20 @@ import { IDatabaseDAO } from '../utils/DatabaseDAO.interface'
 import { ISystemDAO } from '../utils/SystemDAO.interface'
 import { OperationDAO } from '../database/DAOs/OperationDAO'
 
+import { ICreateDatabaseEventSchema } from './eventSchemas/CreateDatabaseEventSchema.interface'
+import { ICreateDatabaseUsageEventSchema } from './eventSchemas/CreateDatabaseUsageEventSchema.interface'
+import { ICreateOperationEventSchema } from './eventSchemas/CreateOperationEventSchema.interface'
+import { ICreateServiceEventSchema } from './eventSchemas/CreateServiceEventSchema.interface'
+import { ICreateSystemEventSchema } from './eventSchemas/CreateSystemEventSchema.interface'
+
 export class KafkaController {
   constructor(
     private readonly systemRepository: ISystemRepository,
     private readonly systemDao: ISystemDAO,
     private readonly databaseDAO: IDatabaseDAO,
   ) {}
-  public printMessage(msgString: Message): void {
-    const msg = this.parseMessageValue(msgString)
-    console.log(msg)
-  }
 
-  public printError(err: any): void {
-    console.log(err)
-  }
-
-  public async createSystem(msgString: Message): Promise<void> {
-    const { name, id } = this.parseMessageValue(msgString)
+  public async createSystem({ name, id }: ICreateSystemEventSchema): Promise<void> {
     try {
       const system = System.create(name, id)
       await this.systemRepository.save(system)
@@ -39,8 +34,7 @@ export class KafkaController {
     }
   }
 
-  public async createService(msgString: Message): Promise<void> {
-    const { name, id, systemID } = this.parseMessageValue(msgString)
+  public async createService({ name, id, systemID }: ICreateServiceEventSchema): Promise<void> {
     try {
       const system = await this.systemRepository.findOne(systemID)
       const service = Service.create(name, id)
@@ -51,8 +45,11 @@ export class KafkaController {
     }
   }
 
-  public async createOperation(msgString: Message): Promise<void> {
-    const { verb, path, serviceID } = this.parseMessageValue(msgString)
+  public async createOperation({
+    verb,
+    path,
+    serviceID,
+  }: ICreateOperationEventSchema): Promise<void> {
     try {
       const actualVerb = OperationDAO.verbStringToHTTPVerb(verb)
       const operation = Operation.create(actualVerb, path)
@@ -64,8 +61,7 @@ export class KafkaController {
     }
   }
 
-  public async createDatabase(msgString: Message): Promise<void> {
-    const { make, id } = this.parseMessageValue(msgString)
+  public async createDatabase({ make, id }: ICreateDatabaseEventSchema): Promise<void> {
     try {
       const database = Database.create(make, id)
       await this.databaseDAO.store(database)
@@ -74,8 +70,10 @@ export class KafkaController {
     }
   }
 
-  public async createDatabaseUsage(msgString: Message): Promise<void> {
-    const { serviceID, databaseID } = this.parseMessageValue(msgString)
+  public async createDatabaseUsage({
+    serviceID,
+    databaseID,
+  }: ICreateDatabaseUsageEventSchema): Promise<void> {
     try {
       const { parentSystem: system, service } = await this.systemDao.findOneService(serviceID)
       const database = await this.databaseDAO.findOne(databaseID)
@@ -84,9 +82,5 @@ export class KafkaController {
     } catch (e) {
       if (e instanceof InvalidStateError) console.log(e.message)
     }
-  }
-
-  private parseMessageValue(msg: Message): any {
-    return JSON.parse(msg.value as string)
   }
 }
