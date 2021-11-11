@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto'
 import { Kafka } from './Kafka'
 
 function newMessage(topic: string, payload: Record<string, any>) {
@@ -9,12 +8,12 @@ function newMessage(topic: string, payload: Record<string, any>) {
 }
 
 function manualPopulate(): void {
-  const kafka = Kafka.inst
+  const kafka = new Kafka()
   const producer = kafka.createProducer()
 
-  const sysID = 'fake uuid'
-  const svcID = randomUUID()
-  const dbID = randomUUID()
+  const sysID = 'fake sys uuid'
+  const svcID = 'fake svc uuid'
+  const dbID = 'fake db uuid'
 
   const messages = [
     newMessage('new.system', {
@@ -50,7 +49,7 @@ function manualPopulate(): void {
       const time = i * 2500
 
       setTimeout(() => {
-        producer.send([message], (error, data) => {
+        producer.send([message], (error: any, data: any) => {
           if (error) console.log(error)
           else console.log(data)
         })
@@ -58,9 +57,7 @@ function manualPopulate(): void {
     })
   })
 
-  producer.on('error', (err) => {
-    console.log(err)
-  })
+  producer.on('error', console.log)
 }
 
 manualPopulate()
