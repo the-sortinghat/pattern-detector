@@ -110,9 +110,13 @@ describe(DatabaseDAO, () => {
     })
 
     it('upserts into the collection', () => {
-      expect(mockCollection.updateOne).toHaveBeenCalledWith({ uuid: db.id }, mockDoc, {
-        upsert: true,
-      })
+      expect(mockCollection.updateOne).toHaveBeenCalledWith(
+        { uuid: db.id },
+        { $set: mockDoc },
+        {
+          upsert: true,
+        },
+      )
     })
   })
 })
