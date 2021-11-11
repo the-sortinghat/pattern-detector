@@ -8,7 +8,7 @@ export class DatabaseDAO implements IDatabaseDAO {
   private readonly databaseCollection: Collection
 
   constructor(db: Db) {
-    this.databaseCollection = db.collection('database')
+    this.databaseCollection = db.collection('databases')
   }
 
   public docToDatabase(doc: any): Database {
@@ -23,9 +23,13 @@ export class DatabaseDAO implements IDatabaseDAO {
   }
 
   public async store(db: Database): Promise<void> {
-    await this.databaseCollection.updateOne({ uuid: db.id }, this.databaseToDoc(db), {
-      upsert: true,
-    })
+    await this.databaseCollection.updateOne(
+      { uuid: db.id },
+      { $set: this.databaseToDoc(db) },
+      {
+        upsert: true,
+      },
+    )
   }
 
   public async findOne(id: string): Promise<Database> {
