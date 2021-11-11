@@ -18,7 +18,7 @@ import { ICreateOperationEventSchema } from './eventSchemas/CreateOperationEvent
 import { ICreateServiceEventSchema } from './eventSchemas/CreateServiceEventSchema.interface'
 import { ICreateSystemEventSchema } from './eventSchemas/CreateSystemEventSchema.interface'
 
-export class KafkaController {
+export class EventsController {
   constructor(
     private readonly systemRepository: ISystemRepository,
     private readonly systemDao: ISystemDAO,
