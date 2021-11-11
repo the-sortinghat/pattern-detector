@@ -12,7 +12,17 @@ describe(ExpressController, () => {
       save: jest.fn(),
     }
     mockService = { detectInSystem: jest.fn() }
-    ctrl = new ExpressController(mockRepo, mockService)
+    const mockLogger = {
+      error: jest.fn(console.log),
+      warn: jest.fn(console.log),
+      info: jest.fn(console.log),
+      verbose: jest.fn(console.log),
+      http: jest.fn(console.log),
+      debug: jest.fn(console.log),
+      silly: jest.fn(console.log),
+    }
+    // @ts-expect-error
+    ctrl = new ExpressController(mockRepo, mockService, mockLogger)
   })
 
   describe('launchDetections', () => {

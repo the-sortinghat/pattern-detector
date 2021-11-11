@@ -1,3 +1,4 @@
+import { Logger } from '../logger/Logger'
 import { Request, Response } from 'express'
 import { ISystemRepository, PatternDetectorService } from '../../domain'
 
@@ -5,6 +6,7 @@ export class ExpressController {
   constructor(
     private readonly repo: ISystemRepository,
     private readonly detectionService: PatternDetectorService,
+    private readonly logger: Logger,
   ) {}
 
   public async launchDetections(req: Request, res: Response): Promise<void> {

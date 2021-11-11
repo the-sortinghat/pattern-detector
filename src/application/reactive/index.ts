@@ -11,6 +11,7 @@ import { ICreateServiceEventSchema } from './eventSchemas/CreateServiceEventSche
 import { ICreateSystemEventSchema } from './eventSchemas/CreateSystemEventSchema.interface'
 import { Kafka } from './Kafka'
 import { EventsController } from './EventsController'
+import { Logger } from 'application/logger/Logger'
 
 interface Consumers {
   [key: string]: Consumer
@@ -27,6 +28,7 @@ export function setupReactiveApp(
   sysRepo: ISystemRepository,
   sysDao: ISystemDAO,
   dbDao: IDatabaseDAO,
+  logger: Logger,
 ): void {
   const consumers: Consumers = {
     system: new Kafka().createConsumer('new.system'),
@@ -36,9 +38,11 @@ export function setupReactiveApp(
     usage: new Kafka().createConsumer('new.usage'),
   }
 
-  const kafkaCtrl = new EventsController(sysRepo, sysDao, dbDao)
+  const kafkaCtrl = new EventsController(sysRepo, sysDao, dbDao, logger)
 
-  Object.values(consumers).forEach((consumer: Consumer) => consumer.on('error', console.log))
+  Object.values(consumers).forEach((consumer: Consumer) =>
+    consumer.on('error', (error: any) => logger.error(error)),
+  )
 
   consumers.system.on(
     'message',
@@ -67,5 +71,5 @@ export function setupReactiveApp(
     ),
   )
 
-  console.log('Event consumers set up!')
+  logger.info('Event consumers set up!')
 }

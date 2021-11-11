@@ -13,6 +13,7 @@ import { IServiceDAO } from '../utils/ServiceDAO.interface'
 import { IDatabaseDAO } from '../utils/DatabaseDAO.interface'
 import { ISystemDAO } from '../utils/SystemDAO.interface'
 import { ISystemRepository } from '../../domain'
+import { Logger } from '../logger/Logger'
 
 export interface IPersistenceSetup {
   db: Db
@@ -24,10 +25,8 @@ export interface IPersistenceSetup {
   systemRepository: ISystemRepository
 }
 
-export async function setupPersistence(
-  dbName: string | undefined = undefined,
-): Promise<IPersistenceSetup> {
-  const db = await setupDB(dbName)
+export async function setupPersistence(dbName: string, logger: Logger): Promise<IPersistenceSetup> {
+  const db = await setupDB(dbName, logger)
 
   const dbDao = new DatabaseDAO(db)
   const usageDao = new DatabaseUsageDAO(dbDao)

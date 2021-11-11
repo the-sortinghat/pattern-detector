@@ -1,10 +1,12 @@
 import { Db, MongoClient } from 'mongodb'
 
-export async function setupDB(dbName = 'detector'): Promise<Db> {
+import { Logger } from '../logger/Logger'
+
+export async function setupDB(dbName: string, logger: Logger): Promise<Db> {
   const url = process.env.MONGO_URL as string
   const client = new MongoClient(url)
   await client.connect()
-  console.log('Connected to MongoDB successfully!')
+  logger.info('Connected to MongoDB successfully!')
 
   return client.db(dbName)
 }
