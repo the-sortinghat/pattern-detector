@@ -5,11 +5,15 @@ import {
 import { MetricsCollector } from '../metrics/MetricsCollector'
 import { System } from '../model/System'
 
-export type PatternDetectionResult = IDatabasePerServiceResult
+export interface PatternDetectionResult {
+  databasePerService: IDatabasePerServiceResult[]
+}
 
 export class PatternDetectorService {
-  public detectInSystem(system: System): PatternDetectionResult[] {
-    let results: PatternDetectionResult[] = []
+  public detectInSystem(system: System): PatternDetectionResult {
+    const results: PatternDetectionResult = {
+      databasePerService: [],
+    }
 
     const metricCollector = MetricsCollector.create()
 
@@ -18,7 +22,7 @@ export class PatternDetectorService {
     system.accept(dbpsDetector)
 
     const dbps = dbpsDetector.results
-    if (dbps) results = results.concat(dbps as IDatabasePerServiceResult[])
+    if (dbps) results.databasePerService = dbps
 
     return results
   }
