@@ -12,9 +12,9 @@ export class PatternDetectorService {
     let results: PatternDetectionResult[] = []
 
     const metricCollector = MetricsCollector.create()
-    const dbpsDetector = DatabasePerServiceDetector.create()
 
     system.accept(metricCollector)
+    const dbpsDetector = DatabasePerServiceDetector.create(metricCollector.metrics)
     system.accept(dbpsDetector)
 
     const dbps = dbpsDetector.results

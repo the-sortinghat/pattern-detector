@@ -4,26 +4,38 @@ import { DatabaseUsage } from '../model/DatabaseUsage'
 import { Operation } from '../model/Operation'
 import { Service } from '../model/Service'
 import { System } from '../model/System'
-import { Metrics } from './MeasuresVessel'
+import { MeasuresVessel, Metrics } from './MeasuresVessel'
+
+export interface IObjectVessels {
+  [id: string]: MeasuresVessel
+}
 
 export class MetricsCollector implements IVisitor {
   static create(): MetricsCollector {
     return new MetricsCollector()
   }
 
-  protected constructor() {}
+  private readonly vessels: IObjectVessels
+
+  protected constructor() {
+    this.vessels = {}
+  }
 
   visitSystem(system: System): void {
     system.services.forEach((svc: Service) => svc.accept(this))
   }
 
   visitService(service: Service): void {
+    const id = service.id
+
+    if (!this.vessels[id]) this.vessels[id] = new MeasuresVessel()
+
     service.operations.forEach((op: Operation) => {
-      service.measuresVessel.increment(Metrics.nOperations)
+      this.vessels[id].increment(Metrics.nOperations)
       op.accept(this)
     })
     service.usages.forEach((dbUsage: DatabaseUsage) => {
-      service.measuresVessel.increment(Metrics.nDatabaseUsing)
+      this.vessels[id].increment(Metrics.nDatabaseUsing)
       dbUsage.accept(this)
     })
   }
@@ -33,8 +45,28 @@ export class MetricsCollector implements IVisitor {
   }
 
   visitDatabase(database: Database): void {
-    database.usages.forEach(() => database.measuresVessel.increment(Metrics.nUsageClients))
+    const id = database.id
+
+    if (!this.vessels[id]) this.vessels[id] = new MeasuresVessel()
+
+    database.usages.forEach(() => this.vessels[id].increment(Metrics.nUsageClients))
   }
 
   visitOperation(operation: Operation): void {}
+
+  public nUsageClients(id: string): number {
+    return this.vessels[id]?.nUsageClients || 0
+  }
+
+  public nOperations(id: string): number {
+    return this.vessels[id]?.nOperations || 0
+  }
+
+  public nDatabaseUsing(id: string): number {
+    return this.vessels[id]?.nDatabaseUsing || 0
+  }
+
+  public get metrics(): IObjectVessels {
+    return this.vessels
+  }
 }

@@ -4,6 +4,7 @@ import { Operation } from '../model/Operation'
 import { Database } from '../model/Database'
 import { DatabaseUsage } from '../model/DatabaseUsage'
 import { IVisitor } from '../utils/Visitor.interface'
+import { IObjectVessels } from './MetricsCollector'
 
 export interface IDatabasePerServiceResult {
   serviceID: string
@@ -13,15 +14,15 @@ export interface IDatabasePerServiceResult {
 export class DatabasePerServiceDetector implements IVisitor {
   public static readonly maxOperationsThreshold = 10
 
-  public static create(): DatabasePerServiceDetector {
-    return new DatabasePerServiceDetector()
+  public static create(vessels: IObjectVessels): DatabasePerServiceDetector {
+    return new DatabasePerServiceDetector(vessels)
   }
 
   private svcCandidates: Service[]
   private dbCandidates: Database[]
   private _results: IDatabasePerServiceResult[] | undefined
 
-  private constructor() {
+  private constructor(private readonly vessels: IObjectVessels) {
     this.svcCandidates = []
     this.dbCandidates = []
     this._results = undefined
@@ -34,9 +35,9 @@ export class DatabasePerServiceDetector implements IVisitor {
   }
 
   public visitService(svc: Service): void {
-    const singleUsage = svc.measuresVessel.nDatabaseUsing === 1
+    const singleUsage = this.vessels[svc.id].nDatabaseUsing === 1
     const hasFewOperations =
-      svc.measuresVessel.nOperations <= DatabasePerServiceDetector.maxOperationsThreshold
+      this.vessels[svc.id].nOperations <= DatabasePerServiceDetector.maxOperationsThreshold
 
     if (singleUsage && hasFewOperations) this.addCandidate(svc)
 
@@ -46,7 +47,7 @@ export class DatabasePerServiceDetector implements IVisitor {
   public visitOperation(op: Operation): void {}
 
   public visitDatabase(db: Database): void {
-    const singleClient = db.measuresVessel.nUsageClients === 1
+    const singleClient = this.vessels[db.id].nUsageClients === 1
 
     if (singleClient) this.addCandidate(db)
   }

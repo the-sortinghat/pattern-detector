@@ -2,9 +2,10 @@ import { System } from '../model/System'
 import { Database } from '../model/Database'
 import { Service } from '../model/Service'
 import { DatabasePerServiceDetector } from './DatabasePerServiceDetector'
-import { Metrics } from './MeasuresVessel'
+import { MeasuresVessel, Metrics } from './MeasuresVessel'
 import { HTTPVerb, Operation } from '../model/Operation'
 import { DatabaseUsage } from '../model/DatabaseUsage'
+import { IObjectVessels } from './MetricsCollector'
 
 interface IServiceWithPayload {
   nOperations: number
@@ -15,30 +16,40 @@ interface IDatabaseWithPayload {
   nClients: number
 }
 
-function generateServiceWithMetrics({ nOperations, nUsages }: IServiceWithPayload): Service {
-  const service = Service.create('generated')
-
-  service.measuresVessel.increment(Metrics.nOperations, nOperations)
-  service.measuresVessel.increment(Metrics.nDatabaseUsing, nUsages)
-
-  return service
+interface IServiceWithVessel {
+  service: Service
+  vessel: MeasuresVessel
 }
 
-function generateDatabaseWithMetrics({ nClients }: IDatabaseWithPayload): Database {
+interface IDatabaseWithVessel {
+  database: Database
+  vessel: MeasuresVessel
+}
+
+function generateServiceWithMetrics({
+  nOperations,
+  nUsages,
+}: IServiceWithPayload): IServiceWithVessel {
+  const service = Service.create('generated')
+  const vessel = new MeasuresVessel()
+
+  vessel.increment(Metrics.nOperations, nOperations)
+  vessel.increment(Metrics.nDatabaseUsing, nUsages)
+
+  return { service, vessel }
+}
+
+function generateDatabaseWithMetrics({ nClients }: IDatabaseWithPayload): IDatabaseWithVessel {
   const database = Database.create('generated')
+  const vessel = new MeasuresVessel()
 
-  database.measuresVessel.increment(Metrics.nUsageClients, nClients)
+  vessel.increment(Metrics.nUsageClients, nClients)
 
-  return database
+  return { database, vessel }
 }
 
 describe(DatabasePerServiceDetector, () => {
   let detector: DatabasePerServiceDetector
-
-  beforeEach(() => {
-    detector = DatabasePerServiceDetector.create()
-  })
-
   describe('visitService', () => {
     let service: Service
 
@@ -46,7 +57,12 @@ describe(DatabasePerServiceDetector, () => {
       const maxOperations = 10
 
       beforeEach(() => {
-        service = generateServiceWithMetrics({ nOperations: maxOperations, nUsages: 1 })
+        const sWithVessel = generateServiceWithMetrics({ nOperations: maxOperations, nUsages: 1 })
+        service = sWithVessel.service
+
+        const vessels: IObjectVessels = {}
+        vessels[service.id] = sWithVessel.vessel
+        detector = DatabasePerServiceDetector.create(vessels)
         detector.addCandidate = jest.fn()
         detector.visitService(service)
       })
@@ -60,7 +76,14 @@ describe(DatabasePerServiceDetector, () => {
       const tooManyOperations = 11
 
       beforeEach(() => {
-        service = generateServiceWithMetrics({ nOperations: tooManyOperations, nUsages: 1 })
+        const sWithVessel = generateServiceWithMetrics({
+          nOperations: tooManyOperations,
+          nUsages: 1,
+        })
+        service = sWithVessel.service
+        const vessels: IObjectVessels = {}
+        vessels[service.id] = sWithVessel.vessel
+        detector = DatabasePerServiceDetector.create(vessels)
         detector.addCandidate = jest.fn()
         detector.visitService(service)
       })
@@ -75,7 +98,16 @@ describe(DatabasePerServiceDetector, () => {
       const tooManyDBs = 2
 
       beforeEach(() => {
-        service = generateServiceWithMetrics({ nOperations: maxOperations, nUsages: tooManyDBs })
+        const sWithVessel = generateServiceWithMetrics({
+          nOperations: maxOperations,
+          nUsages: tooManyDBs,
+        })
+        service = sWithVessel.service
+        const vessels: IObjectVessels = {}
+        vessels[service.id] = sWithVessel.vessel
+        detector = DatabasePerServiceDetector.create(vessels)
+        detector.addCandidate = jest.fn()
+        detector.visitService(service)
         detector.addCandidate = jest.fn()
         detector.visitService(service)
       })
@@ -90,7 +122,14 @@ describe(DatabasePerServiceDetector, () => {
       const tooManyDBs = 2
 
       beforeEach(() => {
-        service = generateServiceWithMetrics({ nOperations: tooManyOps, nUsages: tooManyDBs })
+        const sWithVessel = generateServiceWithMetrics({
+          nOperations: tooManyOps,
+          nUsages: tooManyDBs,
+        })
+        service = sWithVessel.service
+        const vessels: IObjectVessels = {}
+        vessels[service.id] = sWithVessel.vessel
+        detector = DatabasePerServiceDetector.create(vessels)
         detector.addCandidate = jest.fn()
         detector.visitService(service)
       })
@@ -104,15 +143,16 @@ describe(DatabasePerServiceDetector, () => {
   describe('visitDatabase', () => {
     let database: Database
 
-    beforeEach(() => {
-      detector.addCandidate = jest.fn()
-    })
-
     describe('database with 0 usages', () => {
       const nClients = 0
 
       beforeEach(() => {
-        database = generateDatabaseWithMetrics({ nClients })
+        const dWithVessels = generateDatabaseWithMetrics({ nClients })
+        database = dWithVessels.database
+        const vessels: IObjectVessels = {}
+        vessels[database.id] = dWithVessels.vessel
+        detector = DatabasePerServiceDetector.create(vessels)
+        detector.addCandidate = jest.fn()
         detector.visitDatabase(database)
       })
 
@@ -125,11 +165,16 @@ describe(DatabasePerServiceDetector, () => {
       const nClients = 1
 
       beforeEach(() => {
-        database = generateDatabaseWithMetrics({ nClients })
+        const dWithVessels = generateDatabaseWithMetrics({ nClients })
+        database = dWithVessels.database
+        const vessels: IObjectVessels = {}
+        vessels[database.id] = dWithVessels.vessel
+        detector = DatabasePerServiceDetector.create(vessels)
+        detector.addCandidate = jest.fn()
         detector.visitDatabase(database)
       })
 
-      it('does not make into candidates list', () => {
+      it('enters as candidate', () => {
         expect(detector.addCandidate).toHaveBeenCalledWith(database)
       })
     })
@@ -138,7 +183,12 @@ describe(DatabasePerServiceDetector, () => {
       const nClients = 2
 
       beforeEach(() => {
-        database = generateDatabaseWithMetrics({ nClients })
+        const dWithVessels = generateDatabaseWithMetrics({ nClients })
+        database = dWithVessels.database
+        const vessels: IObjectVessels = {}
+        vessels[database.id] = dWithVessels.vessel
+        detector = DatabasePerServiceDetector.create(vessels)
+        detector.addCandidate = jest.fn()
         detector.visitDatabase(database)
       })
 
@@ -149,13 +199,16 @@ describe(DatabasePerServiceDetector, () => {
   })
 
   describe('composeResults', () => {
-    beforeEach(() => {
-      detector = DatabasePerServiceDetector.create()
-    })
-
     describe('single service', () => {
       beforeEach(() => {
-        detector.addCandidate(Service.create('mockado'))
+        const svc = Service.create('mockado')
+
+        const vessels: IObjectVessels = {}
+        vessels[svc.id] = new MeasuresVessel()
+        vessels[svc.id].increment(Metrics.nOperations)
+
+        detector = DatabasePerServiceDetector.create(vessels)
+        detector.addCandidate(svc)
         detector.composeResults()
       })
 
@@ -166,7 +219,13 @@ describe(DatabasePerServiceDetector, () => {
 
     describe('single database', () => {
       beforeEach(() => {
-        detector.addCandidate(Database.create('mockdb'))
+        const db = Database.create('mockdb')
+
+        const vessels: IObjectVessels = {}
+        vessels[db.id] = new MeasuresVessel()
+
+        detector = DatabasePerServiceDetector.create(vessels)
+        detector.addCandidate(db)
         detector.composeResults()
       })
 
@@ -183,7 +242,17 @@ describe(DatabasePerServiceDetector, () => {
         service = Service.create('mockaccino')
         database = Database.create('mockdb')
 
+        const vessels: IObjectVessels = {}
+        vessels[service.id] = new MeasuresVessel()
+        vessels[database.id] = new MeasuresVessel()
+
+        vessels[service.id].increment(Metrics.nOperations)
+        vessels[service.id].increment(Metrics.nDatabaseUsing)
+        vessels[database.id].increment(Metrics.nUsageClients)
+
         DatabaseUsage.create(service, database)
+
+        detector = DatabasePerServiceDetector.create(vessels)
 
         detector.addCandidate(service)
         detector.addCandidate(database)
@@ -198,12 +267,11 @@ describe(DatabasePerServiceDetector, () => {
   })
 
   describe('the complete detection process', () => {
-    let detector: DatabasePerServiceDetector
     let svc3: Service
     let db2: Database
 
     beforeEach(() => {
-      detector = DatabasePerServiceDetector.create()
+      detector = DatabasePerServiceDetector.create({})
 
       const system = System.create('toy')
 
@@ -236,17 +304,27 @@ describe(DatabasePerServiceDetector, () => {
       DatabaseUsage.create(svc2, db1)
       DatabaseUsage.create(svc3, db2)
 
-      svc1.measuresVessel.increment(Metrics.nOperations, 2)
-      svc1.measuresVessel.increment(Metrics.nDatabaseUsing, 1)
+      const vessels: IObjectVessels = {}
 
-      svc2.measuresVessel.increment(Metrics.nOperations, 1)
-      svc2.measuresVessel.increment(Metrics.nDatabaseUsing, 1)
+      vessels[svc1.id] = new MeasuresVessel()
+      vessels[svc2.id] = new MeasuresVessel()
+      vessels[svc3.id] = new MeasuresVessel()
+      vessels[db1.id] = new MeasuresVessel()
+      vessels[db2.id] = new MeasuresVessel()
 
-      svc3.measuresVessel.increment(Metrics.nOperations, 3)
-      svc3.measuresVessel.increment(Metrics.nDatabaseUsing, 1)
+      vessels[svc1.id].increment(Metrics.nOperations, 2)
+      vessels[svc1.id].increment(Metrics.nDatabaseUsing, 1)
 
-      db1.measuresVessel.increment(Metrics.nUsageClients, 2)
-      db2.measuresVessel.increment(Metrics.nUsageClients, 1)
+      vessels[svc2.id].increment(Metrics.nOperations, 1)
+      vessels[svc2.id].increment(Metrics.nDatabaseUsing, 1)
+
+      vessels[svc3.id].increment(Metrics.nOperations, 3)
+      vessels[svc3.id].increment(Metrics.nDatabaseUsing, 1)
+
+      vessels[db1.id].increment(Metrics.nUsageClients, 2)
+      vessels[db2.id].increment(Metrics.nUsageClients, 1)
+
+      detector = DatabasePerServiceDetector.create(vessels)
 
       detector.visitSystem(system)
     })

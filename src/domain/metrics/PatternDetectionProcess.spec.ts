@@ -13,7 +13,6 @@ describe('the complete detection process', () => {
 
   beforeEach(() => {
     collector = MetricsCollector.create()
-    detector = DatabasePerServiceDetector.create()
   })
 
   describe('scenario 1', () => {
@@ -23,6 +22,7 @@ describe('the complete detection process', () => {
       expectation = exp
 
       system.accept(collector)
+      detector = DatabasePerServiceDetector.create(collector.metrics)
       system.accept(detector)
     })
 
@@ -37,6 +37,7 @@ describe('the complete detection process', () => {
       expectation = exp
 
       system.accept(collector)
+      detector = DatabasePerServiceDetector.create(collector.metrics)
       system.accept(detector)
     })
 
@@ -51,6 +52,7 @@ describe('the complete detection process', () => {
       expectation = exp
 
       system.accept(collector)
+      detector = DatabasePerServiceDetector.create(collector.metrics)
       system.accept(detector)
     })
 

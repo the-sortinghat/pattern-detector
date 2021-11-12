@@ -59,15 +59,15 @@ describe(MetricsCollector, () => {
     })
 
     it('marks the metrics vessel of the service with nOperations = 1', () => {
-      expect(service.measuresVessel.nOperations).toEqual(1)
+      expect(collector.nOperations(service.id)).toEqual(1)
     })
 
     it('marks the metrics vessel of the service with nDatabaseUsing = 1', () => {
-      expect(service.measuresVessel.nDatabaseUsing).toEqual(1)
+      expect(collector.nDatabaseUsing(service.id)).toEqual(1)
     })
 
     it("does not change nUsageClients of the service's metrics vessel", () => {
-      expect(service.measuresVessel.nUsageClients).toEqual(0)
+      expect(collector.nUsageClients(service.id)).toEqual(0)
     })
   })
 
@@ -99,15 +99,15 @@ describe(MetricsCollector, () => {
     })
 
     it('marks the metrics vessel of the database with nUsageClients = 1', () => {
-      expect(database.measuresVessel.nUsageClients).toEqual(1)
+      expect(collector.nUsageClients(database.id)).toEqual(1)
     })
 
     it("does not change nDatabaseUsing of the database's metrics vessel", () => {
-      expect(database.measuresVessel.nDatabaseUsing).toEqual(0)
+      expect(collector.nDatabaseUsing(database.id)).toEqual(0)
     })
 
     it("does not change nOperations of the database's metrics vessel", () => {
-      expect(database.measuresVessel.nOperations).toEqual(0)
+      expect(collector.nOperations(database.id)).toEqual(0)
     })
   })
 
@@ -117,25 +117,25 @@ describe(MetricsCollector, () => {
 
     beforeEach(() => {
       const system = System.create('Integration System')
-      service = Service.create('Service')
+      service = Service.create('Service', '1')
       system.addService(service)
       service.addOperation(Operation.create(HTTPVerb.GET, '/foo'))
-      database = Database.create('DatabaseDB')
+      database = Database.create('DatabaseDB', '2')
       DatabaseUsage.create(service, database)
 
-      system.accept(MetricsCollector.create())
+      system.accept(collector)
     })
 
     it('counts nOperations = 1 for the service', () => {
-      expect(service.measuresVessel.nOperations).toEqual(1)
+      expect(collector.nOperations(service.id)).toEqual(1)
     })
 
     it('counts nDatabaseUsing = 1 for the service', () => {
-      expect(service.measuresVessel.nDatabaseUsing).toEqual(1)
+      expect(collector.nDatabaseUsing(service.id)).toEqual(1)
     })
 
     it('counts nUsageClients = 1 for the database', () => {
-      expect(database.measuresVessel.nUsageClients).toEqual(1)
+      expect(collector.nUsageClients(database.id)).toEqual(1)
     })
   })
 })
