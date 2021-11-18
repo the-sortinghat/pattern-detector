@@ -54,43 +54,50 @@ async function manualPopulate(): Promise<void> {
   const producer = kafka.createProducer()
   producer.on('error', console.log)
 
-  await newSystem(producer, 'Fakr', '1')
+  await newSystem(producer, 'Pingr', '1')
 
-  await newService(producer, 'Service 1', '1', '1')
-  await newService(producer, 'Service 2', '2', '1')
-  await newService(producer, 'Service 3', '3', '1')
-  await newService(producer, 'Service 4', '4', '1')
+  await newService(producer, 'Account', '1', '1')
+  await newService(producer, 'Connections', '2', '1')
+  await newService(producer, 'Content', '3', '1')
+  await newService(producer, 'Recommendation', '4', '1')
+  await newService(producer, 'Ping', '5', '1')
+  await newService(producer, 'Interaction', '6', '1')
 
-  await newDatabase(producer, 'FakeDB', '1')
-  await newDatabase(producer, 'FakeDB', '2')
-  await newDatabase(producer, 'FakeDB', '3')
-
-  await newOperation(producer, 'GET', '/path1', '1')
-  await newOperation(producer, 'GET', '/path2', '1')
-  await newOperation(producer, 'GET', '/path3', '2')
-  await newOperation(producer, 'GET', '/path4', '3')
-  await newOperation(producer, 'GET', '/path5', '3')
-  await newOperation(producer, 'GET', '/path6', '3')
-  await newOperation(producer, 'GET', '/path7', '3')
-  await newOperation(producer, 'GET', '/path8', '3')
-  await newOperation(producer, 'GET', '/path9', '3')
-  await newOperation(producer, 'GET', '/path10', '3')
-  await newOperation(producer, 'GET', '/path11', '3')
-  await newOperation(producer, 'GET', '/path12', '3')
-  await newOperation(producer, 'GET', '/path13', '3')
-  await newOperation(producer, 'GET', '/path14', '3')
-  await newOperation(producer, 'GET', '/path15', '3')
-  await newOperation(producer, 'GET', '/path16', '3')
-  await newOperation(producer, 'GET', '/path17', '3')
-  await newOperation(producer, 'GET', '/path18', '3')
-  await newOperation(producer, 'GET', '/path19', '3')
-  await newOperation(producer, 'GET', '/path20', '3')
-  await newOperation(producer, 'GET', '/path21', '4')
+  await newDatabase(producer, 'mongo-db', '1') // accounts db
+  await newDatabase(producer, 'mongo-db', '2') // pings db
+  await newDatabase(producer, 'mongo-db', '3') // trends db
+  await newDatabase(producer, 'mongo-db', '4') // timelines db
+  await newDatabase(producer, 'mongo-db', '5') // Interactions db
 
   await newDBUsage(producer, '1', '1')
-  await newDBUsage(producer, '2', '2')
-  await newDBUsage(producer, '3', '3')
-  await newDBUsage(producer, '4', '2')
+  await newDBUsage(producer, '2', '4')
+  await newDBUsage(producer, '3', '4')
+  await newDBUsage(producer, '4', '3')
+  await newDBUsage(producer, '5', '2')
+  await newDBUsage(producer, '6', '5')
+
+  await newOperation(producer, 'POST', '/registration', '1')
+  await newOperation(producer, 'DELETE', '/registration/:id', '1')
+  await newOperation(producer, 'PATCH', '/registration/:id', '1')
+  await newOperation(producer, 'POST', '/login', '1')
+  await newOperation(producer, 'PATCH', '/login', '1')
+  await newOperation(producer, 'DELETE', '/login', '1')
+  await newOperation(producer, 'PUT', '/profiles/:id', '1')
+  await newOperation(producer, 'GET', '/profiles/:id', '1')
+
+  await newOperation(producer, 'POST', '/friendships', '2')
+  await newOperation(producer, 'PUT', '/friendships/:id', '2')
+
+  await newOperation(producer, 'GET', '/profile/:id/timeline', '3')
+
+  await newOperation(producer, 'GET', '/trends', '4')
+
+  await newOperation(producer, 'GET', '/pings/:id', '5')
+  await newOperation(producer, 'POST', '/pings', '5')
+  await newOperation(producer, 'DELETE', '/pings/:id', '5')
+
+  await newOperation(producer, 'POST', '/pings/:id/likes', '6')
+  await newOperation(producer, 'POST', '/pings/:id/shares', '6')
 }
 
 manualPopulate()
