@@ -15,7 +15,7 @@ export class Operation {
     const validVerb = verbs.includes(verb)
     if (!validVerb) throw new InvalidStateError(`http verb must be one of: ${verbs.join(', ')}`)
 
-    const rgx = /^(\/[A-Za-z0-9\-_]+)+$/
+    const rgx = /^(\/[A-Za-z0-9\-_:]+)+(\?[A-Za-z0-9\-_=&\[\]]+)?$/
     const validPath = rgx.test(path)
 
     if (!validPath) throw new InvalidStateError('path must be of format /foo/baz/123, got ' + path)

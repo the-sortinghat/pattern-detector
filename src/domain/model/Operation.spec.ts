@@ -27,6 +27,19 @@ describe(Operation, () => {
     })
   })
 
+  describe('create with valid arguments', () => {
+    const validUnusualCases = [
+      { caseID: `with ':'`, path: '/foo/:id' },
+      { caseID: `with '?' and '='`, path: '/foo?key=value' },
+    ]
+
+    validUnusualCases.forEach(({ caseID, path }) => {
+      test(`${caseID} doesn't throw error`, () => {
+        expect(() => Operation.create(HTTPVerb.GET, path)).not.toThrow()
+      })
+    })
+  })
+
   describe('create with invalid arguments throwing InvalidStateError', () => {
     test('when verb is a string not from the enum', () => {
       // @ts-ignore
@@ -40,7 +53,6 @@ describe(Operation, () => {
 
     const cases = [
       { id: 'with spaces', path: '/foo /bar' },
-      { id: 'with invalid chars', path: '/foo?bar' },
       { id: 'without leading forward-slash', path: 'foo/bar' },
       { id: 'with trailling forward-slash', path: '/foo/bar/' },
     ]
