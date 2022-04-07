@@ -1,13 +1,17 @@
 package com.sortinghat.pattern_detector.db
 
 import com.sortinghat.pattern_detector.db.tables.Systems
+import com.sortinghat.pattern_detector.domain.SystemNotFoundException
+import com.sortinghat.pattern_detector.domain.System
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -25,18 +29,22 @@ internal class SystemRepositoryImplTest {
 			user = "",
 			password = ""
 		).connect()
+
+		underTest = SystemRepositoryImpl(testDB)
 	}
 
-	@BeforeEach
-	fun instantiate() {
-		underTest = SystemRepositoryImpl(testDB)
+	@AfterEach
+	fun clearDB() {
+		transaction {
+			Systems.deleteAll()
+		}
 	}
 
 	@Test
 	fun `save stores when there's no id`() {
 		val countBefore = count()
 
-		val system = com.sortinghat.pattern_detector.domain.System("test")
+		val system = System("test")
 		underTest.save(system)
 
 		val countAfter = count()
@@ -46,7 +54,7 @@ internal class SystemRepositoryImplTest {
 
 	@Test
 	fun `save updates when there's an id`() {
-		var system = com.sortinghat.pattern_detector.domain.System("test")
+		var system = System("test")
 		system = underTest.save(system)
 
 		val countBefore = count()
@@ -57,6 +65,22 @@ internal class SystemRepositoryImplTest {
 		val countAfter = count()
 
 		assertEquals(countAfter - countBefore, 0L)
+	}
+
+	@Test
+	fun `findById throws SystemNotFound when there's no such id`() {
+		assertThrows<SystemNotFoundException> {
+			underTest.findById(0)
+		}
+	}
+
+	@Test
+	fun `findById returns a system with given id when it exists`() {
+		val given = underTest.save(System("test"))
+
+		val found = underTest.findById(given.id!!)
+
+		assertEquals(found.id, given.id)
 	}
 
 	private fun count(): Long {
