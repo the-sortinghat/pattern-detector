@@ -1,0 +1,1 @@
+rootProject.name = "com.sortinghat.pattern_detector"
