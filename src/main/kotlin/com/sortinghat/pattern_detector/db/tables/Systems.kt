@@ -4,7 +4,7 @@ import org.jetbrains.exposed.sql.Table
 
 object Systems : Table() {
 	val uuid = varchar("uuid", 255)
-	val name = varchar("name", 255)
+	val name = varchar("name", 255).uniqueIndex()
 
 	override val primaryKey = PrimaryKey(uuid, name = "PK_System")
 }
