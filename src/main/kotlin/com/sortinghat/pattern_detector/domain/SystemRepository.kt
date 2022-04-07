@@ -4,6 +4,4 @@ interface SystemRepository {
 
 	fun save(system: System): System
 
-	fun findById(id: Int): System
-
 }
