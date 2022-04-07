@@ -4,6 +4,7 @@ import com.sortinghat.pattern_detector.db.tables.Systems
 import com.sortinghat.pattern_detector.domain.System
 import com.sortinghat.pattern_detector.domain.SystemNotFoundException
 import com.sortinghat.pattern_detector.domain.SystemRepository
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
@@ -11,7 +12,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
 class SystemRepositoryImpl(private val db: Database) : SystemRepository {
-	override fun save(system: System): System = when (system.id) {
+	override fun save(system: System) = when (system.id) {
 		null -> store(system)
 		else -> update(system)
 	}
@@ -35,22 +36,29 @@ class SystemRepositoryImpl(private val db: Database) : SystemRepository {
 	}
 
 	private fun update(system: System): System {
-		transaction(db) {
-			Systems.update({ Systems.id eq system.id!! }) {
-				it[name] = system.name
+		try {
+			transaction(db) {
+				Systems.update({ Systems.id eq system.id!! }) {
+					it[name] = system.name
+				}
 			}
-		}
 
-		return system
+			return system
+		} catch (e: ExposedSQLException) {
+			throw IllegalArgumentException("Cannot update System id=${system.id}: name=${system.name} already taken")
+		}
 	}
 
 	private fun store(system: System): System {
-		val id = transaction(db) {
-			Systems.insertAndGetId {
-				it[name] = system.name
+		try {
+			val id = transaction(db) {
+				Systems.insertAndGetId {
+					it[name] = system.name
+				}
 			}
+			return system.copy(id = id.value)
+		} catch (e: ExposedSQLException) {
+			throw IllegalArgumentException("Cannot create System: name=${system.name} already taken")
 		}
-
-		return system.copy(id = id.value)
 	}
 }

@@ -68,6 +68,29 @@ internal class SystemRepositoryImplTest {
 	}
 
 	@Test
+	fun `save throws IllegalArgumentException when creating with duplicated name`() {
+		val duplicatedName = "some name to be duplicated"
+		underTest.save(System(duplicatedName))
+
+		assertThrows<IllegalArgumentException> {
+			underTest.save(System(duplicatedName))
+		}
+	}
+
+	@Test
+	fun `save throws IllegalArgumentException when updating to a duplicated name`() {
+		val duplicatedName = "some name to be duplicated"
+		underTest.save(System(duplicatedName))
+
+		var otherSystem = underTest.save(System("different name"))
+		otherSystem = otherSystem.copy(name = duplicatedName)
+
+		assertThrows<IllegalArgumentException> {
+			underTest.save(otherSystem)
+		}
+	}
+
+	@Test
 	fun `findById throws SystemNotFound when there's no such id`() {
 		assertThrows<SystemNotFoundException> {
 			underTest.findById(0)
