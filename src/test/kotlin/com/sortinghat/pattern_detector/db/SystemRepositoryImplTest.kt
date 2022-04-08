@@ -38,9 +38,9 @@ internal class SystemRepositoryImplTest {
 	@Test
 	fun `save adds a new record when given a system with unknown UUID`() {
 		// given
-		val unknownUUID = UUID.randomUUID()
+		val system = System.create("test")
+		val unknownUUID = system.id
 		deleteByUUID(unknownUUID)
-		val system = System("test", unknownUUID)
 		val countBefore = getCount()
 
 		// when
@@ -55,11 +55,11 @@ internal class SystemRepositoryImplTest {
 	fun `save updates an existing record when given a system with a known UUID`() {
 		// given
 		val knownID = UUID.randomUUID()
-		val existingSystem = System("test", knownID)
+		val existingSystem = System.hydrate("test", knownID)
 		ensureExists(existingSystem)
 
 		// when
-		val updateViewOfExistingSystem = System("new name", knownID)
+		val updateViewOfExistingSystem = System.hydrate("new name", knownID)
 		underTest.save(updateViewOfExistingSystem)
 
 		// then
@@ -72,11 +72,11 @@ internal class SystemRepositoryImplTest {
 	fun `save throws IllegalArgumentException when given a new system with duplicated name`() {
 		// given
 		val duplicatedName = "dup name"
-		ensureExists(System(duplicatedName, UUID.randomUUID()))
+		ensureExists(System.create(duplicatedName))
 
 		// when & then
 		assertThrows<IllegalArgumentException> {
-			underTest.save(System(duplicatedName, UUID.randomUUID()))
+			underTest.save(System.create(duplicatedName))
 		}
 	}
 
@@ -84,9 +84,9 @@ internal class SystemRepositoryImplTest {
 	fun `save throws IllegalArgumentException when given an update to a duplicated name`() {
 		// given
 		val duplicatedName = "dup name"
-		val existingSystem = System(duplicatedName, UUID.randomUUID())
+		val existingSystem = System.create(duplicatedName)
 		ensureExists(existingSystem)
-		val secondSystem = System("different name", UUID.randomUUID())
+		val secondSystem = System.create("different name")
 		ensureExists(secondSystem)
 
 		// when & then
