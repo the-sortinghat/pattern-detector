@@ -5,6 +5,7 @@ val exposed_version: String by project
 val pgdriver_version: String by project
 val bcrypt_version: String by project
 val h2_version: String by project
+val mockk_version: String by project
 
 plugins {
     application
@@ -44,4 +45,5 @@ dependencies {
     testImplementation(kotlin("test"))
 	testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("com.h2database:h2:${h2_version}")
+    testImplementation("io.mockk:mockk:${mockk_version}")
 }
