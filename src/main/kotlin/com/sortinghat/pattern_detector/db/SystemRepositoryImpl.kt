@@ -2,6 +2,7 @@ package com.sortinghat.pattern_detector.db
 
 import com.sortinghat.pattern_detector.db.tables.Systems
 import com.sortinghat.pattern_detector.domain.System
+import com.sortinghat.pattern_detector.domain.SystemNotFoundException
 import com.sortinghat.pattern_detector.domain.SystemRepository
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
@@ -13,6 +14,24 @@ class SystemRepositoryImpl(private val db: Database) : SystemRepository {
 	override fun save(system: System) = when(idExists(system.id)) {
 		true -> update(system)
 		else -> store(system)
+	}
+
+	override fun findById(id: UUID): System {
+		val systems = transaction(db) {
+			Systems
+				.select { Systems.uuid eq id.toString() }
+				.map {
+					System(
+						id = UUID.fromString(it[Systems.uuid]),
+						name = it[Systems.name]
+					)
+				}
+		}
+
+		if (systems.isEmpty())
+			throw SystemNotFoundException(id)
+
+		return systems[0]
 	}
 
 	private fun store(system: System): System {

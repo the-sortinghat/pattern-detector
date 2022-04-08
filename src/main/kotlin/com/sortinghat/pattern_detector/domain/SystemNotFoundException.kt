@@ -1,4 +1,6 @@
 package com.sortinghat.pattern_detector.domain
 
-class SystemNotFoundException(id: Int): Exception("System id=$id not found") {
+import java.util.UUID
+
+class SystemNotFoundException(id: UUID): Exception("System id=$id not found") {
 }

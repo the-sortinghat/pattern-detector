@@ -2,6 +2,7 @@ package com.sortinghat.pattern_detector.db
 
 import com.sortinghat.pattern_detector.db.tables.Systems
 import com.sortinghat.pattern_detector.domain.System
+import com.sortinghat.pattern_detector.domain.SystemNotFoundException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
@@ -96,6 +97,30 @@ internal class SystemRepositoryImplTest {
 		}
 	}
 
+	@Test
+	fun `findById throws SystemNotFound when there is no such id`() {
+		// given
+		val givenId = UUID.randomUUID()
+		deleteByUUID(givenId)
+
+		// when & then
+		assertThrows<SystemNotFoundException> {
+			underTest.findById(givenId)
+		}
+	}
+
+	@Test
+	fun `findById returns a System when there is an id match`() {
+		// given
+		val system = System.create("test")
+		ensureExists(system)
+
+		// when
+		val foundSystem = underTest.findById(system.id)
+
+		// then
+		assertEquals(foundSystem.id, system.id)
+	}
 
 	private fun getCount() = transaction {
 		Systems.selectAll().count()
