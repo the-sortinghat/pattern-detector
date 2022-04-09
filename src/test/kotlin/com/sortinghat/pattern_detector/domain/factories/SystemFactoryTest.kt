@@ -1,4 +1,4 @@
-package com.sortinghat.pattern_detector.domain
+package com.sortinghat.pattern_detector.domain.factories
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull

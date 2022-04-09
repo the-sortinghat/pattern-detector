@@ -1,4 +1,4 @@
-package com.sortinghat.pattern_detector.domain
+package com.sortinghat.pattern_detector.domain.model
 
 import java.util.*
 

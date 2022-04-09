@@ -1,5 +1,7 @@
-package com.sortinghat.pattern_detector.domain
+package com.sortinghat.pattern_detector.domain.factories
 
+import com.sortinghat.pattern_detector.domain.SystemNotFoundException
+import com.sortinghat.pattern_detector.domain.SystemRepository
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

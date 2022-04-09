@@ -1,7 +1,7 @@
 package com.sortinghat.pattern_detector.db
 
 import com.sortinghat.pattern_detector.db.tables.Systems
-import com.sortinghat.pattern_detector.domain.System
+import com.sortinghat.pattern_detector.domain.model.System
 import com.sortinghat.pattern_detector.domain.SystemNotFoundException
 import com.sortinghat.pattern_detector.domain.SystemRepository
 import org.jetbrains.exposed.exceptions.ExposedSQLException
