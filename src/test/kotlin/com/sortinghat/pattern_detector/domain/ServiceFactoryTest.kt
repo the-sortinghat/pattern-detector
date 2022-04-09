@@ -18,6 +18,8 @@ internal class ServiceFactoryTest {
     @MockK
     lateinit var systemRepository: SystemRepository
 
+    private val systemFactory = SystemFactory()
+
     private val underTest: ServiceFactory
 
     init {
@@ -45,7 +47,7 @@ internal class ServiceFactoryTest {
     @Test
     fun `ServiceFactory create returns a new service within the given system`() {
         // given
-        val system = System.create("test")
+        val system = systemFactory.create("test")
         every { systemRepository.findById(any()) } returns system
 
         // when
