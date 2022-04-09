@@ -1,5 +1,6 @@
 package com.sortinghat.pattern_detector.db
 
+import com.sortinghat.pattern_detector.db.tables.Services
 import com.sortinghat.pattern_detector.db.tables.Systems
 import com.sortinghat.pattern_detector.domain.model.System
 import com.sortinghat.pattern_detector.domain.SystemNotFoundException
@@ -51,17 +52,26 @@ class SystemRepositoryImpl(private val db: Database) : SystemRepository {
 
 	private fun update(system: System): System {
 		try {
-			transaction (db) {
+			transaction {
 				Systems.update({ Systems.uuid eq system.id.toString() }) {
 					it[name] = system.name
+				}
+
+				system.getServices().forEach { svc ->
+					Services.insert {
+						it[name] = svc.name
+						it[systemUuid] = system.id.toString()
+					}
 				}
 			}
 
 			return system
 		} catch (e: ExposedSQLException) {
-			throw IllegalArgumentException("Cannot update System id=${system.id}: name=${system.name} already taken")
+			if (e.message != null && e.message!!.matches(Regex("SERVICE")))
+				throw IllegalArgumentException("Cannot update System id=${system.id}: duplicated service name")
+			else
+				throw IllegalArgumentException("Cannot update System id=${system.id}: duplicated system name")
 		}
-
 	}
 
 	private fun idExists(id: UUID): Boolean = transaction {

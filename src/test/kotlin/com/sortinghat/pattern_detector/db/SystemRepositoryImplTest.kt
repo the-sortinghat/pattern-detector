@@ -1,9 +1,12 @@
 package com.sortinghat.pattern_detector.db
 
+import com.sortinghat.pattern_detector.db.tables.Services
 import com.sortinghat.pattern_detector.db.tables.Systems
 import com.sortinghat.pattern_detector.domain.model.System
 import com.sortinghat.pattern_detector.domain.factories.SystemFactory
 import com.sortinghat.pattern_detector.domain.SystemNotFoundException
+import com.sortinghat.pattern_detector.domain.factories.ServiceFactory
+import com.sortinghat.pattern_detector.domain.model.Service
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
@@ -15,10 +18,12 @@ import kotlin.test.assertEquals
 internal class SystemRepositoryImplTest {
 
 	lateinit var underTest: SystemRepositoryImpl
+	lateinit var serviceFactory: ServiceFactory
 
 	lateinit var testDB: Database
 
 	private val systemFactory = SystemFactory()
+
 
 	@BeforeAll
 	fun setUp() {
@@ -30,11 +35,13 @@ internal class SystemRepositoryImplTest {
 		).connect()
 
 		underTest = SystemRepositoryImpl(testDB)
+		serviceFactory = ServiceFactory(underTest)
 	}
 
 	@AfterEach
 	fun clearDB() {
 		transaction {
+			Services.deleteAll()
 			Systems.deleteAll()
 		}
 	}
@@ -45,11 +52,11 @@ internal class SystemRepositoryImplTest {
 		val system = systemFactory.create("test")
 		val unknownUUID = system.id
 		deleteByUUID(unknownUUID)
-		val countBefore = getCount()
+		val countBefore = countSystems()
 
 		// when
 		underTest.save(system)
-		val countAfter = getCount()
+		val countAfter = countSystems()
 
 		// then
 		assertEquals(countAfter - countBefore, 1L)
@@ -60,7 +67,7 @@ internal class SystemRepositoryImplTest {
 		// given
 		val knownID = UUID.randomUUID()
 		val existingSystem = systemFactory.create("test", knownID)
-		ensureExists(existingSystem)
+		ensureSystemExists(existingSystem)
 
 		// when
 		val updateViewOfExistingSystem = systemFactory.create("new name", knownID)
@@ -73,10 +80,28 @@ internal class SystemRepositoryImplTest {
 	}
 
 	@Test
+	fun `save adds new records to Services table when given a system with services`() {
+		// given
+		val system = systemFactory.create("test")
+		ensureSystemExists(system)
+		val service = serviceFactory.create("svc", system.id.toString())
+		system.addService(service)
+		val countBefore = countServices()
+
+		// when
+		underTest.save(system)
+
+
+		// then
+		val countAfter = countServices()
+		assertEquals(countAfter - countBefore, 1L)
+	}
+
+	@Test
 	fun `save throws IllegalArgumentException when given a new system with duplicated name`() {
 		// given
 		val duplicatedName = "dup name"
-		ensureExists(systemFactory.create(duplicatedName))
+		ensureSystemExists(systemFactory.create(duplicatedName))
 
 		// when & then
 		assertThrows<IllegalArgumentException> {
@@ -89,14 +114,32 @@ internal class SystemRepositoryImplTest {
 		// given
 		val duplicatedName = "dup name"
 		val existingSystem = systemFactory.create(duplicatedName)
-		ensureExists(existingSystem)
+		ensureSystemExists(existingSystem)
 		val secondSystem = systemFactory.create("different name")
-		ensureExists(secondSystem)
+		ensureSystemExists(secondSystem)
 
 		// when & then
 		val updateViewOfSecondSystem = secondSystem.copy(name = duplicatedName)
 		assertThrows<IllegalArgumentException> {
 			underTest.save(updateViewOfSecondSystem)
+		}
+	}
+
+	@Test
+	fun `save throws IllegalArgumentException when given a system to update with a duplicated service name`() {
+		// given
+		val system = systemFactory.create("test")
+		ensureSystemExists(system)
+		val duplicatedName = "svc"
+		val service = serviceFactory.create(duplicatedName, system.id.toString())
+		system.addService(service)
+		ensureServiceExists(service)
+
+		// when & then
+		val otherService = serviceFactory.create(duplicatedName, system.id.toString())
+		system.addService(otherService)
+		assertThrows<IllegalArgumentException> {
+			underTest.save(system)
 		}
 	}
 
@@ -116,7 +159,7 @@ internal class SystemRepositoryImplTest {
 	fun `findById returns a System when there is an id match`() {
 		// given
 		val system = systemFactory.create("test")
-		ensureExists(system)
+		ensureSystemExists(system)
 
 		// when
 		val foundSystem = underTest.findById(system.id)
@@ -125,8 +168,12 @@ internal class SystemRepositoryImplTest {
 		assertEquals(foundSystem.id, system.id)
 	}
 
-	private fun getCount() = transaction {
+	private fun countSystems() = transaction {
 		Systems.selectAll().count()
+	}
+
+	private fun countServices() = transaction {
+		Services.selectAll().count()
 	}
 
 	private fun getByUUID(id: UUID) = transaction {
@@ -145,10 +192,17 @@ internal class SystemRepositoryImplTest {
 		Systems.deleteWhere { Systems.uuid eq uuid.toString() }
 	}
 
-	private fun ensureExists(system: System) = transaction {
+	private fun ensureSystemExists(system: System) = transaction {
 		Systems.insert {
 			it[uuid] = system.id.toString()
 			it[name] = system.name
+		}
+	}
+
+	private fun ensureServiceExists(service: Service) = transaction {
+		Services.insert {
+			it[name] = service.name
+			it[systemUuid] = service.system.id.toString()
 		}
 	}
 }
