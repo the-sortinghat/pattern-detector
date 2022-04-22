@@ -1,11 +1,9 @@
 package com.sortinghat.pattern_detector.db
 
-import com.sortinghat.pattern_detector.db.tables.Services
-import com.sortinghat.pattern_detector.db.tables.Systems
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
+@Suppress("unused")
 class DatabaseAdapterImpl (
 	private val url: String,
 	private val driver: String,
@@ -23,8 +21,7 @@ class DatabaseAdapterImpl (
 
 	private fun createTables() {
 		transaction {
-			SchemaUtils.create(Systems)
-			SchemaUtils.create(Services)
+
 		}
 	}
 }
