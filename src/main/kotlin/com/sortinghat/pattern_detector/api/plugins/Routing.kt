@@ -1,16 +1,17 @@
 package com.sortinghat.pattern_detector.api.plugins
 
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
-import io.ktor.routing.routing
-import io.ktor.routing.get
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
     routing {
         get("/") {
-            call.respond(HttpStatusCode.OK, message = mapOf("message" to "hello, world"))
+            call.respond(
+                status = HttpStatusCode.OK,
+                message = "Hello, Ktor!"
+            )
         }
     }
 }
