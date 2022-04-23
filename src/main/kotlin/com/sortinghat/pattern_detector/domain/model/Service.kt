@@ -1,5 +1,6 @@
 package com.sortinghat.pattern_detector.domain.model
 
+import com.sortinghat.pattern_detector.domain.behaviors.Measurable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitor
 
@@ -8,7 +9,8 @@ data class Service(
     val systemName: Slug,
     val usages: MutableSet<DatabaseUsage> = mutableSetOf(),
     val operations: MutableSet<Operation> = mutableSetOf(),
-) : Visitable {
+    val bag: MetricBag = MetricBag(),
+) : Visitable, Measurable by bag {
     override fun accept(visitor: Visitor) {
         visitor.visit(this)
     }
