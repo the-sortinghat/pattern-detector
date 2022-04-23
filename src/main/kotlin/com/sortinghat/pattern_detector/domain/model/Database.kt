@@ -1,8 +1,10 @@
 package com.sortinghat.pattern_detector.domain.model
 
+import com.sortinghat.pattern_detector.domain.behaviors.Measurable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitor
 
+@Suppress("unused")
 enum class DataSource {
     MySql, PostgreSql, MariaDb,
     CassandraDb, MongoDb, Redis,
@@ -14,8 +16,9 @@ enum class DataSource {
 data class Database(
     val name: String,
     val type: DataSource,
-    val usages: MutableSet<DatabaseUsage> = mutableSetOf()
-) : Visitable {
+    val usages: MutableSet<DatabaseUsage> = mutableSetOf(),
+    val bag: MetricBag = MetricBag()
+) : Visitable, Measurable by bag {
     override fun accept(visitor: Visitor) {
         visitor.visit(this)
     }

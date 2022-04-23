@@ -16,14 +16,31 @@ class MetricCollector : Visitor {
             service.increase(Metrics.OPERATIONS_OF_SERVICE)
             op.accept(visitor = this)
         }
+
+        service.usages.forEach { usage ->
+            service.increase(Metrics.DATABASES_USED_BY_SERVICE)
+            usage.accept(visitor = this)
+        }
     }
 
     override fun visit(operation: Operation) {
     }
 
     override fun visit(database: Database) {
+        if (database in visited) return
+
+        visited.add(database)
+        database.usages.forEach { usage ->
+            database.increase(Metrics.CLIENTS_OF_DATABASE)
+            usage.accept(visitor = this)
+        }
     }
 
     override fun visit(usage: DatabaseUsage) {
+        if (usage in visited) return
+
+        visited.add(usage)
+        usage.service.accept(visitor = this)
+        usage.database.accept(visitor = this)
     }
 }
