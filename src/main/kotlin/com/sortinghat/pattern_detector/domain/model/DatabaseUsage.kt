@@ -3,14 +3,20 @@ package com.sortinghat.pattern_detector.domain.model
 import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitor
 
-enum class HttpVerb {
-    GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD, CONNECT, TRACE
+enum class DatabaseAccessMode {
+    ReadOnly, WriteOnly, ReadWrite
 }
 
-data class Operation(
-    val verb: HttpVerb,
-    val uri: String
+data class DatabaseUsage(
+    val service: Service,
+    val database: Database,
+    val accessMode: DatabaseAccessMode
 ) : Visitable {
+    init {
+        service.addUsage(this)
+        database.addUsage(this)
+    }
+
     override fun accept(visitor: Visitor) {
         visitor.visit(this)
     }
