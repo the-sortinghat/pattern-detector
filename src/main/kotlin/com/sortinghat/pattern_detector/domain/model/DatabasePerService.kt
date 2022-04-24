@@ -1,14 +1,16 @@
 package com.sortinghat.pattern_detector.domain.model
 
-class DatabasePerService(
-    service: Service,
-    database: Database
-) {
-    val service: String
-    val database: String
+import kotlinx.serialization.Serializable
 
-    init {
-        this.service = service.name
-        this.database = database.name
+@Serializable
+data class DatabasePerService(
+    val service: String,
+    val database: String
+) {
+    companion object {
+        fun from(service: Service, database: Database) = DatabasePerService(
+            service.name,
+            database.name
+        )
     }
 }

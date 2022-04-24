@@ -55,7 +55,7 @@ class DatabasePerServiceDetector : Visitor {
                 db.usages.any { usage -> usage.service == service }
             } ?: return@forEach
 
-            occurrences.add(DatabasePerService(service, database))
+            occurrences.add(DatabasePerService.from(service, database))
         }
 
         return occurrences
