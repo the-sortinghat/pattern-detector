@@ -1,5 +1,6 @@
 package com.sortinghat.pattern_detector.api.plugins
 
+import com.sortinghat.pattern_detector.api.PatternsInSystemPayload
 import com.sortinghat.pattern_detector.domain.model.ServiceRepository
 import com.sortinghat.pattern_detector.domain.services.DatabasePerServiceDetector
 import com.sortinghat.pattern_detector.domain.services.MetricCollector
@@ -12,26 +13,27 @@ fun Application.configureRouting(serviceRepository: ServiceRepository) {
     routing {
         get("/systems/{slug}/patterns") {
             val slugParam = call.parameters["slug"]
-                ?: call.respond(
+                ?: return@get call.respond(
                     status = HttpStatusCode.BadRequest,
                     message = mapOf("error" to "slug must be provided")
                 )
 
-            val services = serviceRepository.findAllOfSystem(slugParam as String)
+            val services = serviceRepository.findAllOfSystem(slugParam)
 
-            val metricCollector = MetricCollector()
-            val databasePerServiceDetector = DatabasePerServiceDetector()
+            val collector = MetricCollector()
+            val dbpsDetector = DatabasePerServiceDetector()
 
-            services.forEach { it.accept(metricCollector) }
-            services.forEach { it.accept(databasePerServiceDetector) }
+            services.forEach { it.accept(collector) }
+            services.forEach { it.accept(dbpsDetector) }
 
-            val dbps = databasePerServiceDetector.getResults()
-
-            val patterns = mapOf("DatabasePerService" to dbps)
+            val body = PatternsInSystemPayload.create(
+                system = slugParam,
+                databasePerServices = dbpsDetector.getResults()
+            )
 
             call.respond(
                 status = HttpStatusCode.OK,
-                message = mapOf("patterns" to patterns)
+                message = body
             )
         }
     }
