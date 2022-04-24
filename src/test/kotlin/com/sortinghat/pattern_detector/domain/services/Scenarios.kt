@@ -22,5 +22,16 @@ class Scenarios {
 
             return listOf(service)
         }
+
+        fun oneServiceWithTwoDatabases(): List<Visitable> {
+            val service = Service(name = "foo", systemName = Slug.from("foo system"))
+            val db1 = Database(name = "db 1", DataSource.MongoDb)
+            val db2 = Database(name = "db 2", DataSource.PostgreSql)
+
+            DatabaseUsage(service, database = db1, accessMode = DatabaseAccessMode.ReadWrite)
+            DatabaseUsage(service, database = db2, accessMode = DatabaseAccessMode.ReadWrite)
+
+            return listOf(service)
+        }
     }
 }

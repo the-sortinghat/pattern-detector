@@ -28,4 +28,18 @@ internal class DatabasePerServiceDetectorTest {
         val results = underTest.getResults()
         assertEquals(1, results.size)
     }
+
+    @Test
+    fun `it correctly do not detect when service uses two databases`() {
+        // given
+        val visitable = Scenarios.oneServiceWithTwoDatabases()
+        visitable.forEach { it.accept(MetricCollector()) }
+
+        // when
+        visitable.forEach { it.accept(underTest) }
+
+        // then
+        val results = underTest.getResults()
+        assertEquals(0, results.size)
+    }
 }
