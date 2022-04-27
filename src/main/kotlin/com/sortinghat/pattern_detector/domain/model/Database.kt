@@ -23,6 +23,10 @@ data class Database(
         visitor.visit(this)
     }
 
+    override fun children(): Iterable<Visitable> {
+        return usages
+    }
+
     fun addUsage(usage: DatabaseUsage) {
         this.usages.add(usage)
     }

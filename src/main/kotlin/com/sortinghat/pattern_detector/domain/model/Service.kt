@@ -15,6 +15,10 @@ data class Service(
         visitor.visit(this)
     }
 
+    override fun children(): Iterable<Visitable> {
+        return usages + operations
+    }
+
     fun addUsage(usage: DatabaseUsage) {
         this.usages.add(usage)
     }

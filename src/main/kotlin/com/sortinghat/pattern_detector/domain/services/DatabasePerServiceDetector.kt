@@ -21,8 +21,7 @@ class DatabasePerServiceDetector : Visitor {
         val hasFewOperations = service.get(Metrics.OPERATIONS_OF_SERVICE) < nOperationsThreshold
 
         if (hasFewOperations && singleDatabase) serviceCandidates.add(service)
-        service.operations.forEach { it.accept(visitor = this) }
-        service.usages.forEach { it.accept(visitor = this) }
+        service.children().forEach { it.accept(visitor = this) }
     }
 
     override fun visit(operation: Operation) {
@@ -36,15 +35,14 @@ class DatabasePerServiceDetector : Visitor {
 
         if (singleClient) databaseCandidates.add(database)
 
-        database.usages.forEach { it.accept(visitor = this) }
+        database.children().forEach { it.accept(visitor = this) }
     }
 
     override fun visit(usage: DatabaseUsage) {
         if (usage in visited) return
 
         visited.add(usage)
-        usage.service.accept(visitor = this)
-        usage.database.accept(visitor = this)
+        usage.children().forEach { it.accept(visitor = this) }
     }
 
     fun getResults(): Set<DatabasePerService> {
