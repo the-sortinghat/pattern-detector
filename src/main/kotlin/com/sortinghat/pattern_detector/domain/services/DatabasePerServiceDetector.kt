@@ -1,11 +1,12 @@
 package com.sortinghat.pattern_detector.domain.services
 
+import com.sortinghat.pattern_detector.domain.behaviors.PatternDetector
 import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitor
 import com.sortinghat.pattern_detector.domain.model.*
 
 @Suppress("unused")
-class DatabasePerServiceDetector : Visitor {
+class DatabasePerServiceDetector : Visitor, PatternDetector {
 
     private val nOperationsThreshold = 8
 
@@ -45,7 +46,7 @@ class DatabasePerServiceDetector : Visitor {
         usage.children().forEach { it.accept(visitor = this) }
     }
 
-    fun getResults(): Set<DatabasePerService> {
+    override fun getResults(): Set<DatabasePerService> {
         val occurrences = mutableSetOf<DatabasePerService>()
 
         serviceCandidates.forEach { service ->
