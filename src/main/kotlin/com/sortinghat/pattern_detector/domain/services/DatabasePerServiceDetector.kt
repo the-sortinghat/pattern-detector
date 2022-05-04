@@ -17,10 +17,10 @@ class DatabasePerServiceDetector : Visitor {
         if (service in visited) return
 
         visited.add(service)
-        val singleDatabase = service.get(Metrics.DATABASES_USED_BY_SERVICE) == 1
         val hasFewOperations = service.get(Metrics.OPERATIONS_OF_SERVICE) < nOperationsThreshold
 
-        if (hasFewOperations && singleDatabase) serviceCandidates.add(service)
+        if (hasFewOperations) serviceCandidates.add(service)
+
         service.children().forEach { it.accept(visitor = this) }
     }
 
