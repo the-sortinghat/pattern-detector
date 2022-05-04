@@ -10,13 +10,19 @@ data class Service(
     val usages: MutableSet<DatabaseUsage> = mutableSetOf(),
     val operations: MutableSet<Operation> = mutableSetOf(),
     val bag: MetricBag = MetricBag(),
+    val module: Module = Module(),
 ) : Visitable, Measurable by bag {
+
+    init {
+        module.addService(this)
+    }
+
     override fun accept(visitor: Visitor) {
         visitor.visit(this)
     }
 
     override fun children(): Iterable<Visitable> {
-        return usages + operations
+        return usages + operations + module
     }
 
     fun addUsage(usage: DatabaseUsage) {

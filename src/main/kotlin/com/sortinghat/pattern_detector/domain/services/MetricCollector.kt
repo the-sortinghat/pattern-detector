@@ -43,4 +43,12 @@ class MetricCollector : Visitor {
         visited.add(usage)
         usage.children().forEach { it.accept(visitor = this) }
     }
+
+    override fun visit(module: Module) {
+        if (module in visited) return
+
+        visited.add(module)
+
+        module.children().forEach { it.accept(visitor = this) }
+    }
 }
