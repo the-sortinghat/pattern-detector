@@ -49,6 +49,9 @@ class MetricCollector : Visitor {
 
         visited.add(module)
 
-        module.children().forEach { it.accept(visitor = this) }
+        module.children().forEach {
+            module.increase(Metrics.SERVICES_PER_MODULE)
+            it.accept(visitor = this)
+        }
     }
 }

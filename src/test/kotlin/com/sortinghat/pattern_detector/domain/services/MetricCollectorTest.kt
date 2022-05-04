@@ -1,6 +1,7 @@
 package com.sortinghat.pattern_detector.domain.services
 
 import com.sortinghat.pattern_detector.domain.behaviors.Measurable
+import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.model.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,5 +53,18 @@ internal class MetricCollectorTest {
         // then
         val db = (visitable[0] as Service).usages.first().database
         assertEquals(1, db.get(Metrics.CLIENTS_OF_DATABASE))
+    }
+
+    @Test
+    fun `it collects n services per module correctly for trivial case`() {
+        // given
+        val visitable: List<Visitable> = Scenarios.oneModuleWithOneService()
+
+        // when
+        visitable.forEach { it.accept(underTest) }
+
+        // then
+        val module = (visitable[0] as Service).module
+        assertEquals(1, (module as Measurable).get(Metrics.SERVICES_PER_MODULE))
     }
 }

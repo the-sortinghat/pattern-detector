@@ -33,5 +33,15 @@ class Scenarios {
 
             return listOf(service)
         }
+
+        fun oneModuleWithOneService(): List<Visitable> {
+            val explicitModule = Module()
+
+            return listOf(Service(
+                name = "foo",
+                systemName = Slug.from("foo system"),
+                module = explicitModule
+            ))
+        }
     }
 }
