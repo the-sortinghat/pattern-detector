@@ -4,6 +4,7 @@ import com.sortinghat.pattern_detector.api.PatternsInSystemPayload
 import com.sortinghat.pattern_detector.domain.model.ServiceRepository
 import com.sortinghat.pattern_detector.domain.services.DatabasePerServiceDetector
 import com.sortinghat.pattern_detector.domain.services.MetricCollector
+import com.sortinghat.pattern_detector.domain.services.SingleServicePerHostDetector
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -20,15 +21,20 @@ fun Application.configureRouting(serviceRepository: ServiceRepository) {
 
             val services = serviceRepository.findAllOfSystem(slugParam)
 
-            val collector = MetricCollector()
-            val dbpsDetector = DatabasePerServiceDetector()
+            val visitors = mapOf(
+                "metrics" to MetricCollector(),
+                "dbps" to DatabasePerServiceDetector(),
+                "ssph" to SingleServicePerHostDetector()
+            )
 
-            services.forEach { it.accept(collector) }
-            services.forEach { it.accept(dbpsDetector) }
+            visitors.values.forEach { visitor ->
+                services.forEach { it.accept(visitor) }
+            }
 
             val body = PatternsInSystemPayload.create(
                 system = slugParam,
-                databasePerServices = dbpsDetector.getResults()
+                databasePerServices = (visitors["dbps"] as DatabasePerServiceDetector).getResults(),
+                singleServicePerHost = (visitors["ssph"] as SingleServicePerHostDetector).getResults()
             )
 
             call.respond(
