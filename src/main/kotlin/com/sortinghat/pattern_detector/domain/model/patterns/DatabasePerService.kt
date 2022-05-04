@@ -1,6 +1,8 @@
-package com.sortinghat.pattern_detector.domain.model
+package com.sortinghat.pattern_detector.domain.model.patterns
 
 import com.sortinghat.pattern_detector.domain.behaviors.Pattern
+import com.sortinghat.pattern_detector.domain.model.Database
+import com.sortinghat.pattern_detector.domain.model.Service
 import kotlinx.serialization.Serializable
 
 @Serializable

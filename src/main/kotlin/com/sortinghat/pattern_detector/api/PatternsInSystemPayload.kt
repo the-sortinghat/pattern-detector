@@ -1,6 +1,6 @@
 package com.sortinghat.pattern_detector.api
 
-import com.sortinghat.pattern_detector.domain.model.DatabasePerService
+import com.sortinghat.pattern_detector.domain.model.patterns.DatabasePerService
 import kotlinx.serialization.Serializable
 
 @Serializable
