@@ -1,7 +1,6 @@
 package com.sortinghat.pattern_detector.api
 
-import com.sortinghat.pattern_detector.domain.model.patterns.DatabasePerService
-import com.sortinghat.pattern_detector.domain.model.patterns.SingleServicePerHost
+import com.sortinghat.pattern_detector.domain.model.patterns.Detections
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,16 +9,12 @@ data class PatternsInSystemPayload(
     val patterns: PatternsPresent
 ) {
     companion object {
-        fun create(
-            system: String,
-            databasePerServices: Set<DatabasePerService>,
-            singleServicePerHost: Set<SingleServicePerHost>
-        ): PatternsInSystemPayload {
+        fun from(system: String, detections: Detections): PatternsInSystemPayload {
             return PatternsInSystemPayload(
-                system = system,
+                system,
                 patterns = PatternsPresent(
-                    databasePerService = databasePerServices,
-                    singleServicePerHost = singleServicePerHost
+                    detections.databasePerServices,
+                    detections.singleServicePerHosts
                 )
             )
         }
