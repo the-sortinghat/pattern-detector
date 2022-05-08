@@ -8,13 +8,17 @@ import com.sortinghat.pattern_detector.domain.model.patterns.SingleServicePerHos
 
 class SingleServicePerHostDetector : Visitor, PatternDetector {
 
+    private val nOperationsThreshold = 8
     private val visited = mutableSetOf<Visitable>()
-    private val detections = mutableSetOf<SingleServicePerHost>()
+    private val serviceCandidates = mutableSetOf<Service>()
+    private val moduleCandidates = mutableListOf<Module>()
 
     override fun visit(service: Service) {
         if (service in visited) return
 
         visited.add(service)
+        val hasFewOperations = service.get(Metrics.OPERATIONS_OF_SERVICE) < nOperationsThreshold
+        if (hasFewOperations) serviceCandidates.add(service)
 
         service.children().forEach { it.accept(visitor = this) }
     }
@@ -48,15 +52,20 @@ class SingleServicePerHostDetector : Visitor, PatternDetector {
 
         visited.add(module)
         val singleService = module.get(Metrics.SERVICES_PER_MODULE) == 1
-        if (singleService) {
-            val theService = module.services.first()
-            detections.add(SingleServicePerHost.from(theService))
-        }
+        if (singleService) moduleCandidates.add(module)
 
         module.children().forEach { it.accept(visitor = this) }
     }
 
     override fun getResults(): Set<SingleServicePerHost> {
-        return detections
+        return moduleCandidates
+            .filter { module ->
+                module.services.first() in serviceCandidates
+            }
+            .map { module ->
+                val service = module.services.first()
+                SingleServicePerHost.from(service)
+            }
+            .toSet()
     }
 }

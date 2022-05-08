@@ -28,4 +28,18 @@ internal class SingleServicePerHostDetectorTest {
         // then
         assertEquals(1, results.size)
     }
+
+    @Test
+    fun `it does not detect single svc on the trivial case when too many operations`() {
+        // given
+        val visitable = Scenarios.oneModuleWithVeryLargeService()
+        visitable.forEach { it.accept(visitor = MetricCollector()) }
+
+        // when
+        visitable.forEach { it.accept(underTest) }
+        val results = underTest.getResults()
+
+        // then
+        assertEquals(0, results.size)
+    }
 }

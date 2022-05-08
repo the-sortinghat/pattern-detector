@@ -43,5 +43,20 @@ class Scenarios {
                 module = explicitModule
             ))
         }
+
+        fun oneModuleWithVeryLargeService(): List<Visitable> {
+            val explicitModule = Module()
+
+            val svc = Service(
+                name = "foo",
+                systemName = Slug.from("foo system"),
+                module = explicitModule
+            )
+
+            for (i in 1..20)
+                svc.addOperation(Operation(HttpVerb.GET, "/oper_$i"))
+
+            return listOf(svc)
+        }
     }
 }
