@@ -10,7 +10,8 @@ fun detectionWorkflow(systemSlug: String, serviceRepository: ServiceRepository):
     val visitors = mapOf(
         "metrics" to MetricCollector(),
         "dbps" to DatabasePerServiceDetector(),
-        "ssph" to SingleServicePerHostDetector()
+        "ssph" to SingleServicePerHostDetector(),
+        "apic" to APICompositionDetector()
     )
 
     visitors.values.forEach { visitor ->
@@ -19,6 +20,7 @@ fun detectionWorkflow(systemSlug: String, serviceRepository: ServiceRepository):
 
     return Detections(
         databasePerServices = (visitors["dbps"] as DatabasePerServiceDetector).getResults(),
-        singleServicePerHosts = (visitors["ssph"] as SingleServicePerHostDetector).getResults()
+        singleServicePerHosts = (visitors["ssph"] as SingleServicePerHostDetector).getResults(),
+        apiCompostions = (visitors["apic"] as APICompositionDetector).getResults()
     )
 }
