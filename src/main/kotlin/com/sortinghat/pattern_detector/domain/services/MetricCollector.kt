@@ -13,12 +13,10 @@ class MetricCollector : Visitor {
 
         visited.add(service)
 
-        service.children().forEach { child ->
-            when (child) {
-                is Operation -> service.increase(Metrics.OPERATIONS_OF_SERVICE)
-                is DatabaseUsage -> service.increase(Metrics.DATABASES_USED_BY_SERVICE)
-            }
+        service.exposedOperations.forEach { _ -> service.increase(Metrics.OPERATIONS_OF_SERVICE) }
+        service.usages.forEach { _ -> service.increase(Metrics.DATABASES_USED_BY_SERVICE) }
 
+        service.children().forEach { child ->
             child.accept(visitor = this)
         }
     }
@@ -30,9 +28,10 @@ class MetricCollector : Visitor {
         if (database in visited) return
 
         visited.add(database)
-        database.children().forEach { child ->
-            if (child is DatabaseUsage) database.increase(Metrics.CLIENTS_OF_DATABASE)
 
+        database.usages.forEach { _ -> database.increase(Metrics.CLIENTS_OF_DATABASE) }
+
+        database.children().forEach { child ->
             child.accept(visitor = this)
         }
     }
