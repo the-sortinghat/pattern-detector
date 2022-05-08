@@ -67,4 +67,18 @@ internal class MetricCollectorTest {
         val module = (visitable[0] as Service).module
         assertEquals(1, (module as Measurable).get(Metrics.SERVICES_PER_MODULE))
     }
+
+    @Test
+    fun `it collects sync dep correctly for the trivial case`() {
+        // given
+        val visitable = Scenarios.oneQueryServiceWithTwoSyncDependencies()
+
+        // when
+        visitable.forEach { it.accept(underTest) }
+
+        // then
+        assertEquals(2, (visitable[0] as Service).get(Metrics.SYNC_DEPENDENCY))
+        assertEquals(0, (visitable[1] as Service).get(Metrics.SYNC_DEPENDENCY))
+        assertEquals(0, (visitable[2] as Service).get(Metrics.SYNC_DEPENDENCY))
+    }
 }

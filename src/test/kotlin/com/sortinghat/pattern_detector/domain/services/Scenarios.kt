@@ -9,7 +9,7 @@ class Scenarios {
             val service = Service(name = "foo", systemName =  Slug.from("foo service"))
             val operation = Operation(verb = HttpVerb.GET, uri = "/foo")
 
-            service.addOperation(operation)
+            service.expose(operation)
 
             return listOf(service)
         }
@@ -54,9 +54,30 @@ class Scenarios {
             )
 
             for (i in 1..20)
-                svc.addOperation(Operation(HttpVerb.GET, "/oper_$i"))
+                svc.expose(Operation(HttpVerb.GET, "/oper_$i"))
 
             return listOf(svc)
+        }
+
+        fun oneQueryServiceWithTwoSyncDependencies(): List<Visitable> {
+            val systemName = Slug.from("foo system")
+            val querySvc = Service(name = "query", systemName)
+            val dep1 = Service(name = "dep 1", systemName)
+            val dep2 = Service(name = "dep 2", systemName)
+
+            val queryOp = Operation(HttpVerb.GET, "/foo")
+            val partialQuery1 = Operation(HttpVerb.GET, "/bar")
+            val partialQuery2 = Operation(HttpVerb.GET, "/baz")
+
+            querySvc.expose(queryOp)
+            dep1.expose(partialQuery1)
+            dep2.expose(partialQuery2)
+
+            listOf(partialQuery1, partialQuery2).forEach { partial ->
+                querySvc.consume(partial)
+            }
+
+            return listOf(querySvc, dep1, dep2)
         }
     }
 }

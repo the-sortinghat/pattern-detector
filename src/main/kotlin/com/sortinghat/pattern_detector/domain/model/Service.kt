@@ -8,7 +8,8 @@ data class Service(
     val name: String,
     val systemName: Slug,
     val usages: MutableSet<DatabaseUsage> = mutableSetOf(),
-    val operations: MutableSet<Operation> = mutableSetOf(),
+    val exposedOperations: MutableSet<Operation> = mutableSetOf(),
+    val consumedOperations: MutableSet<Operation> = mutableSetOf(),
     val bag: MetricBag = MetricBag(),
     val module: Module = Module(),
 ) : Visitable, Measurable by bag {
@@ -22,15 +23,18 @@ data class Service(
     }
 
     override fun children(): Iterable<Visitable> {
-        return usages + operations + module
+        return usages + exposedOperations + module
     }
 
     fun addUsage(usage: DatabaseUsage) {
         this.usages.add(usage)
     }
 
-    fun addOperation(operation: Operation) {
-        this.operations.add(operation)
+    fun expose(operation: Operation) {
+        this.exposedOperations.add(operation)
+    }
+    fun consume(operation: Operation) {
+        this.consumedOperations.add(operation)
     }
 
     override fun equals(other: Any?): Boolean {

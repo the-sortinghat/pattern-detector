@@ -15,6 +15,7 @@ class MetricCollector : Visitor {
 
         service.exposedOperations.forEach { _ -> service.increase(Metrics.OPERATIONS_OF_SERVICE) }
         service.usages.forEach { _ -> service.increase(Metrics.DATABASES_USED_BY_SERVICE) }
+        service.consumedOperations.forEach { _ -> service.increase(Metrics.SYNC_DEPENDENCY) }
 
         service.children().forEach { child ->
             child.accept(visitor = this)
