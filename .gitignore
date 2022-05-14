@@ -1,3 +1,5 @@
+/src/main/kotlin/com/sortinghat/pattern_detector/db/seed.sql
+
 .DS_Store
 .idea/shelf
 /confluence/target
