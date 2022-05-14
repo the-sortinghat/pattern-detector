@@ -1,6 +1,8 @@
 package com.sortinghat.pattern_detector.db
 
+import com.sortinghat.pattern_detector.db.tables.*
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
 @Suppress("unused")
@@ -21,7 +23,12 @@ class DatabaseAdapterImpl (
 
 	private fun createTables() {
 		transaction {
-
+			SchemaUtils.create(Modules)
+			SchemaUtils.create(Databases)
+			SchemaUtils.create(Services)
+			SchemaUtils.create(DatabaseUsages)
+			SchemaUtils.create(Operations)
+			SchemaUtils.create(ConsumedOperations)
 		}
 	}
 }
