@@ -22,7 +22,12 @@ fun Application.module() {
     dbAdapter.connect()
     val serviceRepository = ServiceRepositoryImpl()
 
+    val thresholds = mapOf(
+        "maxOperationsPerService" to environment.config.property("thresholds.max_operations_per_service").getString().toInt(),
+        "minComposedServices" to environment.config.property("thresholds.min_composed_services").getString().toInt()
+    )
+
     configureSerialization()
     configureHTTP()
-    configureRouting(serviceRepository)
+    configureRouting(serviceRepository, thresholds)
 }

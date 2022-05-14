@@ -8,7 +8,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting(serviceRepository: ServiceRepository) {
+fun Application.configureRouting(serviceRepository: ServiceRepository, thresholds: Map<String, Int>) {
     routing {
         get("/systems/{slug}/patterns") {
             val systemSlug = call.parameters["slug"]
@@ -17,7 +17,7 @@ fun Application.configureRouting(serviceRepository: ServiceRepository) {
                     message = mapOf("error" to "slug must be provided")
                 )
 
-            val detections = detectionWorkflow(systemSlug, serviceRepository)
+            val detections = detectionWorkflow(systemSlug, serviceRepository, thresholds)
 
             call.respond(
                 status = HttpStatusCode.OK,

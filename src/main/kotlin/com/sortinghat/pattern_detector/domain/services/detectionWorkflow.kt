@@ -4,14 +4,21 @@ import com.sortinghat.pattern_detector.domain.model.ServiceRepository
 import com.sortinghat.pattern_detector.domain.model.patterns.Detections
 
 
-fun detectionWorkflow(systemSlug: String, serviceRepository: ServiceRepository): Detections {
+fun detectionWorkflow(systemSlug: String, serviceRepository: ServiceRepository, thresholds: Map<String, Int>): Detections {
     val services = serviceRepository.findAllOfSystem(systemSlug)
 
     val visitors = mapOf(
         "metrics" to MetricCollector(),
-        "dbps" to DatabasePerServiceDetector(),
-        "ssph" to SingleServicePerHostDetector(),
-        "apic" to APICompositionDetector()
+        "dbps" to DatabasePerServiceDetector(
+            maxOperationsPerService = thresholds["maxOperationsPerService"]!!
+        ),
+        "ssph" to SingleServicePerHostDetector(
+            maxOperationsPerService = thresholds["maxOperationsPerService"]!!
+        ),
+        "apic" to APICompositionDetector(
+            maxOperationsPerService = thresholds["maxOperationsPerService"]!!,
+            minComposedServices = thresholds["minComposedServices"]!!
+        )
     )
 
     visitors.values.forEach { visitor ->

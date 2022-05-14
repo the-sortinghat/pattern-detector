@@ -6,14 +6,22 @@ import com.sortinghat.pattern_detector.domain.behaviors.Visitor
 import com.sortinghat.pattern_detector.domain.model.*
 import com.sortinghat.pattern_detector.domain.model.patterns.APIComposition
 
-class APICompositionDetector : Visitor, PatternDetector {
+class APICompositionDetector(
+    maxOperationsPerService: Int = 8,
+    minComposedServices: Int = 2
+) : Visitor, PatternDetector {
 
-    private val nOperationsThreshold = 8
-    private val nServicesThreshold = 2
+    private val maxOperationsPerService: Int
+    private val minComposedServices: Int
 
     private val visited = mutableSetOf<Visitable>()
     private val candidates = mutableSetOf<Service>()
     private val exposedBy: MutableMap<Operation, Service> = mutableMapOf()
+
+    init {
+        this.maxOperationsPerService = maxOperationsPerService
+        this.minComposedServices = minComposedServices
+    }
 
     override fun getResults(): Set<APIComposition> {
         return candidates
@@ -25,7 +33,7 @@ class APICompositionDetector : Visitor, PatternDetector {
     private fun readsFromManyServices(service: Service): Boolean {
         val dependencies = mutableSetOf<Service>()
         service.consumedOperations.forEach { op -> dependencies.add(exposedBy[op]!!) }
-        return dependencies.size >= nServicesThreshold
+        return dependencies.size >= minComposedServices
     }
 
     override fun visit(service: Service) {
@@ -33,7 +41,7 @@ class APICompositionDetector : Visitor, PatternDetector {
 
         visited.add(service)
 
-        val hasFewOperations = service.get(Metrics.OPERATIONS_OF_SERVICE) < nOperationsThreshold
+        val hasFewOperations = service.get(Metrics.OPERATIONS_OF_SERVICE) < maxOperationsPerService
         val dependsOnMany = service.get(Metrics.SYNC_DEPENDENCY) >= 2
         val exposedQuery = service.exposedOperations.count { op -> op.verb == HttpVerb.GET } >= 1
 

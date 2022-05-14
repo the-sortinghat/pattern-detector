@@ -7,19 +7,25 @@ import com.sortinghat.pattern_detector.domain.model.*
 import com.sortinghat.pattern_detector.domain.model.patterns.DatabasePerService
 
 @Suppress("unused")
-class DatabasePerServiceDetector : Visitor, PatternDetector {
+class DatabasePerServiceDetector(
+    maxOperationsPerService: Int = 8
+) : Visitor, PatternDetector {
 
-    private val nOperationsThreshold = 8
+    private val maxOperationsPerService: Int
 
     private val visited = mutableSetOf<Visitable>()
     private val serviceCandidates = mutableSetOf<Service>()
     private val databaseCandidates = mutableSetOf<Database>()
 
+    init {
+        this.maxOperationsPerService = maxOperationsPerService
+    }
+
     override fun visit(service: Service) {
         if (service in visited) return
 
         visited.add(service)
-        val hasFewOperations = service.get(Metrics.OPERATIONS_OF_SERVICE) < nOperationsThreshold
+        val hasFewOperations = service.get(Metrics.OPERATIONS_OF_SERVICE) < maxOperationsPerService
 
         if (hasFewOperations) serviceCandidates.add(service)
 
