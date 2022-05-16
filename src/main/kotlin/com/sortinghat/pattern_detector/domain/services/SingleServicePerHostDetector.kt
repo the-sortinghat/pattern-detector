@@ -63,6 +63,9 @@ class SingleServicePerHostDetector(
         module.children().forEach { it.accept(visitor = this) }
     }
 
+    override fun visit(channel: MessageChannel) {
+    }
+
     override fun getResults(): Set<SingleServicePerHost> {
         return moduleCandidates
             .filter { module ->

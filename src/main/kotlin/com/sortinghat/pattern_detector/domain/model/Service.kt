@@ -10,6 +10,8 @@ data class Service(
     val usages: MutableSet<DatabaseUsage> = mutableSetOf(),
     val exposedOperations: MutableSet<Operation> = mutableSetOf(),
     val consumedOperations: MutableSet<Operation> = mutableSetOf(),
+    val channelsPublished: MutableSet<MessageChannel> = mutableSetOf(),
+    val channelsListening: MutableSet<MessageChannel> = mutableSetOf(),
     val bag: MetricBag = MetricBag(),
     val module: Module = Module(),
 ) : Visitable, Measurable by bag {
@@ -22,9 +24,12 @@ data class Service(
         visitor.visit(this)
     }
 
-    override fun children(): Iterable<Visitable> {
-        return usages + exposedOperations + module
-    }
+    override fun children() = emptySet<Visitable>() +
+            module +
+            usages +
+            exposedOperations +
+            channelsListening +
+            channelsPublished
 
     fun addUsage(usage: DatabaseUsage) {
         this.usages.add(usage)
@@ -35,6 +40,16 @@ data class Service(
     }
     fun consume(operation: Operation) {
         this.consumedOperations.add(operation)
+    }
+
+    @Suppress("unused")
+    fun publishTo(channel: MessageChannel) {
+        this.channelsPublished.add(channel)
+    }
+    
+    @Suppress("unused")
+    fun listenTo(channel: MessageChannel) {
+        this.channelsListening.add(channel)
     }
 
     override fun equals(other: Any?): Boolean {

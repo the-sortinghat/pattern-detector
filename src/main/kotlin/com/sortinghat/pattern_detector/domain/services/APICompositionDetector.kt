@@ -80,4 +80,7 @@ class APICompositionDetector(
 
         module.children().forEach { it.accept(visitor = this) }
     }
+
+    override fun visit(channel: MessageChannel) {
+    }
 }

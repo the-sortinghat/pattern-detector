@@ -60,6 +60,9 @@ class DatabasePerServiceDetector(
         module.children().forEach { it.accept(visitor = this) }
     }
 
+    override fun visit(channel: MessageChannel) {
+    }
+
     override fun getResults(): Set<DatabasePerService> {
         val occurrences = mutableSetOf<DatabasePerService>()
 

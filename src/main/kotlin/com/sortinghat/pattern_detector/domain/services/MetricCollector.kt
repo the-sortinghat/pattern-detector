@@ -54,4 +54,7 @@ class MetricCollector : Visitor {
             it.accept(visitor = this)
         }
     }
+
+    override fun visit(channel: MessageChannel) {
+    }
 }
