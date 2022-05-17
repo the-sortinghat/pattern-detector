@@ -1,9 +1,6 @@
 package com.sortinghat.pattern_detector.db
 
-import com.sortinghat.pattern_detector.db.tables.DatabaseUsages
-import com.sortinghat.pattern_detector.db.tables.Databases
-import com.sortinghat.pattern_detector.db.tables.Operations
-import com.sortinghat.pattern_detector.db.tables.Services
+import com.sortinghat.pattern_detector.db.tables.*
 import com.sortinghat.pattern_detector.domain.model.*
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
@@ -13,6 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class ServiceRepositoryImpl : ServiceRepository {
     override fun findAllOfSystem(id: String) = transaction {
         val dbIDtoInstance = mutableMapOf<Int, Database>()
+        val channelIDtoInstance = mutableMapOf<Int, MessageChannel>()
 
         Databases
             .selectAll()
@@ -20,6 +18,14 @@ class ServiceRepositoryImpl : ServiceRepository {
                 dbIDtoInstance[db[Databases.id].value] = Database(
                     name = db[Databases.name],
                     type = datasourceFromString(db[Databases.type])
+                )
+            }
+
+        MessageChannels
+            .selectAll()
+            .forEach { channel ->
+                channelIDtoInstance[channel[MessageChannels.id].value] = MessageChannel(
+                    name = channel[MessageChannels.name]
                 )
             }
 
@@ -59,6 +65,16 @@ class ServiceRepositoryImpl : ServiceRepository {
                     )
                 }
 
+            val channelsPublishes = Publications
+                .select { Publications.publisherId eq sid }
+                .map { pub -> channelIDtoInstance[pub[Publications.channelId].value]!! }
+                .toSet()
+
+            val channelSubscribed = Subscriptions
+                .select { Subscriptions.subscriberId eq sid }
+                .map { sub -> channelIDtoInstance[sub[Subscriptions.channelId].value]!! }
+                .toSet()
+
             Services
                 .select { Services.id eq sid }
                 .map {
@@ -66,7 +82,9 @@ class ServiceRepositoryImpl : ServiceRepository {
                         name = it[Services.name],
                         systemName = Slug.from(it[Services.systemName]),
                         exposedOperations = ops,
-                        module = moduleIDtoInstance[it[Services.moduleId].value]!!
+                        module = moduleIDtoInstance[it[Services.moduleId].value]!!,
+                        channelsPublished = channelsPublishes.toMutableSet(),
+                        channelsListening = channelSubscribed.toMutableSet()
                     )
 
                     usagePayloads.forEach { map ->

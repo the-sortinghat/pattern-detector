@@ -21,7 +21,7 @@ class AsyncMessageDetector : Visitor, PatternDetector {
 
             setOfChannels.forEach { channel ->
                 if (producerToConsumers[producer] == null) producerToConsumers[producer] = mutableSetOf()
-                channelToConsumer[channel]!!.forEach { consumer ->
+                channelToConsumer[channel]?.forEach { consumer ->
                     if (consumer !in consumerCandidates) return@forEach
                     producerToConsumers[producer]!!.add(consumer)
                 }

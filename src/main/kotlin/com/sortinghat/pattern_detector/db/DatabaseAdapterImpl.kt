@@ -29,6 +29,9 @@ class DatabaseAdapterImpl (
 			SchemaUtils.create(DatabaseUsages)
 			SchemaUtils.create(Operations)
 			SchemaUtils.create(ConsumedOperations)
+			SchemaUtils.create(MessageChannels)
+			SchemaUtils.create(Publications)
+			SchemaUtils.create(Subscriptions)
 		}
 	}
 }
