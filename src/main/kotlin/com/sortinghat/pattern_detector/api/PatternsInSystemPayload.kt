@@ -15,7 +15,8 @@ data class PatternsInSystemPayload(
                 patterns = PatternsPresent(
                     detections.databasePerServices,
                     detections.singleServicePerHosts,
-                    detections.apiCompostions
+                    detections.apiCompostions,
+                    detections.asyncMessages
                 )
             )
         }

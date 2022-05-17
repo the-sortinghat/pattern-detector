@@ -18,7 +18,8 @@ fun detectionWorkflow(systemSlug: String, serviceRepository: ServiceRepository, 
         "apic" to APICompositionDetector(
             maxOperationsPerService = thresholds["maxOperationsPerService"]!!,
             minComposedServices = thresholds["minComposedServices"]!!
-        )
+        ),
+        "amsg" to AsyncMessageDetector()
     )
 
     visitors.values.forEach { visitor ->
@@ -28,6 +29,7 @@ fun detectionWorkflow(systemSlug: String, serviceRepository: ServiceRepository, 
     return Detections(
         databasePerServices = (visitors["dbps"] as DatabasePerServiceDetector).getResults(),
         singleServicePerHosts = (visitors["ssph"] as SingleServicePerHostDetector).getResults(),
-        apiCompostions = (visitors["apic"] as APICompositionDetector).getResults()
+        apiCompostions = (visitors["apic"] as APICompositionDetector).getResults(),
+        asyncMessages = (visitors["amsg"] as AsyncMessageDetector).getResults()
     )
 }

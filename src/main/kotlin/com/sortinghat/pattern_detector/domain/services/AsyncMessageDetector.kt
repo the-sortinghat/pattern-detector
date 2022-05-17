@@ -1,6 +1,5 @@
 package com.sortinghat.pattern_detector.domain.services
 
-import com.sortinghat.pattern_detector.domain.behaviors.Pattern
 import com.sortinghat.pattern_detector.domain.behaviors.PatternDetector
 import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitor
@@ -15,7 +14,7 @@ class AsyncMessageDetector : Visitor, PatternDetector {
     private val producerToChannels = mutableMapOf<Service, MutableSet<MessageChannel>>()
     private val channelToConsumer = mutableMapOf<MessageChannel, MutableSet<Service>>()
 
-    override fun getResults(): Set<Pattern> {
+    override fun getResults(): Set<AsyncMessage> {
         val producerToConsumers = mutableMapOf<Service, MutableSet<Service>>()
         producerToChannels.forEach { (producer, setOfChannels) ->
             if (producer !in producerCandidates) return@forEach
