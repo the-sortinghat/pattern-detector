@@ -81,4 +81,48 @@ internal class MetricCollectorTest {
         assertEquals(0, (visitable[1] as Service).get(Metrics.SYNC_DEPENDENCY))
         assertEquals(0, (visitable[2] as Service).get(Metrics.SYNC_DEPENDENCY))
     }
+
+    @Test
+    fun `it collects async dep correctly for the trivial case`() {
+         // given
+        val visitable = Scenarios.onePublisherOneSubscriber()
+
+        // when
+        visitable.forEach { it.accept(underTest) }
+
+        // then
+        assertEquals(0, (visitable[0] as Service).get(Metrics.ASYNC_DEPENDENCY))
+        assertEquals(1, (visitable[1] as Service).get(Metrics.ASYNC_DEPENDENCY))
+    }
+
+    @Test
+    fun `it collects async imp correctly for the trivial case`() {
+        // given
+        val visitable = Scenarios.onePublisherOneSubscriber()
+
+        // when
+        visitable.forEach { it.accept(underTest) }
+
+        // then
+        assertEquals(1, (visitable[0] as Service).get(Metrics.ASYNC_IMPORTANCE))
+        assertEquals(0, (visitable[1] as Service).get(Metrics.ASYNC_IMPORTANCE))
+    }
+
+    @Test
+    fun `it collects async imp and dep correctly for a more complex case`() {
+        // given
+        val visitable = Scenarios.onePublisherTwoSubscribers()
+
+        // when
+        visitable.forEach { it.accept(underTest) }
+
+        // then
+        assertEquals(2, (visitable[0] as Service).get(Metrics.ASYNC_IMPORTANCE))
+        assertEquals(0, (visitable[1] as Service).get(Metrics.ASYNC_IMPORTANCE))
+        assertEquals(0, (visitable[2] as Service).get(Metrics.ASYNC_IMPORTANCE))
+
+        assertEquals(0, (visitable[0] as Service).get(Metrics.ASYNC_DEPENDENCY))
+        assertEquals(1, (visitable[1] as Service).get(Metrics.ASYNC_DEPENDENCY))
+        assertEquals(1, (visitable[2] as Service).get(Metrics.ASYNC_DEPENDENCY))
+    }
 }

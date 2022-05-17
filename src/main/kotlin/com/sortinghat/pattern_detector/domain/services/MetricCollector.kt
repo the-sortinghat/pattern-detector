@@ -7,6 +7,9 @@ import com.sortinghat.pattern_detector.domain.model.*
 class MetricCollector : Visitor {
 
     private val visited = mutableSetOf<Visitable>()
+    private val channelToPublishers = mutableMapOf<MessageChannel, MutableSet<Service>>()
+    private val channelToConsumers = mutableMapOf<MessageChannel, MutableSet<Service>>()
+    private val publisherToConsumers = mutableMapOf<Service, MutableSet<Service>>()
 
     override fun visit(service: Service) {
         if (service in visited) return
@@ -16,6 +19,35 @@ class MetricCollector : Visitor {
         service.exposedOperations.forEach { _ -> service.increase(Metrics.OPERATIONS_OF_SERVICE) }
         service.usages.forEach { _ -> service.increase(Metrics.DATABASES_USED_BY_SERVICE) }
         service.consumedOperations.forEach { _ -> service.increase(Metrics.SYNC_DEPENDENCY) }
+
+        service.channelsPublished.forEach { targetChannel ->
+            if (channelToPublishers[targetChannel] == null) channelToPublishers[targetChannel] = mutableSetOf()
+            channelToPublishers[targetChannel]!!.add(service)
+
+            channelToConsumers[targetChannel]?.forEach { consumer: Service ->
+                if (publisherToConsumers[service]?.contains(consumer) == true) return
+
+                if (publisherToConsumers[service] == null) publisherToConsumers[service] = mutableSetOf()
+                publisherToConsumers[service]!!.add(consumer)
+
+                service.increase(Metrics.ASYNC_IMPORTANCE)
+                consumer.increase(Metrics.ASYNC_DEPENDENCY)
+            }
+        }
+
+        service.channelsListening.forEach { sourceChannel ->
+            if (channelToConsumers[sourceChannel] == null) channelToConsumers[sourceChannel] = mutableSetOf()
+            channelToConsumers[sourceChannel]!!.add(service)
+
+            channelToPublishers[sourceChannel]?.forEach { publisher ->
+                if (publisherToConsumers[publisher]?.contains(service) == true) return
+
+                if (publisherToConsumers[publisher] == null) publisherToConsumers[publisher] = mutableSetOf()
+                publisherToConsumers[publisher]!!.add(service)
+                service.increase(Metrics.ASYNC_DEPENDENCY)
+                publisher.increase(Metrics.ASYNC_IMPORTANCE)
+            }
+        }
 
         service.children().forEach { child ->
             child.accept(visitor = this)

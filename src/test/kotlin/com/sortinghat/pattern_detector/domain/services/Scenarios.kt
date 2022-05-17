@@ -79,5 +79,33 @@ class Scenarios {
 
             return listOf(querySvc, dep1, dep2)
         }
+
+        fun onePublisherOneSubscriber(): List<Visitable> {
+            val systemName = Slug.from("foo system")
+            val publisher = Service(name = "pub", systemName)
+            val subscriber = Service(name = "sub", systemName)
+
+            val channel = MessageChannel("topic")
+
+            publisher.publishTo(channel)
+            subscriber.listenTo(channel)
+
+            return listOf(publisher, subscriber)
+        }
+
+        fun onePublisherTwoSubscribers(): List<Visitable> {
+            val systemName = Slug.from("foo system")
+            val publisher = Service(name = "pub", systemName)
+            val subscriber1 = Service(name = "sub1", systemName)
+            val subscriber2 = Service(name = "sub2", systemName)
+
+            val channel = MessageChannel("topic")
+
+            publisher.publishTo(channel)
+            subscriber1.listenTo(channel)
+            subscriber2.listenTo(channel)
+
+            return listOf(publisher, subscriber1, subscriber2)
+        }
     }
 }
