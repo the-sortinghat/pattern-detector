@@ -42,12 +42,10 @@ data class Service(
         this.consumedOperations.add(operation)
     }
 
-    @Suppress("unused")
     fun publishTo(channel: MessageChannel) {
         this.channelsPublished.add(channel)
     }
 
-    @Suppress("unused")
     fun listenTo(channel: MessageChannel) {
         this.channelsListening.add(channel)
     }

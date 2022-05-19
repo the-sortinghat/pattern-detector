@@ -3,7 +3,6 @@ package com.sortinghat.pattern_detector.domain.services
 import com.sortinghat.pattern_detector.domain.model.ServiceRepository
 import com.sortinghat.pattern_detector.domain.model.patterns.Detections
 
-
 fun detectionWorkflow(systemSlug: String, serviceRepository: ServiceRepository, thresholds: Map<String, Int>): Detections {
     val services = serviceRepository.findAllOfSystem(systemSlug)
 

@@ -4,7 +4,6 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cors.*
 
-@Suppress("unused")
 fun Application.configureHTTP() {
     install(CORS) {
         anyHost()

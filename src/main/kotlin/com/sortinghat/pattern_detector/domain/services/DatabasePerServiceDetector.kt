@@ -6,7 +6,6 @@ import com.sortinghat.pattern_detector.domain.behaviors.Visitor
 import com.sortinghat.pattern_detector.domain.model.*
 import com.sortinghat.pattern_detector.domain.model.patterns.DatabasePerService
 
-@Suppress("unused")
 class DatabasePerServiceDetector(
     maxOperationsPerService: Int = 8
 ) : Visitor, PatternDetector {

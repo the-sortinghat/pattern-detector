@@ -6,7 +6,6 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
-@Suppress("unused")
 class ServiceRepositoryImpl : ServiceRepository {
     override fun findAllOfSystem(id: String) = transaction {
         val dbIDtoInstance = mutableMapOf<Int, Database>()

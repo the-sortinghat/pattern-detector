@@ -3,7 +3,6 @@ package com.sortinghat.pattern_detector.domain.model
 import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitor
 
-@Suppress("unused")
 enum class DatabaseAccessMode {
     ReadOnly, WriteOnly, ReadWrite
 }
