@@ -25,7 +25,7 @@ class MetricCollector : Visitor {
             channelToPublishers[targetChannel]!!.add(service)
 
             channelToConsumers[targetChannel]?.forEach { consumer: Service ->
-                if (publisherToConsumers[service]?.contains(consumer) == true) return
+                if (publisherToConsumers[service]?.contains(consumer) == true) return@forEach
 
                 if (publisherToConsumers[service] == null) publisherToConsumers[service] = mutableSetOf()
                 publisherToConsumers[service]!!.add(consumer)
@@ -40,7 +40,7 @@ class MetricCollector : Visitor {
             channelToConsumers[sourceChannel]!!.add(service)
 
             channelToPublishers[sourceChannel]?.forEach { publisher ->
-                if (publisherToConsumers[publisher]?.contains(service) == true) return
+                if (publisherToConsumers[publisher]?.contains(service) == true) return@forEach
 
                 if (publisherToConsumers[publisher] == null) publisherToConsumers[publisher] = mutableSetOf()
                 publisherToConsumers[publisher]!!.add(service)
