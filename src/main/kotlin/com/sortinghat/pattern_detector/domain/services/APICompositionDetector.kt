@@ -54,7 +54,10 @@ class APICompositionDetector(
 
 
     override fun visit(operation: Operation) {
+        if (operation in visited) return
 
+        visited.add(operation)
+        operation.children().forEach { it.accept(visitor = this) }
     }
 
     override fun visit(database: Database) {
@@ -82,5 +85,9 @@ class APICompositionDetector(
     }
 
     override fun visit(channel: MessageChannel) {
+        if (channel in visited) return
+
+        visited.add(channel)
+        channel.children().forEach { it.accept(visitor = this) }
     }
 }

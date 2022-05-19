@@ -64,6 +64,10 @@ class SingleServicePerHostDetector(
     }
 
     override fun visit(channel: MessageChannel) {
+        if (channel in visited) return
+
+        visited.add(channel)
+        channel.children().forEach { it.accept(visitor = this) }
     }
 
     override fun getResults(): Set<SingleServicePerHost> {
