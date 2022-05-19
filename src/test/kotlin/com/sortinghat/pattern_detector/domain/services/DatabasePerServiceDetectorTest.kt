@@ -40,6 +40,6 @@ internal class DatabasePerServiceDetectorTest {
 
         // then
         val results = underTest.getResults()
-        assertEquals(1, results.size)
+        assertEquals(2, results.size)
     }
 }

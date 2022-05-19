@@ -67,11 +67,13 @@ class DatabasePerServiceDetector(
         val occurrences = mutableSetOf<DatabasePerService>()
 
         serviceCandidates.forEach { service ->
-            val database = databaseCandidates.find { db ->
+            val databases = databaseCandidates.filter { db ->
                 db.usages.any { usage -> usage.service == service }
-            } ?: return@forEach
+            }
 
-            occurrences.add(DatabasePerService.from(service, database))
+            databases.forEach { database ->
+                occurrences.add(DatabasePerService.from(service, database))
+            }
         }
 
         return occurrences
