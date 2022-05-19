@@ -42,4 +42,18 @@ internal class SingleServicePerHostDetectorTest {
         // then
         assertEquals(0, results.size)
     }
+
+    @Test
+    fun `it does not detect ssph when two services share a module`() {
+        // given
+        val visitable = Scenarios.oneModuleWithTwoServices()
+        visitable.forEach { it.accept(visitor = MetricCollector()) }
+
+        // when
+        visitable.forEach { it.accept(underTest) }
+        val results = underTest.getResults()
+
+        // then
+        assertEquals(0, results.size)
+    }
 }

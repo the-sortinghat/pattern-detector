@@ -173,5 +173,15 @@ class Scenarios {
                 )
             )
         }
+
+        fun oneModuleWithTwoServices(): List<Visitable> {
+            val system = Slug.from("foo")
+            val module = Module()
+
+            val svc1 = Service(name = "svc1", system, module = module)
+            val svc2 = Service(name = "svc2", system, module = module)
+
+            return listOf(svc1, svc2)
+        }
     }
 }
