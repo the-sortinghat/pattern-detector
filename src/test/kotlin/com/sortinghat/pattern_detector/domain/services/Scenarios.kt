@@ -2,6 +2,7 @@ package com.sortinghat.pattern_detector.domain.services
 
 import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.model.*
+import com.sortinghat.pattern_detector.domain.model.patterns.AsyncMessage
 
 class Scenarios {
     companion object {
@@ -106,6 +107,71 @@ class Scenarios {
             subscriber2.listenTo(channel)
 
             return listOf(publisher, subscriber1, subscriber2)
+        }
+
+        fun cqrsBetweenTwoServices(): CQRSScenario {
+            val slug = Slug.from("foo system")
+            val command = Service(name = "command", slug)
+            val query = Service(name = "query", slug)
+
+            command.expose(Operation(HttpVerb.POST, "/foos"))
+            query.expose(Operation(HttpVerb.GET, "/foos"))
+
+            val channel = MessageChannel(name = "topic")
+
+            command.publishTo(channel)
+            query.listenTo(channel)
+
+            return CQRSScenario(
+                listOf(command, query),
+                setOf(AsyncMessage.from(command, query))
+            )
+        }
+
+        fun twoCqrsEachNonTrivial(): CQRSScenario {
+            val slug = Slug.from("foo system")
+
+            val commandA1 = Service(name = "commandA1", slug)
+            val commandA2 = Service(name = "commandA2", slug)
+            val queryA = Service(name = "queryA", slug)
+
+            commandA1.expose(Operation(HttpVerb.POST, "/foos"))
+            commandA2.expose(Operation(HttpVerb.POST, "/bazes"))
+            queryA.expose(Operation(HttpVerb.GET, "/foos/:id/bazes"))
+
+            val channelA1 = MessageChannel(name = "topicA1")
+            val channelA2 = MessageChannel(name = "topicA2")
+
+            commandA1.publishTo(channelA1)
+            commandA2.publishTo(channelA2)
+            queryA.listenTo(channelA1)
+            queryA.listenTo(channelA2)
+
+            val commandB1 = Service(name = "commandB1", slug)
+            val commandB2 = Service(name = "commandB2", slug)
+            val queryB = Service(name = "queryB", slug)
+
+            commandB1.expose(Operation(HttpVerb.POST, "/foo"))
+            commandB2.expose(Operation(HttpVerb.POST, "/baz"))
+            queryB.expose(Operation(HttpVerb.GET, "/foo/:id/baz"))
+
+            val channelB1 = MessageChannel(name = "topicB1")
+            val channelB2 = MessageChannel(name = "topicB2")
+
+            commandA1.publishTo(channelB1)
+            commandA2.publishTo(channelB2)
+            queryA.listenTo(channelB1)
+            queryA.listenTo(channelB2)
+
+            return CQRSScenario(
+                listOf(commandA1, commandA2, queryA, commandB1, commandB2, queryB),
+                setOf(
+                    AsyncMessage.from(commandA1, queryA),
+                    AsyncMessage.from(commandA2, queryA),
+                    AsyncMessage.from(commandB1, queryB),
+                    AsyncMessage.from(commandB2, queryB),
+                )
+            )
         }
     }
 }
