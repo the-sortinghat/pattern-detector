@@ -16,7 +16,8 @@ data class PatternsInSystemPayload(
                     detections.databasePerServices,
                     detections.singleServicePerHosts,
                     detections.apiCompostions,
-                    detections.asyncMessages
+                    detections.asyncMessages,
+                    detections.cqrs
                 )
             )
         }

@@ -4,5 +4,6 @@ data class Detections(
     val databasePerServices: Set<DatabasePerService>,
     val singleServicePerHosts: Set<SingleServicePerHost>,
     val apiCompostions: Set<APIComposition>,
-    val asyncMessages: Set<AsyncMessage>
+    val asyncMessages: Set<AsyncMessage>,
+    val cqrs: Set<CQRS>
 )
