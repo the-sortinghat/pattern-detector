@@ -19,4 +19,10 @@ data class Operation(
     override fun children(): Iterable<Visitable> {
         return emptyList()
     }
+
+    override fun toString(): String {
+        return "Operation(verb=$verb, uri='$uri')"
+    }
+
+
 }

@@ -13,4 +13,10 @@ data class MessageChannel(
     }
 
     override fun children() = emptyList<Visitable>()
+
+    override fun toString(): String {
+        return "MessageChannel(name='$name')"
+    }
+
+
 }

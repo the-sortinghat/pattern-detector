@@ -47,5 +47,9 @@ data class Database(
         return result
     }
 
+    override fun toString(): String {
+        return "Database(name='$name', type=$type)"
+    }
+
 
 }

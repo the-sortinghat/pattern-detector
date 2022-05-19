@@ -25,4 +25,10 @@ data class DatabaseUsage(
     override fun children(): Iterable<Visitable> {
         return listOf(service, database)
     }
+
+    override fun toString(): String {
+        return "DatabaseUsage(service=$service, database=$database)"
+    }
+
+
 }

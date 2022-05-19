@@ -68,5 +68,9 @@ data class Service(
         return result
     }
 
+    override fun toString(): String {
+        return "Service(name='$name', systemName=$systemName)"
+    }
+
 
 }

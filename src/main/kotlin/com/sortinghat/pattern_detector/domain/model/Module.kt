@@ -20,4 +20,10 @@ data class Module(
     override fun children(): Iterable<Visitable> {
         return services
     }
+
+    override fun toString(): String {
+        return "Module(services=$services)"
+    }
+
+
 }

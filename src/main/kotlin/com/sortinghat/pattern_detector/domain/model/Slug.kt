@@ -7,4 +7,10 @@ class Slug internal constructor(val value: String) {
             return Slug(raw)
         }
     }
+
+    override fun toString(): String {
+        return value
+    }
+
+
 }
