@@ -36,9 +36,7 @@ data class Database(
         if (other !is Database) return false
 
         if (name != other.name) return false
-        if (type != other.type) return false
-
-        return true
+        return type == other.type
     }
 
     override fun hashCode(): Int {

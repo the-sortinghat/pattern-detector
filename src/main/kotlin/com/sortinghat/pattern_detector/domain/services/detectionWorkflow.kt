@@ -36,7 +36,6 @@ fun detectionWorkflow(systemSlug: String, serviceRepository: ServiceRepository, 
     )
     services.forEach { it.accept(cqrs) }
 
-
     return Detections(
         databasePerServices = dbps.getResults(),
         singleServicePerHosts = ssph.getResults(),

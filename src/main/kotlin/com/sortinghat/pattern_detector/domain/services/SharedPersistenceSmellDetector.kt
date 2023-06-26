@@ -1,55 +1,47 @@
 package com.sortinghat.pattern_detector.domain.services
 
-import com.sortinghat.pattern_detector.domain.behaviors.PatternDetector
+import com.sortinghat.pattern_detector.domain.behaviors.SmellDetector
 import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitor
 import com.sortinghat.pattern_detector.domain.model.*
-import com.sortinghat.pattern_detector.domain.model.patterns.APIComposition
+import com.sortinghat.pattern_detector.domain.model.smells.SharedPersistenceSmell
 
-class APICompositionDetector(
-    maxOperationsPerService: Int = 8,
-    minComposedServices: Int = 2
-) : Visitor, PatternDetector {
-
-    private val maxOperationsPerService: Int
-    private val minComposedServices: Int
+class SharedPersistenceSmellDetector : Visitor, SmellDetector {
 
     private val visited = mutableSetOf<Visitable>()
-    private val candidates = mutableSetOf<Service>()
-    private val exposedBy: MutableMap<Operation, Service> = mutableMapOf()
+    private val databaseCandidates = mutableSetOf<Database>()
+    private val results = mutableMapOf<String, MutableList<String>>()
+    private val occurrences = mutableSetOf<SharedPersistenceSmell>()
+    private var usageCount: Int = 0
 
-    init {
-        this.maxOperationsPerService = maxOperationsPerService
-        this.minComposedServices = minComposedServices
-    }
-
-    override fun getResults(): Set<APIComposition> {
-        return candidates
-            .filter(::readsFromManyServices)
-            .map(APIComposition.Companion::from)
-            .toSet()
-    }
-
-    private fun readsFromManyServices(service: Service): Boolean {
-        val dependencies = mutableSetOf<Service>()
-        service.consumedOperations.forEach { op -> dependencies.add(exposedBy[op]!!) }
-        return dependencies.size >= minComposedServices
-    }
 
     override fun visit(service: Service) {
+        val serviceDatabases = mutableMapOf<Service, MutableSet<Database>>()
+
         if (service in visited) return
-
         visited.add(service)
+        serviceDatabases.putIfAbsent(service, mutableSetOf())
 
-        val hasFewOperations = service.get(Metrics.OPERATIONS_OF_SERVICE) < maxOperationsPerService
-        val dependsOnMany = service.get(Metrics.SYNC_DEPENDENCY) >= 2
-        val exposedQuery = service.exposedOperations.count { op -> op.verb == HttpVerb.GET } >= 1
-
-        if (hasFewOperations && dependsOnMany && exposedQuery) candidates.add(service)
-
-        service.exposedOperations.forEach { operation -> exposedBy[operation] = service }
+        service.usages.forEach { usage ->
+            val database = usage.database
+            serviceDatabases[service]?.add(database)
+        }
 
         service.children().forEach { it.accept(visitor = this) }
+
+        serviceDatabases.forEach { (service, databases) ->
+            for (count in databases) {
+                usageCount = count.usages.size
+            }
+            if (usageCount > 1) {
+                databases.forEach { database ->
+                    results.getOrPut(database.name) { mutableListOf() }.add(service.name)
+                }
+            }
+        }
+
+        service.children().forEach { it.accept(visitor = this) }
+
     }
 
 
@@ -65,14 +57,17 @@ class APICompositionDetector(
 
         visited.add(database)
 
+        val singleClient = database.get(Metrics.CLIENTS_OF_DATABASE) == 1
+
+        if (singleClient) databaseCandidates.add(database)
         database.children().forEach { it.accept(visitor = this) }
+
     }
 
     override fun visit(usage: DatabaseUsage) {
         if (usage in visited) return
 
         visited.add(usage)
-
         usage.children().forEach { it.accept(visitor = this) }
     }
 
@@ -80,7 +75,6 @@ class APICompositionDetector(
         if (module in visited) return
 
         visited.add(module)
-
         module.children().forEach { it.accept(visitor = this) }
     }
 
@@ -98,4 +92,9 @@ class APICompositionDetector(
         dependency.children().forEach { it.accept(visitor = this) }
     }
 
+    override fun getResults(): Set<SharedPersistenceSmell> {
+        return results.map { (database, services) ->
+            SharedPersistenceSmell(database, services)
+        }.toSet()
+    }
 }

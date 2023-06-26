@@ -14,4 +14,6 @@ interface Visitor {
     fun visit(module: Module)
 
     fun visit(channel: MessageChannel)
+
+    fun visit(dependencies: ServiceDependency)
 }
