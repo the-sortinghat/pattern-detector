@@ -51,17 +51,15 @@ class ServiceRepositoryImpl : ServiceRepository {
                 .forEach { mid -> moduleIDtoInstance[mid.value] = Module() }
         }
 
-        if (id == "all") {
-            Services
-                .selectAll()
-                .forEach { service ->
-                    serviceIDtoInstance[service[Services.id].value] = Service(
-                        name = service[Services.name],
-                        systemName = Slug.from(service[Services.systemName]),
-                        module = moduleIDtoInstance[service[Services.moduleId].value]!!
-                    )
-                }
-        }
+        Services
+            .select { Services.systemName inList systemNames }
+            .forEach { service ->
+                serviceIDtoInstance[service[Services.id].value] = Service(
+                    name = service[Services.name],
+                    systemName = Slug.from(service[Services.systemName]),
+                    module = moduleIDtoInstance[service[Services.moduleId].value]!!
+                )
+            }
 
         serviceIDs.map { sid ->
             val ops = Operations
