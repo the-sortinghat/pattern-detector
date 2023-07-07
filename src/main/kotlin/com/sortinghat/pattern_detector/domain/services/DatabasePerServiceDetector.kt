@@ -24,9 +24,7 @@ class DatabasePerServiceDetector(
         if (service in visited) return
 
         visited.add(service)
-        val hasFewOperations = service.get(Metrics.OPERATIONS_OF_SERVICE) < maxOperationsPerService
-
-        if (hasFewOperations) serviceCandidates.add(service)
+        serviceCandidates.add(service)
 
         service.children().forEach { it.accept(visitor = this) }
     }
@@ -68,6 +66,13 @@ class DatabasePerServiceDetector(
 
         visited.add(channel)
         channel.children().forEach { it.accept(visitor = this) }
+    }
+
+    override fun visit(dependency: ServiceDependency) {
+        if (dependency in visited) return
+
+        visited.add(dependency)
+        dependency.children().forEach { it.accept(visitor = this) }
     }
 
     override fun getResults(): Set<DatabasePerService> {

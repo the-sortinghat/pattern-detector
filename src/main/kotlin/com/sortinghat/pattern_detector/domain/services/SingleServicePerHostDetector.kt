@@ -70,6 +70,13 @@ class SingleServicePerHostDetector(
         channel.children().forEach { it.accept(visitor = this) }
     }
 
+    override fun visit(dependency: ServiceDependency) {
+        if (dependency in visited) return
+
+        visited.add(dependency)
+        dependency.children().forEach { it.accept(visitor = this) }
+    }
+
     override fun getResults(): Set<SingleServicePerHost> {
         return moduleCandidates
             .filter { module ->

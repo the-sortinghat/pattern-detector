@@ -1,8 +1,10 @@
 package com.sortinghat.pattern_detector.api.plugins
 
 import com.sortinghat.pattern_detector.api.PatternsInSystemPayload
+import com.sortinghat.pattern_detector.api.SmellsInSystemPayload
 import com.sortinghat.pattern_detector.domain.model.ServiceRepository
 import com.sortinghat.pattern_detector.domain.services.detectionWorkflow
+import com.sortinghat.pattern_detector.domain.services.smellsWorkflow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -22,6 +24,20 @@ fun Application.configureRouting(serviceRepository: ServiceRepository, threshold
             call.respond(
                 status = HttpStatusCode.OK,
                 message = PatternsInSystemPayload.from(systemSlug, detections)
+            )
+        }
+        get("/systems/{slug}/smells") {
+            val systemSlug = call.parameters["slug"]
+                ?: return@get call.respond(
+                    status = HttpStatusCode.BadRequest,
+                    message = mapOf("error" to "slug must be provided")
+                )
+
+            val smells = smellsWorkflow(systemSlug, serviceRepository)
+
+            call.respond(
+                status = HttpStatusCode.OK,
+                message = SmellsInSystemPayload.from(systemSlug, smells)
             )
         }
     }

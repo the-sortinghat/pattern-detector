@@ -23,6 +23,8 @@ fun datasourceFromString(str: String) = when(str) {
     "redis"         -> DataSource.Redis
     "mongodb"       -> DataSource.MongoDb
     "postgresql"    -> DataSource.PostgreSql
+    "sqlserver"    -> DataSource.SqlServer
+    "oracle"       -> DataSource.Oracle
     else            -> DataSource.Relational
 }
 

@@ -4,10 +4,11 @@ import com.sortinghat.pattern_detector.domain.behaviors.Measurable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitable
 import com.sortinghat.pattern_detector.domain.behaviors.Visitor
 
-data class Service(
+class Service(
     val name: String,
     val systemName: Slug,
     val usages: MutableSet<DatabaseUsage> = mutableSetOf(),
+    val dependencies: MutableSet<ServiceDependency> = mutableSetOf(),
     val exposedOperations: MutableSet<Operation> = mutableSetOf(),
     val consumedOperations: MutableSet<Operation> = mutableSetOf(),
     val channelsPublished: MutableSet<MessageChannel> = mutableSetOf(),
@@ -27,12 +28,17 @@ data class Service(
     override fun children() = emptySet<Visitable>() +
             module +
             usages +
+            dependencies +
             exposedOperations +
             channelsListening +
             channelsPublished
 
     fun addUsage(usage: DatabaseUsage) {
         this.usages.add(usage)
+    }
+
+    fun addDepend(depend: ServiceDependency) {
+        this.dependencies.add(depend)
     }
 
     fun expose(operation: Operation) {
@@ -55,9 +61,7 @@ data class Service(
         if (other !is Service) return false
 
         if (name != other.name) return false
-        if (systemName != other.systemName) return false
-
-        return true
+        return systemName == other.systemName
     }
 
     override fun hashCode(): Int {
