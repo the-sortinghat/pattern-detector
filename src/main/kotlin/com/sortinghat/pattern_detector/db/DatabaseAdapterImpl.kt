@@ -31,6 +31,7 @@ class DatabaseAdapterImpl (
 			SchemaUtils.create(MessageChannels)
 			SchemaUtils.create(Publications)
 			SchemaUtils.create(Subscriptions)
+			SchemaUtils.create(ServiceDependencies)
 		}
 	}
 }
