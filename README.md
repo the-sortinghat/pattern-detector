@@ -75,6 +75,9 @@ Ensure you have already run the application at least once before seeding the dat
 
 Exampleapp diagram used to create exampleapp_seed.sql data is provided in file exampleapp_diagram.jpg.
 
+A field mapping is available in file field-mapping-trace-db.md. This file is an example of mapping the metrics in Jaeger's API to the application's elements in the μsVision database.
+
+Obs. Other open-source or commercial tools can be used to map the metrics to the application's elements, as the metrics used are standard for application monitoring.
 
 ## Usage
 
