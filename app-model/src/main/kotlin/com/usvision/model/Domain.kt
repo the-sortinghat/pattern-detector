@@ -38,6 +38,8 @@ data class Microservice(
     private val exposedOperations: MutableSet<Operation> = mutableSetOf()
     private val consumedOperations: MutableSet<Operation> = mutableSetOf()
     private val databases: MutableSet<Database> = mutableSetOf()
+    private val publishChannels: MutableSet<MessageChannel> = mutableSetOf()
+    private val subscribedChannels: MutableSet<MessageChannel> = mutableSetOf()
 
     override fun getExposedOperations(): Set<Operation> = exposedOperations
 
@@ -53,9 +55,21 @@ data class Microservice(
         databases.add(database)
     }
 
+    override fun addPublishChannel(channel: MessageChannel) {
+        publishChannels.add(channel)
+    }
+
+    override fun addSubscribedChannel(channel: MessageChannel) {
+        subscribedChannels.add(channel)
+    }
+
     override fun getConsumedOperations(): Set<Operation> = consumedOperations
 
     override fun getDatabases(): Set<Database> = databases
+
+    override fun getPublishChannels(): Set<MessageChannel> = publishChannels
+
+    override fun getSubscribedChannels(): Set<MessageChannel> = subscribedChannels
 
     override fun accept(visitor: Visitor) {
         visitor.visit(this)
@@ -68,3 +82,17 @@ data class RestEndpoint(
     override val description: String = ""
 ) : Operation(description)
 
+data class MessageChannel(
+    val name: String,
+    val id: String? = null
+) {
+    override fun equals(other: Any?): Boolean {
+        return if (other !is MessageChannel) false
+        else if (id == null || other.id == null) name == other.name
+        else id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+}

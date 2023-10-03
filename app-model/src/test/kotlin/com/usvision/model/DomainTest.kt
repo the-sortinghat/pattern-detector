@@ -127,4 +127,59 @@ internal class DomainTest {
         // then
         assertFalse { result }
     }
+
+    @Test
+    fun `ensure two channels are the same when they have the same id`() {
+        // given
+        val id = "any-id"
+        val mc1 = MessageChannel(id = id, name = "whatever")
+        val mc2 = MessageChannel(id = id, name = "other whatever")
+
+        // when
+        val result = mc1 == mc2
+
+        // then
+        assertTrue { result }
+    }
+
+    @Test
+    fun `ensure two channels are the not same when they have the same attributes, but different ids`() {
+        // given
+        val commonName = "bla bla bla"
+        val mc1 = MessageChannel(id = "one", name = commonName)
+        val mc2 = MessageChannel(id = "two", name = commonName)
+
+        // when
+        val result = mc1 == mc2
+
+        // then
+        assertFalse { result }
+    }
+
+    @Test
+    fun `ensure two channels without id are equal when their attributes are equal`() {
+        // given
+        val commonName = "foo"
+        val idlessMc1 = MessageChannel(name = commonName)
+        val idlessMc2 = MessageChannel(name = commonName)
+
+        // when
+        val result = idlessMc1 == idlessMc2
+
+        // then
+        assertTrue { result }
+    }
+
+    @Test
+    fun `ensure two channels without id are different when their attributes are different`() {
+        // given
+        val idlessMc1 = MessageChannel(name = "foo")
+        val idlessMc2 = MessageChannel(name = "bar")
+
+        // when
+        val result = idlessMc1 == idlessMc2
+
+        // then
+        assertFalse { result }
+    }
 }
