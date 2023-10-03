@@ -72,4 +72,59 @@ internal class DomainTest {
         // then
         assertFalse { result }
     }
+
+    @Test
+    fun `ensure two databases are the same when they have the same id`() {
+        // given
+        val id = "any-id"
+        val db1 = PostgreSQL(id = id, description = "whatever")
+        val db2 = PostgreSQL(id = id, description = "other whatever")
+
+        // when
+        val result = db1 == db2
+
+        // then
+        assertTrue { result }
+    }
+
+    @Test
+    fun `ensure two databases are the not same when they have the same attributes, but different ids`() {
+        // given
+        val commonDescription = "bla bla bla"
+        val db1 = PostgreSQL(id = "one", description = commonDescription)
+        val db2 = PostgreSQL(id = "two", description = commonDescription)
+
+        // when
+        val result = db1 == db2
+
+        // then
+        assertFalse { result }
+    }
+
+    @Test
+    fun `ensure two databases without id are equal when their attributes are equal`() {
+        // given
+        val commonDescription = "foo"
+        val idlessDb1 = PostgreSQL(description = commonDescription)
+        val idlessDb2 = PostgreSQL(description = commonDescription)
+
+        // when
+        val result = idlessDb1 == idlessDb2
+
+        // then
+        assertTrue { result }
+    }
+
+    @Test
+    fun `ensure two databases without id are different when their attributes are different`() {
+        // given
+        val idlessDb1 = PostgreSQL(description = "foo")
+        val idlessDb2 = PostgreSQL(description = "bar")
+
+        // when
+        val result = idlessDb1 == idlessDb2
+
+        // then
+        assertFalse { result }
+    }
 }

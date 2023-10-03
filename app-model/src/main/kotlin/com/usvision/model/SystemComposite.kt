@@ -5,6 +5,7 @@ interface System : Visitable {
 
     fun getExposedOperations(): Set<Operation>
     fun getConsumedOperations(): Set<Operation>
+    fun getDatabases(): Set<Database>
 }
 
 abstract class SystemOfSystems() : System {
@@ -25,9 +26,15 @@ abstract class SystemOfSystems() : System {
         .fold(emptySet<Operation>()) { acc, curr ->
             acc + curr.getConsumedOperations()
         }
+
+    override fun getDatabases() = subsystems
+        .fold(emptySet<Database>()) { acc, curr ->
+            acc + curr.getDatabases()
+        }
 }
 
 interface SystemOfComponents : System {
     fun exposeOperation(operation: Operation)
     fun consumeOperation(operation: Operation)
+    fun addDatabaseConnection(database: Database)
 }
