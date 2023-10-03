@@ -11,3 +11,16 @@ data class Relationship(val with: Visitable)
 
 interface RelationshipAnalyzer : Analyzer<Relationship>
 
+interface Measure {
+    val value: Any
+    val type: String
+    val unit: String
+}
+
+data class Count(
+    override val value: Any,
+    override val type: String,
+    override val unit: String
+): Measure
+
+interface Measurer : Analyzer<Measure>
