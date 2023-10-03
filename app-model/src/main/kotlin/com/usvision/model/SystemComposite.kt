@@ -31,7 +31,3 @@ interface SystemOfComponents : System {
     fun exposeOperation(operation: Operation)
     fun consumeOperation(operation: Operation)
 }
-
-abstract class Operation(
-    open val description: String = ""
-)

@@ -8,6 +8,10 @@ data class CompanySystem(
     }
 }
 
+abstract class Operation(
+    open val description: String = ""
+)
+
 data class Microservice(
     override val name: String
 ) : SystemOfComponents {
