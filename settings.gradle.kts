@@ -1,1 +1,5 @@
-rootProject.name = "com.sortinghat.pattern_detector"
+rootProject.name = "com.usvision"
+
+include(
+    "app-model",
+)
