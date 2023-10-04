@@ -5,6 +5,7 @@ data class CompanySystem(
 ) : SystemOfSystems() {
     override fun accept(visitor: Visitor) {
         visitor.visit(this)
+        subsystems.forEach { it.accept(visitor) }
     }
 }
 

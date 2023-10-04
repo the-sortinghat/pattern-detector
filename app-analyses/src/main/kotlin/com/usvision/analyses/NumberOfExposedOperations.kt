@@ -17,8 +17,6 @@ class NumberOfExposedOperations : Measurer {
             value = companySystem.getExposedOperations().size,
             type = INT_TYPE_NAME, unit = UNIT_OPERATIONS
         )
-
-        companySystem.getSubsystemSet().forEach { it.accept(this) }
     }
 
     override fun visit(microservice: Microservice) {

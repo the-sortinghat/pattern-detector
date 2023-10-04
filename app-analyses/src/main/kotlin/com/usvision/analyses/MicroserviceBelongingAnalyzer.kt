@@ -15,11 +15,6 @@ class MicroserviceBelongingAnalyzer : RelationshipAnalyzer {
             .getSubsystemSet()
             .filterIsInstance<Microservice>()
             .forEach { parentOf[it] = parentRelationship }
-
-        companySystem
-            .getSubsystemSet()
-            .filter { it !is Microservice }
-            .forEach { it.accept(this) }
     }
 
     override fun visit(microservice: Microservice) {}
