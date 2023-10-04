@@ -1,6 +1,7 @@
 package com.usvision.analyses
 
 import com.usvision.model.CompanySystem
+import com.usvision.model.Database
 import com.usvision.model.Microservice
 import com.usvision.model.Visitable
 
@@ -18,4 +19,6 @@ class MicroserviceBelongingAnalyzer : RelationshipAnalyzer {
     }
 
     override fun visit(microservice: Microservice) {}
+
+    override fun visit(database: Database) {}
 }

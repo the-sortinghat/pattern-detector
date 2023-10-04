@@ -1,6 +1,7 @@
 package com.usvision.analyses
 
 import com.usvision.model.CompanySystem
+import com.usvision.model.Database
 import com.usvision.model.Microservice
 import com.usvision.model.Visitable
 
@@ -25,4 +26,6 @@ class NumberOfExposedOperations : Measurer {
             type = INT_TYPE_NAME, unit = UNIT_OPERATIONS
         )
     }
+
+    override fun visit(database: Database) {}
 }

@@ -13,7 +13,7 @@ abstract class Operation(
     open val description: String = ""
 )
 
-interface Database {
+interface Database : Visitable {
     val id: String?
     val description: String
 }
@@ -22,6 +22,10 @@ data class PostgreSQL(
     override val description: String = "PostgreSQL database",
     override val id: String? = null
 ) : Database {
+    override fun accept(visitor: Visitor) {
+        visitor.visit(this)
+    }
+
     override fun equals(other: Any?): Boolean {
         return if (other !is PostgreSQL) false
         else if (id == null || other.id == null) description == other.description
