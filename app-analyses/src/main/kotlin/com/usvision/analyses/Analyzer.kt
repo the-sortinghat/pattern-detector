@@ -10,6 +10,7 @@ interface Analyzer<out T> : Visitor {
 data class Relationship(val with: Visitable)
 
 interface RelationshipAnalyzer : Analyzer<Relationship>
+interface RelationshipsAnalyzer : Analyzer<Set<Relationship>>
 
 interface Measure {
     val value: Any
