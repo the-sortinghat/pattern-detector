@@ -2,5 +2,6 @@ rootProject.name = "com.usvision"
 
 include(
     "app-model",
-    "app-analyses"
+    "app-analyses",
+    "app-reports"
 )
