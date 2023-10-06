@@ -1,23 +1,11 @@
 package com.usvision.reports
 
-import com.usvision.analyses.ArchitectureInsight
-import com.usvision.analyses.Detector
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class MockClassNotDetector {}
-
-class MockDetector : Detector() {
-    override fun collectMetrics() {}
-
-    override fun combineMetric() {}
-
-    override fun getInstances(): Set<ArchitectureInsight> {
-        return emptySet()
-    }
-}
 
 internal class ReportRequestGeneratorTest {
     private lateinit var underTest: ReportSupervisor.ReportRequestGenerator

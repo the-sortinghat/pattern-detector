@@ -1,19 +1,23 @@
 package com.usvision.reports
 
+import com.usvision.analyses.ArchitectureInsight
 import com.usvision.analyses.Detector
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.starProjectedType
 
-interface Report
+class Report(
+    private val value: Map<KClass<out ArchitectureInsight>, Any>
+) : Map<KClass<out ArchitectureInsight>, Any> by value
 
 data class ReportRequest(
     val detectors: Set<KClass<Detector>>
 )
 
 class ReportSupervisor(
-    private val systemRepository: SystemRepository
+    private val systemRepository: SystemRepository,
+    private val planExecutioner: PlanExecutioner = SequentialPlanExecutioner()
 ) {
 
     class ReportRequestGenerator(private val packageName: String = "com.usvision.analyses") {
@@ -46,13 +50,18 @@ class ReportSupervisor(
         }
     }
 
-    fun generateReport(detectorsNames: Set<String>): Report? {
+    fun generateReport(detectorsNames: Set<String>, systemName: String): Report {
         val reportRequest = ReportRequestGenerator().generate(detectorsNames)
-        return null
+        val plan = Plan(emptySet(), emptySet())
+        val system = systemRepository.load(systemName)
+        return planExecutioner.execute(plan, system)
     }
 
-    fun generateReport(presetName: String): Report? {
-        return generateReport(detectorsNames = resolvePreset(presetName))
+    fun generateReport(presetName: String, systemName: String): Report {
+        return generateReport(
+            detectorsNames = resolvePreset(presetName),
+            systemName = systemName
+        )
     }
 
     private fun resolvePreset(presetName: String): Set<String> {
