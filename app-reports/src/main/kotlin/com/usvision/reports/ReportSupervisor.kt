@@ -12,11 +12,12 @@ class Report(
 ) : Map<KClass<out ArchitectureInsight>, Any> by value
 
 data class ReportRequest(
-    val detectors: Set<KClass<Detector>>
+    val detectors: Set<KClass<out Detector>>
 )
 
 class ReportSupervisor(
     private val systemRepository: SystemRepository,
+    private val planner: Planner = AnalyzerReusePlanner(),
     private val planExecutioner: PlanExecutioner = SequentialPlanExecutioner()
 ) {
 
@@ -50,9 +51,11 @@ class ReportSupervisor(
         }
     }
 
+    private val presets: Map<String,Set<String>> = emptyMap()
+
     fun generateReport(detectorsNames: Set<String>, systemName: String): Report {
         val reportRequest = ReportRequestGenerator().generate(detectorsNames)
-        val plan = Plan(emptySet(), emptySet())
+        val plan = planner.plan(reportRequest)
         val system = systemRepository.load(systemName)
         return planExecutioner.execute(plan, system)
     }
@@ -64,7 +67,8 @@ class ReportSupervisor(
         )
     }
 
-    private fun resolvePreset(presetName: String): Set<String> {
-        TODO("Not yet implemented")
-    }
+    fun getPresets(): Set<String> = presets.keys.toSet()
+
+    private fun resolvePreset(presetName: String): Set<String> = presets[presetName]
+        ?: throw UnknownPresetException(presetName)
 }
