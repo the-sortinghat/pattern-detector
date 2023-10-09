@@ -9,8 +9,6 @@ abstract class SystemOfSystems() : System {
 
     fun addSubsystem(system: System) = subsystems.add(system)
 
-    fun removeSubsystem(system: System) = subsystems.remove(system)
-
     fun getSubsystemSet(): Set<System> = subsystems
 
     override fun getExposedOperations() = subsystems

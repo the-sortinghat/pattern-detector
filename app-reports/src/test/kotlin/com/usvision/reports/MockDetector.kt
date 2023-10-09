@@ -21,6 +21,7 @@ class MockAnalyzer : Measurer {
     override fun visit(database: Database) {}
 }
 
+@Suppress("unused")
 class MockDetector(private val mockAnalyzer: MockAnalyzer) : Detector() {
     override fun collectMetrics() {}
 
@@ -31,6 +32,7 @@ class MockDetector(private val mockAnalyzer: MockAnalyzer) : Detector() {
     }
 }
 
+@Suppress("unused")
 class AnotherMockDetector(private val mockAnalyzer: MockAnalyzer): Detector() {
     override fun collectMetrics() {}
 

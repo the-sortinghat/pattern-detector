@@ -14,6 +14,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlin.test.*
 
+@Suppress("unused")
 class MockInsight(val system: System) : ArchitectureInsight
 
 internal class SequentialPlanExecutionerTest {
