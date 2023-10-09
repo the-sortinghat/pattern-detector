@@ -1,6 +1,6 @@
 package com.usvision.reports.utils
 
-import com.usvision.analyses.ArchitectureInsight
+import com.usvision.analyses.detector.ArchitectureInsight
 import kotlin.reflect.KClass
 
 class Report(

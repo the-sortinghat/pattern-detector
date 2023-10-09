@@ -1,4 +1,4 @@
-package com.usvision.analyses
+package com.usvision.analyses.analyzer
 
 import com.usvision.model.CompanySystem
 import com.usvision.model.Database

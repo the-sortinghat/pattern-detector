@@ -1,6 +1,6 @@
 package com.usvision.reports
 
-import com.usvision.analyses.Detector
+import com.usvision.analyses.detector.Detector
 import com.usvision.reports.exceptions.ClassIsNotDetectorException
 import com.usvision.reports.exceptions.DetectorNotFoundException
 import com.usvision.reports.exceptions.UnknownPresetException

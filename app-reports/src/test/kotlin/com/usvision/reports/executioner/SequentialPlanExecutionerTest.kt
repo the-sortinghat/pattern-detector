@@ -1,6 +1,6 @@
 package com.usvision.reports.executioner
 
-import com.usvision.analyses.ArchitectureInsight
+import com.usvision.analyses.detector.ArchitectureInsight
 import com.usvision.model.CompanySystem
 import com.usvision.model.Database
 import com.usvision.model.Microservice

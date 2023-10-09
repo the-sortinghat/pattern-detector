@@ -1,5 +1,8 @@
-package com.usvision.analyses
+package com.usvision.analyses.analyzer
 
+import com.usvision.analyses.analyzer.Count
+import com.usvision.analyses.analyzer.Measure
+import com.usvision.analyses.analyzer.Measurer
 import com.usvision.model.CompanySystem
 import com.usvision.model.Database
 import com.usvision.model.Microservice

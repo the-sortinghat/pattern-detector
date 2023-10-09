@@ -1,9 +1,9 @@
 package com.usvision.reports
 
-import com.usvision.analyses.ArchitectureInsight
-import com.usvision.analyses.Detector
-import com.usvision.analyses.Measure
-import com.usvision.analyses.Measurer
+import com.usvision.analyses.detector.ArchitectureInsight
+import com.usvision.analyses.detector.Detector
+import com.usvision.analyses.analyzer.Measure
+import com.usvision.analyses.analyzer.Measurer
 import com.usvision.model.CompanySystem
 import com.usvision.model.Database
 import com.usvision.model.Microservice

@@ -1,5 +1,6 @@
-package com.usvision.analyses
+package com.usvision.analyses.detector
 
+import com.usvision.analyses.analyzer.*
 import com.usvision.model.Database
 import com.usvision.model.Microservice
 import com.usvision.model.Visitable
@@ -66,14 +67,3 @@ class DatabasePerService(
 
 }
 
-data class DatabasePerServiceInstance(
-    val microservice: Microservice,
-    val database: Database
-) : ArchitectureInsight {
-    companion object {
-        fun of(pair: Pair<Microservice, Database>) = DatabasePerServiceInstance(
-            microservice = pair.first,
-            database = pair.second
-        )
-    }
-}

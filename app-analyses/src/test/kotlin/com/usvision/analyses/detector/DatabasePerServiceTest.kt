@@ -1,5 +1,6 @@
-package com.usvision.analyses
+package com.usvision.analyses.detector
 
+import com.usvision.analyses.analyzer.*
 import com.usvision.model.Microservice
 import com.usvision.model.PostgreSQL
 import io.mockk.MockKAnnotations
@@ -36,9 +37,11 @@ class DatabasePerServiceTest {
         val db = PostgreSQL(id = "id")
 
         every { mockNops.getResults() } returns mapOf(
-            ms to Count(value = 1, type = "Int", unit = "operations"))
+            ms to Count(value = 1, type = "Int", unit = "operations")
+        )
         every { mockNclients.getResults() } returns mapOf(
-            db to Count(value = 1, type = "Int", unit = "clients"))
+            db to Count(value = 1, type = "Int", unit = "clients")
+        )
         every { mockDbUsages.getResults() } returns mapOf(
             db to setOf(Relationship(with = ms)))
 
@@ -58,9 +61,11 @@ class DatabasePerServiceTest {
         val db = PostgreSQL(id = "id")
 
         every { mockNops.getResults() } returns mapOf(
-            ms to Count(value = DatabasePerService.MAX_COHESIVE_THRESHOLD + 1, type = "Int", unit = "operations"))
+            ms to Count(value = DatabasePerService.MAX_COHESIVE_THRESHOLD + 1, type = "Int", unit = "operations")
+        )
         every { mockNclients.getResults() } returns mapOf(
-            db to Count(value = 1, type = "Int", unit = "clients"))
+            db to Count(value = 1, type = "Int", unit = "clients")
+        )
         every { mockDbUsages.getResults() } returns mapOf(
             db to setOf(Relationship(with = ms)))
 
@@ -79,9 +84,11 @@ class DatabasePerServiceTest {
         val db = PostgreSQL(id = "id")
 
         every { mockNops.getResults() } returns mapOf(
-            ms to Count(value = 1, type = "Int", unit = "operations"))
+            ms to Count(value = 1, type = "Int", unit = "operations")
+        )
         every { mockNclients.getResults() } returns mapOf(
-            db to Count(value = DatabasePerService.MAX_CLIENTS_THRESHOLD + 1, type = "Int", unit = "clients"))
+            db to Count(value = DatabasePerService.MAX_CLIENTS_THRESHOLD + 1, type = "Int", unit = "clients")
+        )
         every { mockDbUsages.getResults() } returns mapOf(
             db to setOf(Relationship(with = ms)))
 

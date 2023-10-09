@@ -1,4 +1,4 @@
-package com.usvision.analyses
+package com.usvision.analyses.detector
 
 abstract class Detector {
     fun run() {
@@ -12,4 +12,3 @@ abstract class Detector {
     abstract fun getInstances(): Set<ArchitectureInsight>
 }
 
-interface ArchitectureInsight

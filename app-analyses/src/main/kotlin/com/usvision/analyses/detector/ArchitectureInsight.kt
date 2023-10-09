@@ -1,0 +1,3 @@
+package com.usvision.analyses.detector
+
+interface ArchitectureInsight
