@@ -2,6 +2,8 @@ package com.usvision.reports.planner
 
 import com.usvision.analyses.analyzer.Analyzer
 import com.usvision.analyses.detector.Detector
+import com.usvision.reports.utils.EditablePlan
+import com.usvision.reports.utils.ExecutablePlan
 import com.usvision.reports.utils.Plan
 import com.usvision.reports.utils.ReportRequest
 import kotlin.reflect.KClass
@@ -43,7 +45,7 @@ class AnalyzerReusePlanner : Planner {
             .call(*paramValues)
     }
 
-    override fun plan(reportRequest: ReportRequest): Plan {
+    private fun instantiateDetectors(reportRequest: ReportRequest) {
         reportRequest.detectors.forEach { detKClass ->
             val kTypeParams = getTypesOfConstructorParams(detKClass)
             ensureAnalyzerInstanceIsCached(kTypeParams)
@@ -51,10 +53,18 @@ class AnalyzerReusePlanner : Planner {
             val detInstance = instantiateDetector(detKClass, paramValues)
             detectors.add(detInstance)
         }
+    }
 
-        return Plan(
-            analyzers = analyzers.values.toSet() as Set<Analyzer<Any>>,
-            detectors = detectors
-        )
+    private fun craftPlan(): ExecutablePlan {
+        val plan: EditablePlan = Plan()
+        analyzers.values.forEach { plan.addStep(it) }
+        detectors.forEach { plan.addStep(it) }
+        return plan
+    }
+
+    override fun plan(reportRequest: ReportRequest): ExecutablePlan {
+        instantiateDetectors(reportRequest)
+
+        return craftPlan()
     }
 }

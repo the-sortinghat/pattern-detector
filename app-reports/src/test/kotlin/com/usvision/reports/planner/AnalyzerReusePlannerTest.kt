@@ -23,8 +23,8 @@ class AnalyzerReusePlannerTest {
 
         // then
         assertIs<Plan>(result)
-        assertEquals(result.analyzers.size, 1)
-        assertIs<MockAnalyzer>(result.analyzers.first())
+        assertEquals(result.size(), 2)
+        assertIs<MockAnalyzer>(result.getNextStep())
     }
 
     @Test
@@ -40,7 +40,7 @@ class AnalyzerReusePlannerTest {
 
         // then
         assertIs<Plan>(result)
-        assertEquals(result.analyzers.size, 1)
-        assertIs<MockAnalyzer>(result.analyzers.first())
+        assertEquals(result.size(), 3)
+        assertIs<MockAnalyzer>(result.getNextStep())
     }
 }

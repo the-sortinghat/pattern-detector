@@ -37,10 +37,9 @@ internal class SequentialPlanExecutionerTest {
     fun `given a simple Plan, it gives the adequate report`() {
         // given
         val system = CompanySystem(name = "mock")
-        val plan = Plan(
-            analyzers = setOf(mockAnalyzer),
-            detectors = setOf(mockDetector)
-        )
+        val plan = Plan()
+        plan.addStep(mockAnalyzer)
+        plan.addStep(mockDetector)
         every { mockDetector.getInstances() } returns setOf(MockInsight(system))
         every { mockDetector.run() } returns Unit
         every { mockAnalyzer.visit(any() as CompanySystem) } returns Unit
