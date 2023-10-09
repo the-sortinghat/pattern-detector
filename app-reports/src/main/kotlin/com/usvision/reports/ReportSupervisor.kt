@@ -1,19 +1,19 @@
 package com.usvision.reports
 
-import com.usvision.analyses.ArchitectureInsight
 import com.usvision.analyses.Detector
+import com.usvision.reports.exceptions.ClassIsNotDetectorException
+import com.usvision.reports.exceptions.DetectorNotFoundException
+import com.usvision.reports.exceptions.UnknownPresetException
+import com.usvision.reports.executioner.PlanExecutioner
+import com.usvision.reports.executioner.SequentialPlanExecutioner
+import com.usvision.reports.planner.AnalyzerReusePlanner
+import com.usvision.reports.planner.Planner
+import com.usvision.reports.utils.Report
+import com.usvision.reports.utils.ReportRequest
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.starProjectedType
-
-class Report(
-    private val value: Map<KClass<out ArchitectureInsight>, Any>
-) : Map<KClass<out ArchitectureInsight>, Any> by value
-
-data class ReportRequest(
-    val detectors: Set<KClass<out Detector>>
-)
 
 class ReportSupervisor(
     private val systemRepository: SystemRepository,

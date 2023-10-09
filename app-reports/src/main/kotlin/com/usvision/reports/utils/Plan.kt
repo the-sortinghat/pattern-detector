@@ -1,4 +1,4 @@
-package com.usvision.reports
+package com.usvision.reports.utils
 
 import com.usvision.analyses.Analyzer
 import com.usvision.analyses.Detector

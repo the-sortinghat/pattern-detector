@@ -1,5 +1,8 @@
-package com.usvision.reports
+package com.usvision.reports.planner
 
+import com.usvision.reports.*
+import com.usvision.reports.utils.Plan
+import com.usvision.reports.utils.ReportRequest
 import kotlin.test.*
 
 class AnalyzerReusePlannerTest {

@@ -1,5 +1,7 @@
 package com.usvision.reports
 
+import com.usvision.reports.exceptions.ClassIsNotDetectorException
+import com.usvision.reports.exceptions.DetectorNotFoundException
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.BeforeTest

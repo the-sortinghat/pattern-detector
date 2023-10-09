@@ -1,14 +1,17 @@
-package com.usvision.reports
+package com.usvision.reports.executioner
 
 import com.usvision.analyses.ArchitectureInsight
 import com.usvision.model.CompanySystem
 import com.usvision.model.Database
 import com.usvision.model.Microservice
 import com.usvision.model.System
+import com.usvision.reports.MockAnalyzer
+import com.usvision.reports.MockDetector
+import com.usvision.reports.utils.Plan
+import com.usvision.reports.utils.Report
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.impl.annotations.SpyK
 import kotlin.test.*
 
 class MockInsight(val system: System) : ArchitectureInsight

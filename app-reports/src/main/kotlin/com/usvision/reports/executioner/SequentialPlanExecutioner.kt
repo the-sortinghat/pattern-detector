@@ -1,6 +1,8 @@
-package com.usvision.reports
+package com.usvision.reports.executioner
 
 import com.usvision.model.System
+import com.usvision.reports.utils.Plan
+import com.usvision.reports.utils.Report
 
 class SequentialPlanExecutioner : PlanExecutioner {
     override fun execute(plan: Plan, system: System): Report {

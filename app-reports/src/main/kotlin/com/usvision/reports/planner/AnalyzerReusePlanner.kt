@@ -1,7 +1,9 @@
-package com.usvision.reports
+package com.usvision.reports.planner
 
 import com.usvision.analyses.Analyzer
 import com.usvision.analyses.Detector
+import com.usvision.reports.utils.Plan
+import com.usvision.reports.utils.ReportRequest
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.primaryConstructor
