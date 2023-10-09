@@ -4,10 +4,10 @@ import com.usvision.analyses.detector.ArchitectureInsight
 import com.usvision.analyses.detector.Detector
 import com.usvision.analyses.analyzer.Measure
 import com.usvision.analyses.analyzer.Measurer
-import com.usvision.model.CompanySystem
-import com.usvision.model.Database
-import com.usvision.model.Microservice
-import com.usvision.model.Visitable
+import com.usvision.model.domain.CompanySystem
+import com.usvision.model.domain.databases.Database
+import com.usvision.model.domain.Microservice
+import com.usvision.model.visitor.Visitable
 
 class MockAnalyzer : Measurer {
     override fun getResults(): Map<Visitable, Measure> {

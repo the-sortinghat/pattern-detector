@@ -1,6 +1,6 @@
 package com.usvision.reports.executioner
 
-import com.usvision.model.System
+import com.usvision.model.systemcomposite.System
 import com.usvision.reports.utils.Plan
 import com.usvision.reports.utils.Report
 

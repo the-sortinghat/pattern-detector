@@ -1,12 +1,9 @@
 package com.usvision.analyses.analyzer
 
-import com.usvision.analyses.analyzer.Count
-import com.usvision.analyses.analyzer.Measure
-import com.usvision.analyses.analyzer.Measurer
-import com.usvision.model.CompanySystem
-import com.usvision.model.Database
-import com.usvision.model.Microservice
-import com.usvision.model.Visitable
+import com.usvision.model.domain.CompanySystem
+import com.usvision.model.domain.databases.Database
+import com.usvision.model.domain.Microservice
+import com.usvision.model.visitor.Visitable
 
 class NumberOfExposedOperations : Measurer {
     private val INT_TYPE_NAME = Int::class.qualifiedName!!

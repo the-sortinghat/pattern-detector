@@ -1,10 +1,10 @@
 package com.usvision.reports.executioner
 
 import com.usvision.analyses.detector.ArchitectureInsight
-import com.usvision.model.CompanySystem
-import com.usvision.model.Database
-import com.usvision.model.Microservice
-import com.usvision.model.System
+import com.usvision.model.domain.CompanySystem
+import com.usvision.model.domain.databases.Database
+import com.usvision.model.domain.Microservice
+import com.usvision.model.systemcomposite.System
 import com.usvision.reports.MockAnalyzer
 import com.usvision.reports.MockDetector
 import com.usvision.reports.utils.Plan

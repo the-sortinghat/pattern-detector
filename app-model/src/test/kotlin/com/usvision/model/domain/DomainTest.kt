@@ -1,5 +1,7 @@
-package com.usvision.model
+package com.usvision.model.domain
 
+import com.usvision.model.domain.databases.PostgreSQL
+import com.usvision.model.systemcomposite.System
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

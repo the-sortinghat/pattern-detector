@@ -1,14 +1,8 @@
-package com.usvision.model
+package com.usvision.model.systemcomposite
 
-interface System : Visitable {
-    val name: String
-
-    fun getExposedOperations(): Set<Operation>
-    fun getConsumedOperations(): Set<Operation>
-    fun getDatabases(): Set<Database>
-    fun getPublishChannels(): Set<MessageChannel>
-    fun getSubscribedChannels(): Set<MessageChannel>
-}
+import com.usvision.model.domain.databases.Database
+import com.usvision.model.domain.MessageChannel
+import com.usvision.model.domain.operations.Operation
 
 abstract class SystemOfSystems() : System {
     protected open val subsystems: MutableSet<System> = mutableSetOf()
@@ -43,12 +37,4 @@ abstract class SystemOfSystems() : System {
         .fold(emptySet<MessageChannel>()) { acc, curr ->
             acc + curr.getSubscribedChannels()
         }
-}
-
-interface SystemOfComponents : System {
-    fun exposeOperation(operation: Operation)
-    fun consumeOperation(operation: Operation)
-    fun addDatabaseConnection(database: Database)
-    fun addPublishChannel(channel: MessageChannel)
-    fun addSubscribedChannel(channel: MessageChannel)
 }

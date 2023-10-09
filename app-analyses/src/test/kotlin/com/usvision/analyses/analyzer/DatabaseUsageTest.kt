@@ -1,8 +1,8 @@
 package com.usvision.analyses.analyzer
 
-import com.usvision.model.CompanySystem
-import com.usvision.model.Microservice
-import com.usvision.model.PostgreSQL
+import com.usvision.model.domain.CompanySystem
+import com.usvision.model.domain.Microservice
+import com.usvision.model.domain.databases.PostgreSQL
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

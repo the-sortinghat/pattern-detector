@@ -1,7 +1,7 @@
 package com.usvision.analyses.detector
 
-import com.usvision.model.Database
-import com.usvision.model.Microservice
+import com.usvision.model.domain.databases.Database
+import com.usvision.model.domain.Microservice
 
 data class DatabasePerServiceInstance(
     val microservice: Microservice,

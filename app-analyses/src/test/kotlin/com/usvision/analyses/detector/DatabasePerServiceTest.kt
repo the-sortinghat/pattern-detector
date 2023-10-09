@@ -1,8 +1,8 @@
 package com.usvision.analyses.detector
 
 import com.usvision.analyses.analyzer.*
-import com.usvision.model.Microservice
-import com.usvision.model.PostgreSQL
+import com.usvision.model.domain.Microservice
+import com.usvision.model.domain.databases.PostgreSQL
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

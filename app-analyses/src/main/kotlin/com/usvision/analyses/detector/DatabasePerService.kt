@@ -1,9 +1,9 @@
 package com.usvision.analyses.detector
 
 import com.usvision.analyses.analyzer.*
-import com.usvision.model.Database
-import com.usvision.model.Microservice
-import com.usvision.model.Visitable
+import com.usvision.model.domain.databases.Database
+import com.usvision.model.domain.Microservice
+import com.usvision.model.visitor.Visitable
 
 class DatabasePerService(
     private val nops: NumberOfExposedOperations,
@@ -45,7 +45,7 @@ class DatabasePerService(
                 db in dbCandidates && clients.first() in msCandidates
             }
             .map { (db, singleMsRelations) -> Pair(singleMsRelations.first().with, db) }
-            .filterIsInstance<Pair<Microservice,Database>>()
+            .filterIsInstance<Pair<Microservice, Database>>()
             .toSet()
     }
 

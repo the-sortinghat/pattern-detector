@@ -1,41 +1,9 @@
-package com.usvision.model
+package com.usvision.model.domain
 
-data class CompanySystem(
-    override val name: String
-) : SystemOfSystems() {
-    override fun accept(visitor: Visitor) {
-        visitor.visit(this)
-        subsystems.forEach { it.accept(visitor) }
-    }
-}
-
-abstract class Operation(
-    open val description: String = ""
-)
-
-interface Database : Visitable {
-    val id: String?
-    val description: String
-}
-
-data class PostgreSQL(
-    override val description: String = "PostgreSQL database",
-    override val id: String? = null
-) : Database {
-    override fun accept(visitor: Visitor) {
-        visitor.visit(this)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return if (other !is PostgreSQL) false
-        else if (id == null || other.id == null) description == other.description
-        else id == other.id
-    }
-
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
-}
+import com.usvision.model.domain.databases.Database
+import com.usvision.model.domain.operations.Operation
+import com.usvision.model.systemcomposite.SystemOfComponents
+import com.usvision.model.visitor.Visitor
 
 data class Microservice(
     override val name: String
@@ -78,26 +46,5 @@ data class Microservice(
 
     override fun accept(visitor: Visitor) {
         visitor.visit(this)
-    }
-}
-
-data class RestEndpoint(
-    val httpVerb: String,
-    val path: String,
-    override val description: String = ""
-) : Operation(description)
-
-data class MessageChannel(
-    val name: String,
-    val id: String? = null
-) {
-    override fun equals(other: Any?): Boolean {
-        return if (other !is MessageChannel) false
-        else if (id == null || other.id == null) name == other.name
-        else id == other.id
-    }
-
-    override fun hashCode(): Int {
-        return id.hashCode()
     }
 }
