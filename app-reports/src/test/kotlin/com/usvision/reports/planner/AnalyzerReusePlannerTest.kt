@@ -43,4 +43,22 @@ class AnalyzerReusePlannerTest {
         assertEquals(result.size(), 3)
         assertIs<MockAnalyzer>(result.getNextStep())
     }
+
+    @Test// @Ignore
+    fun `it identifies a detector to detector dependency`() {
+        // given
+        val req = ReportRequest(setOf(
+            ComplexMockDetector::class
+        ))
+
+        // when
+        val result = underTest.plan(req)
+
+        // then
+        assertIs<Plan>(result)
+        assertEquals(result.size(), 3)
+        assertIs<MockAnalyzer>(result.getNextStep())
+        assertIs<MockDetector>(result.getNextStep())
+        assertIs<ComplexMockDetector>(result.getNextStep())
+    }
 }

@@ -43,3 +43,15 @@ class AnotherMockDetector(private val mockAnalyzer: MockAnalyzer): Detector() {
     }
 
 }
+
+@Suppress("unused")
+class ComplexMockDetector(private val mockDetector: MockDetector, private val mockAnalyzer: MockAnalyzer) : Detector() {
+    override fun collectMetrics() {}
+
+    override fun combineMetric() {}
+
+    override fun getInstances(): Set<ArchitectureInsight> {
+        return emptySet()
+    }
+
+}

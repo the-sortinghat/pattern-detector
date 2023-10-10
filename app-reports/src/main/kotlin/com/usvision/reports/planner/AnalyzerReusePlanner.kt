@@ -6,65 +6,82 @@ import com.usvision.reports.utils.EditablePlan
 import com.usvision.reports.utils.ExecutablePlan
 import com.usvision.reports.utils.Plan
 import com.usvision.reports.utils.ReportRequest
+import java.util.Stack
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.primaryConstructor
 
 class AnalyzerReusePlanner : Planner {
-    private val analyzers: MutableMap<KType, Analyzer<*>> = mutableMapOf()
-    private val detectors: MutableSet<Detector> = mutableSetOf()
+    private lateinit var stack: Stack<KClass<*>>
+    private lateinit var analyzersCache: MutableMap<Any, Analyzer<*>>
+    private lateinit var detectorsCache: MutableMap<Any, Detector>
 
-    private fun getTypesOfConstructorParams(detKClass: KClass<out Detector>): List<KType> {
-        return detKClass
+    private fun KType.toKClass(): KClass<out Any> {
+        return Class
+            .forName(toString())
+            .kotlin
+    }
+
+    private fun initialize() {
+        stack = Stack()
+        analyzersCache = mutableMapOf()
+        detectorsCache = mutableMapOf()
+    }
+
+    private fun prepareStack(starterKClass: KClass<out Any>) {
+        println("adding to stack $starterKClass")
+        stack.push(starterKClass)
+
+        starterKClass
             .primaryConstructor!!
             .parameters
-            .map { it.type }
+            .map { it.type.toKClass() }
+            .forEach { prepareStack(it) }
     }
 
-    private fun ensureAnalyzerInstanceIsCached(kTypeParams: List<KType>) {
-        kTypeParams
-            .filter { it !in analyzers.keys }
-            .forEach { kType ->
-                val analyzer = Class
-                    .forName(kType.toString())
-                    .getDeclaredConstructor()
-                    .newInstance() as Analyzer<Any>
-                analyzers[kType] = analyzer
-            }
+    private fun getFromCache(kClass: KClass<out Any>): Any? {
+        return analyzersCache[kClass] ?: detectorsCache[kClass]
     }
 
-    private fun getAnalyzersFromCache(kTypeParams: List<KType>): Array<Analyzer<*>?> {
-        return kTypeParams
-            .map { analyzers[it] }
-            .toTypedArray()
+    private fun addToCache(instance: Any) {
+        if (instance is Detector) detectorsCache[instance::class] = instance
+        else analyzersCache[instance::class] = instance as Analyzer<*>
     }
 
-    private fun instantiateDetector(detKClass: KClass<out Detector>, paramValues: Array<Analyzer<*>?>): Detector {
-        return detKClass
+    private fun instantiate(kClass: KClass<*>): Any {
+        val paramsKClasses = kClass
             .primaryConstructor!!
-            .call(*paramValues)
+            .parameters
+            .map { it.type.toKClass() }
+
+        val params = paramsKClasses
+            .map(this::getFromCache)
+            .toTypedArray()
+
+        return if (params.isEmpty()) kClass.primaryConstructor!!.call()
+        else kClass.primaryConstructor!!.call(*params)
     }
 
-    private fun instantiateDetectors(reportRequest: ReportRequest) {
-        reportRequest.detectors.forEach { detKClass ->
-            val kTypeParams = getTypesOfConstructorParams(detKClass)
-            ensureAnalyzerInstanceIsCached(kTypeParams)
-            val paramValues = getAnalyzersFromCache(kTypeParams)
-            val detInstance = instantiateDetector(detKClass, paramValues)
-            detectors.add(detInstance)
-        }
-    }
-
-    private fun craftPlan(): ExecutablePlan {
+    private fun createPlan(): ExecutablePlan {
         val plan: EditablePlan = Plan()
-        analyzers.values.forEach { plan.addStep(it) }
-        detectors.forEach { plan.addStep(it) }
+
+        while (stack.isNotEmpty()) {
+            val kClass = stack.pop()
+
+            val instance = getFromCache(kClass)
+                ?: instantiate(kClass).also { addToCache(it) }
+
+            if (!plan.contains(instance)) plan.addStep(instance)
+        }
+
         return plan
     }
 
     override fun plan(reportRequest: ReportRequest): ExecutablePlan {
-        instantiateDetectors(reportRequest)
+        initialize()
 
-        return craftPlan()
+        reportRequest.detectors.forEach { prepareStack(it) }
+
+        return createPlan()
     }
 }
