@@ -23,7 +23,7 @@ dependencies {
     implementation(project(":app-model"))
     implementation(project(":app-analyses"))
     implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
     testImplementation("io.mockk:mockk:${mockk_version}")
     testImplementation(kotlin("test"))
     implementation(kotlin("reflect"))
