@@ -5,7 +5,6 @@ val mockk_version: String by project
 plugins {
     `java-library`
     kotlin("jvm")
-    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 group = "com.usvision.analyses"
@@ -18,6 +17,9 @@ repositories {
 tasks.test {
     useJUnitPlatform()
 }
+
+group = "com.usvision.analyses"
+version = "0.0.1"
 
 dependencies {
     implementation(project(":app-model"))
