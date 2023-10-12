@@ -6,10 +6,11 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import com.usvision.model.domain.CompanySystem
 import com.usvision.model.domain.Microservice
 import com.usvision.model.domain.operations.RestEndpoint
-import com.usvision.persistence.connectionbuilder.MongoDBConnectionBuilder
+import com.usvision.persistence.repositorybuilder.MongoDBRepositoryProvider
 import com.usvision.persistence.documents.DatabaseDocument
 import com.usvision.persistence.documents.SystemDocument
 import com.usvision.persistence.documents.toDocument
+import com.usvision.persistence.exceptions.SystemNotFoundException
 import kotlinx.coroutines.runBlocking
 import org.bson.Document
 import org.bson.types.ObjectId
@@ -24,19 +25,20 @@ internal class MongoSystemRepositoryTest {
 
     @BeforeTest
     fun `create clean, new instance of MongoSystemRepository`() {
+        val builder = MongoDBRepositoryProvider()
         if (!this::db.isInitialized) {
-            db = MongoDBConnectionBuilder().run {
+            db = builder.run {
                 connectTo("localhost")
                 setPort("27017")
                 withCredentials("usvision", "supersecret123")
                 setDatabase("systems_test")
-                build()
+                getConnection()
             }
         }
 
         systemsCollection = db
             .getCollection<SystemDocument>(MongoSystemRepository.COLLECTION_NAME)
-        underTest = MongoSystemRepository(db)
+        underTest = builder.getRepository()
 
         runBlocking {
             systemsCollection.deleteMany(Document())

@@ -5,6 +5,7 @@ import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import com.usvision.model.systemcomposite.System
 import com.usvision.persistence.documents.SystemDocument
+import com.usvision.persistence.exceptions.SystemNotFoundException
 import com.usvision.reports.SystemRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -34,6 +35,3 @@ class MongoSystemRepository(db: MongoDatabase) : SystemRepository {
         throw SystemNotFoundException(name)
     }
 }
-
-class SystemNotFoundException(name: String)
-    : RuntimeException("System $name not found")
