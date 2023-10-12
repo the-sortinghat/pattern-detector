@@ -1,8 +1,6 @@
 rootProject.name = "com.usvision"
 
-include(
-    "app-model",
-    "app-analyses",
-    "app-reports",
-    "app-persistence"
-)
+include("app-model")
+include("app-analyses")
+include("app-reports")
+include("app-persistence")
