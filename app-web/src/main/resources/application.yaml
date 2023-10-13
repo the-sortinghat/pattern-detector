@@ -1,0 +1,13 @@
+ktor:
+  deployment:
+    port: $USVISION_APP_PORT
+  application:
+    modules:
+      - com.usvision.web.ApplicationKt.module
+
+persistence:
+  host: $USVISION_DATABASE_HOST
+  port: $USVISION_DATABASE_PORT
+  username: $USVISION_DATABASE_USERNAME
+  password: $USVISION_DATABASE_PASSWORD
+  database_name: $USVISION_DATABASE_NAME
