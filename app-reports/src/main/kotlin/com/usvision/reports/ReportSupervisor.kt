@@ -21,7 +21,7 @@ class ReportSupervisor(
     private val planExecutioner: PlanExecutioner = SequentialPlanExecutioner()
 ) {
 
-    class ReportRequestGenerator(private val packageName: String = "com.usvision.analyses") {
+    class ReportRequestGenerator(private val packageName: String = "com.usvision.analyses.detector") {
         fun generate(detectorsNames: Set<String>) = detectorsNames
             .map(this::parse)
             .let { ReportRequest(detectors = it.toSet()) }
@@ -51,7 +51,10 @@ class ReportSupervisor(
         }
     }
 
-    private val presets: Map<String,Set<String>> = emptyMap()
+    // TODO: consider "" as a preset for all detectors
+    private val presets: Map<String,Set<String>> = mapOf(
+        "" to setOf("DatabasePerService")
+    )
 
     fun generateReport(detectorsNames: Set<String>, systemName: String): Report {
         val reportRequest = ReportRequestGenerator().generate(detectorsNames)
