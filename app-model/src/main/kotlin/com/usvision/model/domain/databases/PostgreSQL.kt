@@ -1,7 +1,9 @@
 package com.usvision.model.domain.databases
 
 import com.usvision.model.visitor.Visitor
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class PostgreSQL(
     override val description: String = "PostgreSQL database",
     override val id: String? = null

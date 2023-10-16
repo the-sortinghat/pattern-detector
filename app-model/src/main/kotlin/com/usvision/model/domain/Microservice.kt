@@ -4,7 +4,9 @@ import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.operations.Operation
 import com.usvision.model.systemcomposite.SystemOfComponents
 import com.usvision.model.visitor.Visitor
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Microservice(
     override val name: String
 ) : SystemOfComponents {

@@ -1,3 +1,6 @@
 package com.usvision.analyses.detector
 
-interface ArchitectureInsight
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed interface ArchitectureInsight

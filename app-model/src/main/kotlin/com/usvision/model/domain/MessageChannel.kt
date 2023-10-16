@@ -1,5 +1,8 @@
 package com.usvision.model.domain
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class MessageChannel(
     val name: String,
     val id: String? = null

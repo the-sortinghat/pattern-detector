@@ -1,5 +1,6 @@
 package com.usvision.model.domain.operations
 
-abstract class Operation(
-    open val description: String = ""
-)
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed interface Operation

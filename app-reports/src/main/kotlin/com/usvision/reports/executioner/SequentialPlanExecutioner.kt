@@ -4,8 +4,10 @@ import com.usvision.analyses.analyzer.Analyzer
 import com.usvision.analyses.detector.ArchitectureInsight
 import com.usvision.analyses.detector.Detector
 import com.usvision.model.systemcomposite.System
+import com.usvision.reports.utils.BaseReport
 import com.usvision.reports.utils.ExecutablePlan
 import com.usvision.reports.utils.Report
+import kotlin.reflect.KClass
 
 class SequentialPlanExecutioner : PlanExecutioner {
     private lateinit var system: System
@@ -24,8 +26,13 @@ class SequentialPlanExecutioner : PlanExecutioner {
         }
 
         val insightsGroupedByType = insights.groupBy { it::class }
+        val insightsGroupedByTypeString: MutableMap<String,List<ArchitectureInsight>> = mutableMapOf()
+        insightsGroupedByType.keys.forEach { key: KClass<out ArchitectureInsight> ->
+            val keyName: String = key.simpleName.toString()
+            insightsGroupedByTypeString[keyName] = insightsGroupedByType[key]!!
+        }
 
-        return Report(insightsGroupedByType)
+        return BaseReport(insightsGroupedByTypeString)
     }
 
     private fun runDetector(detector: Detector) {
