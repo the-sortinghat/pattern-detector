@@ -36,3 +36,14 @@ It's important to notice there's no connection between a Detector and a System. 
 | System            |                   |         | 1           | -      |          |         |
 | Detector          |                   | 1       | 2           |        | -        |         |
 | Analyzer          |                   | 1       |             | 1      | 1        | -       |
+
+
+## How to create a new detection
+
+Detection is based solely on the results of analyses -- directly or indirectly --, and they can generate a variety of results, such as patterns and bad smells. More basic detections depend directly on the results of some analyses, but there might be some more complex detections that also benefit from other detections.
+
+Whatever degree of complexity your new detection has, you only need to create a new class that extends the `Detector` abstract class, that takes in its constructor all the `Analyzer`s and `Detector`s it depends on, and, as outcome of the `getResults` method, provides an implementation of `ArchitecturalInsight`. The diagram below shows what is currently implemented.
+
+> All the detectors **must be placed inside the com.usvision.analyses.detector package** otherwise it won't be available for the external clients
+
+![class diagram of the analyses and detections](./../diagrams/usvision-docs-classes_analyses.png)
