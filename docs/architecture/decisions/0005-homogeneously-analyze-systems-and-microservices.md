@@ -20,3 +20,23 @@ Implement CompanySystem and Microservice as classes that belong to the same Comp
 Analyses and detections can be targeted to perform on either one.
 It's still possible to run analyses or detections into each one specifically.
 Some of the algorithms become recursive, which can be perceived as more complex.
+
+## Illustration
+
+Classes diagram of the module `app-model`. There are three regions in this diagram:
+
+- the business abstractions to model the domain
+  - CompanySystem
+  - Microservice
+  - Operation
+  - Message Channel
+  - Database
+- the Composite pattern to treat homogeneously the abstractions
+  - System (the component)
+  - System of Systems (the composite)
+  - System of Components (the leaf)
+- the Visitor pattern to allow seamless addition of behavior to the model without the need to change its classes
+  - Visitable
+  - Visitor
+
+![classes diagram of app-model](./../diagrams/usvision-docs-classes_model.png)

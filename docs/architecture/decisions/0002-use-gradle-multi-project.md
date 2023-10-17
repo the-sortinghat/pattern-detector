@@ -19,3 +19,9 @@ Split the code-base into different Gradle projects
 
 Faster builds due to a more granular access to it.
 Team-wise scalability is improved.
+
+## Illustration
+
+Relationship between the Gradle projects
+
+![modules diagram](./../diagrams/usvision-docs-modules.png)
