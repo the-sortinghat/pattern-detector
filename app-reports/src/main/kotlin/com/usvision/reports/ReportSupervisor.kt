@@ -18,6 +18,7 @@ import kotlin.reflect.full.starProjectedType
 // TODO: add method for getting all detectors available
 class ReportSupervisor(
     private val systemRepository: SystemRepository,
+    private val presets: Map<String,Set<String>>,
     private val planner: Planner = AnalyzerReusePlanner(),
     private val planExecutioner: PlanExecutioner = SequentialPlanExecutioner()
 ) {
@@ -51,10 +52,6 @@ class ReportSupervisor(
             throw DetectorNotFoundException(qualifiedName)
         }
     }
-
-    private val presets: Map<String,Set<String>> = mapOf(
-        "" to setOf("DatabasePerService")
-    )
 
     fun generateReport(detectorsNames: Set<String>, systemName: String): Report {
         val reportRequest = ReportRequestGenerator().generate(detectorsNames)

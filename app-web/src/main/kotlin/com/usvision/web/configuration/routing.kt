@@ -8,6 +8,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting(reportSupervisor: ReportSupervisor) {
+    val defaultPreset = environment.config.property("reports.default_preset_name").getString()
+
     routing {
         route("/systems/{name}/reports") {
             get {
@@ -15,7 +17,7 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor) {
                     ?: throw MissingRequiredPathParameterException("name", "String")
 
                 val detections = call.request.queryParameters.getAll("detections") ?: emptyList()
-                val preset = call.request.queryParameters["preset"] ?: ""
+                val preset = call.request.queryParameters["preset"] ?: defaultPreset
 
                 val report = if (detections.isNotEmpty())
                     reportSupervisor.generateReport(

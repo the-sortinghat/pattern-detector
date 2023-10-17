@@ -12,6 +12,8 @@ fun Application.configureReports(): ReportSupervisor {
     val pass = environment.config.property("persistence.password").getString()
     val dbName = environment.config.property("persistence.database_name").getString()
 
+    val presetsConfig = environment.config.config("reports.presets")
+
     val repoProvider: DBRepositoryProvider = MongoDBRepositoryProvider()
 
     val systemRepository = repoProvider.run {
@@ -22,5 +24,8 @@ fun Application.configureReports(): ReportSupervisor {
         getRepository()
     }
 
-    return ReportSupervisor(systemRepository)
+    return ReportSupervisor(
+        systemRepository,
+        presets = presetsConfig.toMap() as Map<String,Set<String>>
+    )
 }

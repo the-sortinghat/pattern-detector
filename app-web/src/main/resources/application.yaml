@@ -11,3 +11,13 @@ persistence:
   username: $USVISION_DATABASE_USERNAME
   password: $USVISION_DATABASE_PASSWORD
   database_name: $USVISION_DATABASE_NAME
+
+reports:
+  default_preset_name: all
+  presets:
+    all:
+      - DatabasePerService
+    persistence:
+      - DatabasePerService
+    patterns:
+      - DatabasePerService
