@@ -10,8 +10,8 @@ data class SystemDocument(
     val name: String,
     val subsystems: Set<SystemDocument>? = null,
     val exposedOperations: Set<Document>? = null,
+    val consumedOperations: Set<Document>? = null,
     val databases: Set<DatabaseDocument>? = null
-    // TODO: add consumed operations
     // TODO: add published channels
     // TODO: add subscribed channels
 )

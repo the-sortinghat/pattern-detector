@@ -122,6 +122,7 @@ internal class MongoSystemRepositoryTest {
         // then
         assertIs<Microservice>(system)
         assertTrue { system.getExposedOperations().isNotEmpty() }
+        assertTrue { system.getConsumedOperations().isNotEmpty() }
     }
 
     @Test
@@ -178,6 +179,12 @@ internal class MongoSystemRepositoryTest {
                     RestEndpoint(
                         httpVerb = "GET", path = "/test",
                         description = "test rest endpoint"
+                    ).toDocument()
+                ),
+                consumedOperations = setOf(
+                    RestEndpoint(
+                        httpVerb = "GET", path = "/outsourcing",
+                        description = "an external endpoint"
                     ).toDocument()
                 )
             )

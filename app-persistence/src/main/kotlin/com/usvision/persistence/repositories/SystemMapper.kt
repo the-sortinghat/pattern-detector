@@ -29,6 +29,9 @@ class SystemMapper {
                 systemDocument.exposedOperations?.forEach { doc ->
                     createOperation(doc).also { op -> svc.exposeOperation(op) }
                 }
+                systemDocument.consumedOperations?.forEach { doc ->
+                    createOperation(doc).also { op -> svc.consumeOperation(op)}
+                }
                 systemDocument.databases?.forEach { dbDoc ->
                     createDatabase(dbDoc).also { db -> svc.addDatabaseConnection(db) }
                 }
