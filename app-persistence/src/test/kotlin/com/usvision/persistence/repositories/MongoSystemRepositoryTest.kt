@@ -8,6 +8,7 @@ import com.usvision.model.domain.Microservice
 import com.usvision.model.domain.operations.RestEndpoint
 import com.usvision.persistence.repositorybuilder.MongoDBRepositoryProvider
 import com.usvision.persistence.documents.DatabaseDocument
+import com.usvision.persistence.documents.MessageChannelDocument
 import com.usvision.persistence.documents.SystemDocument
 import com.usvision.persistence.documents.toDocument
 import com.usvision.persistence.exceptions.SystemNotFoundException
@@ -137,6 +138,42 @@ internal class MongoSystemRepositoryTest {
         // then
         assertIs<Microservice>(system)
         assertTrue { system.getDatabases().isNotEmpty() }
+    }
+
+    @Test
+    fun `it returns a Microservice with its MessageChannels`() {
+        // given
+        val name = "test"
+        createMicroserviceWithChannels(name)
+
+        // when
+        val system = underTest.load(name)
+
+        // then
+        assertIs<Microservice>(system)
+        assertTrue { system.getPublishChannels().isNotEmpty() }
+        assertTrue { system.getSubscribedChannels().isNotEmpty() }
+    }
+
+    private fun createMicroserviceWithChannels(name: String) = runBlocking {
+        systemsCollection.insertOne(
+            SystemDocument(
+                id = ObjectId(),
+                name = name,
+                publishedChannels = setOf(
+                    MessageChannelDocument(
+                        id = ObjectId(),
+                        name = "channel-one"
+                    )
+                ),
+                subscribedChannels = setOf(
+                    MessageChannelDocument(
+                        id = ObjectId(),
+                        name = "channel-two"
+                    )
+                )
+            )
+        )
     }
 
     private fun createMicroserviceWithDatabases(name: String) = runBlocking {

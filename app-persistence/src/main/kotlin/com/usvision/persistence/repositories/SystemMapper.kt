@@ -1,6 +1,7 @@
 package com.usvision.persistence.repositories
 
 import com.usvision.model.domain.CompanySystem
+import com.usvision.model.domain.MessageChannel
 import com.usvision.model.domain.Microservice
 import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.databases.PostgreSQL
@@ -8,6 +9,7 @@ import com.usvision.model.domain.operations.Operation
 import com.usvision.model.domain.operations.RestEndpoint
 import com.usvision.model.systemcomposite.System
 import com.usvision.persistence.documents.DatabaseDocument
+import com.usvision.persistence.documents.MessageChannelDocument
 import com.usvision.persistence.documents.SystemDocument
 import org.bson.Document
 
@@ -35,7 +37,20 @@ class SystemMapper {
                 systemDocument.databases?.forEach { dbDoc ->
                     createDatabase(dbDoc).also { db -> svc.addDatabaseConnection(db) }
                 }
+                systemDocument.publishedChannels?.forEach { channelDoc ->
+                    createChannel(channelDoc).also { channel -> svc.addPublishChannel(channel) }
+                }
+                systemDocument.subscribedChannels?.forEach { channelDoc ->
+                    createChannel(channelDoc).also { channel -> svc.addSubscribedChannel(channel) }
+                }
             }
+        }
+
+        private fun createChannel(channelDoc: MessageChannelDocument): MessageChannel {
+            return MessageChannel(
+                name = channelDoc.name,
+                id = channelDoc.id.toString()
+            )
         }
 
         private fun createDatabase(dbDoc: DatabaseDocument): Database {

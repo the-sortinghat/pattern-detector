@@ -11,9 +11,9 @@ data class SystemDocument(
     val subsystems: Set<SystemDocument>? = null,
     val exposedOperations: Set<Document>? = null,
     val consumedOperations: Set<Document>? = null,
-    val databases: Set<DatabaseDocument>? = null
-    // TODO: add published channels
-    // TODO: add subscribed channels
+    val databases: Set<DatabaseDocument>? = null,
+    val publishedChannels: Set<MessageChannelDocument>? = null,
+    val subscribedChannels: Set<MessageChannelDocument>? = null
 )
 
 fun RestEndpoint.toDocument(): Document {
@@ -27,4 +27,9 @@ fun RestEndpoint.toDocument(): Document {
 data class DatabaseDocument(
     @BsonId val id: ObjectId,
     val description: String
+)
+
+data class MessageChannelDocument(
+    @BsonId val id: ObjectId,
+    val name: String
 )
