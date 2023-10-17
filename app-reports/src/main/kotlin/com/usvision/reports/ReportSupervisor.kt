@@ -15,6 +15,7 @@ import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.starProjectedType
 
+// TODO: add method for getting all detectors available
 class ReportSupervisor(
     private val systemRepository: SystemRepository,
     private val planner: Planner = AnalyzerReusePlanner(),
@@ -51,7 +52,6 @@ class ReportSupervisor(
         }
     }
 
-    // TODO: consider "" as a preset for all detectors
     private val presets: Map<String,Set<String>> = mapOf(
         "" to setOf("DatabasePerService")
     )
