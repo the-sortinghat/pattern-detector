@@ -6,6 +6,8 @@ Date: 2023-10-17
 
 Accepted
 
+Improved by [10. User can specify a preset](0010-user-can-specify-a-preset.md)
+
 ## Context
 
 As the number of detections grows, there might be unrelated ones.
