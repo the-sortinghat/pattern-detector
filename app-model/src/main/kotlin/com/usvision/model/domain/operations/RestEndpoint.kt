@@ -7,4 +7,6 @@ data class RestEndpoint(
     val httpVerb: String,
     val path: String,
     val description: String = ""
-) : Operation
+) : Operation {
+    override fun isReading(): Boolean = this.httpVerb == "GET"
+}

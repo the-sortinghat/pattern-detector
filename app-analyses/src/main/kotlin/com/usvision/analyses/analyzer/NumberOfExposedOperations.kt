@@ -2,9 +2,11 @@ package com.usvision.analyses.analyzer
 
 import com.usvision.model.domain.CompanySystem
 import com.usvision.model.domain.Microservice
+import com.usvision.model.domain.operations.Operation
+import com.usvision.model.domain.operations.RestEndpoint
 import com.usvision.model.visitor.Visitable
 
-class NumberOfExposedOperations : Measurer() {
+open class NumberOfExposedOperations : Measurer() {
     private val INT_TYPE_NAME = Int::class.qualifiedName!!
     private val UNIT_OPERATIONS = "operations"
 
@@ -13,16 +15,40 @@ class NumberOfExposedOperations : Measurer() {
     override fun getResults(): Map<Visitable, Measure> = counters
 
     override fun visit(companySystem: CompanySystem) {
+        val count = companySystem
+            .getExposedOperations()
+            .filter(this::filterExposedOperations)
+            .size
+
         counters[companySystem] = Count(
-            value = companySystem.getExposedOperations().size,
+            value = count,
             type = INT_TYPE_NAME, unit = UNIT_OPERATIONS
         )
     }
 
     override fun visit(microservice: Microservice) {
+        val count = microservice
+            .getExposedOperations()
+            .filter(this::filterExposedOperations)
+            .size
+
         counters[microservice] = Count(
-            value = microservice.getExposedOperations().size,
+            value = count,
             type = INT_TYPE_NAME, unit = UNIT_OPERATIONS
         )
+    }
+
+    protected open fun filterExposedOperations(operation: Operation): Boolean = true
+}
+
+class NumberOfReadingExposedOperations : NumberOfExposedOperations() {
+    override fun filterExposedOperations(operation: Operation): Boolean {
+        return operation.isReading()
+    }
+}
+
+class NumberOfWritingExposedOperations : NumberOfExposedOperations() {
+    override fun filterExposedOperations(operation: Operation): Boolean {
+        return !operation.isReading()
     }
 }
