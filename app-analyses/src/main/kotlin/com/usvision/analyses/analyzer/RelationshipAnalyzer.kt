@@ -1,3 +1,3 @@
 package com.usvision.analyses.analyzer
 
-interface RelationshipAnalyzer : Analyzer<Relationship>
+abstract class RelationshipAnalyzer : Analyzer<Relationship>()

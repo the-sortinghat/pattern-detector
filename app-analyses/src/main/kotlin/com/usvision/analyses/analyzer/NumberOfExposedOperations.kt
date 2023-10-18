@@ -1,11 +1,10 @@
 package com.usvision.analyses.analyzer
 
 import com.usvision.model.domain.CompanySystem
-import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.Microservice
 import com.usvision.model.visitor.Visitable
 
-class NumberOfExposedOperations : Measurer {
+class NumberOfExposedOperations : Measurer() {
     private val INT_TYPE_NAME = Int::class.qualifiedName!!
     private val UNIT_OPERATIONS = "operations"
 
@@ -26,6 +25,4 @@ class NumberOfExposedOperations : Measurer {
             type = INT_TYPE_NAME, unit = UNIT_OPERATIONS
         )
     }
-
-    override fun visit(database: Database) {}
 }

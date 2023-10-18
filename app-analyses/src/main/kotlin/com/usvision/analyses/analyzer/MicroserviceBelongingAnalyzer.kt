@@ -1,11 +1,10 @@
 package com.usvision.analyses.analyzer
 
 import com.usvision.model.domain.CompanySystem
-import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.Microservice
 import com.usvision.model.visitor.Visitable
 
-class MicroserviceBelongingAnalyzer : RelationshipAnalyzer {
+class MicroserviceBelongingAnalyzer : RelationshipAnalyzer() {
     private val parentOf: MutableMap<Visitable, Relationship> = mutableMapOf()
 
     override fun getResults(): Map<Visitable, Relationship> = parentOf
@@ -17,8 +16,4 @@ class MicroserviceBelongingAnalyzer : RelationshipAnalyzer {
             .filterIsInstance<Microservice>()
             .forEach { parentOf[it] = parentRelationship }
     }
-
-    override fun visit(microservice: Microservice) {}
-
-    override fun visit(database: Database) {}
 }

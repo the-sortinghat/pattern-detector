@@ -1,16 +1,13 @@
 package com.usvision.analyses.analyzer
 
-import com.usvision.model.domain.CompanySystem
 import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.Microservice
 import com.usvision.model.visitor.Visitable
 
-class DatabaseUsage : RelationshipsAnalyzer {
+class DatabaseUsage : RelationshipsAnalyzer() {
     private val usages: MutableMap<Visitable,MutableSet<Relationship>> = mutableMapOf()
 
     override fun getResults(): Map<Visitable, Set<Relationship>> = usages
-
-    override fun visit(companySystem: CompanySystem) {}
 
     override fun visit(microservice: Microservice) {
         microservice.getDatabases().forEach { db ->

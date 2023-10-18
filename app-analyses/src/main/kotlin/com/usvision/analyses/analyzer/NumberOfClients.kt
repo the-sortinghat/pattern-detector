@@ -5,13 +5,11 @@ import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.Microservice
 import com.usvision.model.visitor.Visitable
 
-class NumberOfClients : Measurer {
+class NumberOfClients : Measurer() {
     private val INT_TYPE = Int::class.qualifiedName!!
     private val counters: MutableMap<Visitable, Measure> = mutableMapOf()
 
     override fun getResults(): Map<Visitable, Measure> = counters
-
-    override fun visit(companySystem: CompanySystem) {}
 
     override fun visit(microservice: Microservice) {
         microservice.getDatabases().forEach {db ->

@@ -1,3 +1,3 @@
 package com.usvision.analyses.analyzer
 
-interface Measurer : Analyzer<Measure>
+abstract class Measurer : Analyzer<Measure>()
