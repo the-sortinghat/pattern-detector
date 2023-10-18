@@ -15,6 +15,9 @@ data class Microservice(
     private val databases: MutableSet<Database> = mutableSetOf()
     private val publishChannels: MutableSet<MessageChannel> = mutableSetOf()
     private val subscribedChannels: MutableSet<MessageChannel> = mutableSetOf()
+    var module: Module = Module.createWithId()
+        get() = field
+        set(value) { field = value }
 
     override fun getExposedOperations(): Set<Operation> = exposedOperations
 
