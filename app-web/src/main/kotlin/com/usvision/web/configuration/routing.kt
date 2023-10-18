@@ -48,10 +48,9 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor) {
             }
 
             get("/detectors") {
-                // TODO: implement on ReportSupervisor
                 call.respond(
-                    message = mapOf("error" to "operation not yet available"),
-                    status = HttpStatusCode.BadRequest
+                    message = mapOf("detectors" to reportSupervisor.getDetectors()),
+                    status = HttpStatusCode.OK
                 )
             }
         }
