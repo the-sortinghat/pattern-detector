@@ -1,6 +1,6 @@
 package com.usvision.analyses.detector
 
-abstract class Detector {
+sealed class Detector {
     fun run() {
         collectMetrics()
         combineMetric()
