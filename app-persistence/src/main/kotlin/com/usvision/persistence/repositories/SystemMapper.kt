@@ -3,6 +3,7 @@ package com.usvision.persistence.repositories
 import com.usvision.model.domain.CompanySystem
 import com.usvision.model.domain.MessageChannel
 import com.usvision.model.domain.Microservice
+import com.usvision.model.domain.Module
 import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.databases.PostgreSQL
 import com.usvision.model.domain.operations.Operation
@@ -11,17 +12,19 @@ import com.usvision.model.systemcomposite.System
 import com.usvision.persistence.documents.DatabaseDocument
 import com.usvision.persistence.documents.MessageChannelDocument
 import com.usvision.persistence.documents.SystemDocument
+import com.usvision.persistence.exceptions.MalformedSystemDocumentException
 import org.bson.Document
 
 class SystemMapper {
     companion object {
         fun fromDocument(systemDocument: SystemDocument): System {
             val hasSubsystems = systemDocument.subsystems != null
+            val hasModule = systemDocument.module != null
 
-            return when (hasSubsystems) {
-                true -> createCompanySystem(systemDocument)
-                else -> createMicroservice(systemDocument)
-            }
+            if (!hasSubsystems && !hasModule) throw MalformedSystemDocumentException(systemDocument.name)
+
+            return if (hasSubsystems) createCompanySystem(systemDocument)
+            else createMicroservice(systemDocument)
         }
 
         private fun createMicroservice(systemDocument: SystemDocument): Microservice {
@@ -43,6 +46,7 @@ class SystemMapper {
                 systemDocument.subscribedChannels?.forEach { channelDoc ->
                     createChannel(channelDoc).also { channel -> svc.addSubscribedChannel(channel) }
                 }
+                svc.module = Module(id = systemDocument.module!!.uuid)
             }
         }
 

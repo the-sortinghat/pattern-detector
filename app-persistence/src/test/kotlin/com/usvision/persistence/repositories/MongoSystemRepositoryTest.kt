@@ -6,16 +6,15 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import com.usvision.model.domain.CompanySystem
 import com.usvision.model.domain.Microservice
 import com.usvision.model.domain.operations.RestEndpoint
+import com.usvision.persistence.documents.*
+import com.usvision.persistence.exceptions.MalformedSystemDocumentException
 import com.usvision.persistence.repositorybuilder.MongoDBRepositoryProvider
-import com.usvision.persistence.documents.DatabaseDocument
-import com.usvision.persistence.documents.MessageChannelDocument
-import com.usvision.persistence.documents.SystemDocument
-import com.usvision.persistence.documents.toDocument
 import com.usvision.persistence.exceptions.SystemNotFoundException
 import kotlinx.coroutines.runBlocking
 import org.bson.Document
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.assertThrows
+import java.util.*
 import kotlin.test.*
 
 internal class MongoSystemRepositoryTest {
@@ -43,6 +42,18 @@ internal class MongoSystemRepositoryTest {
 
         runBlocking {
             systemsCollection.deleteMany(Document())
+        }
+    }
+
+    @Test
+    fun `it throws when loading a system that has no subsystem nor module`() {
+        // given
+        val name = "test"
+        createSystemWithoutSubsysNorModule(name)
+
+        // when ... then
+        assertThrows<MalformedSystemDocumentException> {
+            underTest.load(name)
         }
     }
 
@@ -155,6 +166,17 @@ internal class MongoSystemRepositoryTest {
         assertTrue { system.getSubscribedChannels().isNotEmpty() }
     }
 
+    private fun createSystemWithoutSubsysNorModule(name: String) = runBlocking {
+        systemsCollection.insertOne(
+            SystemDocument(
+                id = ObjectId(),
+                name = name,
+                subsystems = null,
+                module = null
+            )
+        )
+    }
+
     private fun createMicroserviceWithChannels(name: String) = runBlocking {
         systemsCollection.insertOne(
             SystemDocument(
@@ -171,6 +193,10 @@ internal class MongoSystemRepositoryTest {
                         id = ObjectId(),
                         name = "channel-two"
                     )
+                ),
+                module = ModuleDocument(
+                    id = ObjectId(),
+                    uuid = UUID.randomUUID().toString()
                 )
             )
         )
@@ -186,6 +212,10 @@ internal class MongoSystemRepositoryTest {
                         id = ObjectId(),
                         description = "anything"
                     )
+                ),
+                module = ModuleDocument(
+                    id = ObjectId(),
+                    uuid = UUID.randomUUID().toString()
                 )
             )
         )
@@ -200,7 +230,11 @@ internal class MongoSystemRepositoryTest {
                     SystemDocument(
                         id = ObjectId(),
                         name = "$name-msvc",
-                        subsystems = null
+                        subsystems = null,
+                        module = ModuleDocument(
+                            id = ObjectId(),
+                            uuid = UUID.randomUUID().toString()
+                        )
                     )
                 )
             )
@@ -223,6 +257,10 @@ internal class MongoSystemRepositoryTest {
                         httpVerb = "GET", path = "/outsourcing",
                         description = "an external endpoint"
                     ).toDocument()
+                ),
+                module = ModuleDocument(
+                    id = ObjectId(),
+                    uuid = UUID.randomUUID().toString()
                 )
             )
         )
@@ -233,7 +271,11 @@ internal class MongoSystemRepositoryTest {
             SystemDocument(
                 id = ObjectId(),
                 name = name,
-                subsystems = null
+                subsystems = null,
+                module = ModuleDocument(
+                    id = ObjectId(),
+                    uuid = UUID.randomUUID().toString()
+                )
             )
         )
     }
@@ -258,7 +300,8 @@ internal class MongoSystemRepositoryTest {
         systemsCollection.insertOne(
             SystemDocument(
                 id = ObjectId(),
-                name = name
+                name = name,
+                subsystems = emptySet()
             )
         )
     }

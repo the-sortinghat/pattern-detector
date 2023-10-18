@@ -13,7 +13,8 @@ data class SystemDocument(
     val consumedOperations: Set<Document>? = null,
     val databases: Set<DatabaseDocument>? = null,
     val publishedChannels: Set<MessageChannelDocument>? = null,
-    val subscribedChannels: Set<MessageChannelDocument>? = null
+    val subscribedChannels: Set<MessageChannelDocument>? = null,
+    val module: ModuleDocument? = null
 )
 
 fun RestEndpoint.toDocument(): Document {
@@ -32,4 +33,9 @@ data class DatabaseDocument(
 data class MessageChannelDocument(
     @BsonId val id: ObjectId,
     val name: String
+)
+
+data class ModuleDocument(
+    @BsonId val id: ObjectId,
+    val uuid: String
 )
