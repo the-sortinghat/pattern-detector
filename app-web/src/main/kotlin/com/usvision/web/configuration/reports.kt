@@ -4,6 +4,8 @@ import com.usvision.persistence.repositorybuilder.DBRepositoryProvider
 import com.usvision.persistence.repositorybuilder.MongoDBRepositoryProvider
 import com.usvision.reports.ReportSupervisor
 import io.ktor.server.application.*
+import io.ktor.server.config.*
+
 
 fun Application.configureReports(): ReportSupervisor {
     val host = environment.config.property("persistence.host").getString()
@@ -12,7 +14,7 @@ fun Application.configureReports(): ReportSupervisor {
     val pass = environment.config.property("persistence.password").getString()
     val dbName = environment.config.property("persistence.database_name").getString()
 
-    val presetsConfig = environment.config.config("reports.presets")
+    val presets = parsePresetsConfig(environment.config.config("reports.presets"))
 
     val repoProvider: DBRepositoryProvider = MongoDBRepositoryProvider()
 
@@ -26,6 +28,20 @@ fun Application.configureReports(): ReportSupervisor {
 
     return ReportSupervisor(
         systemRepository,
-        presets = presetsConfig.toMap() as Map<String,Set<String>>
+        presets = presets
     )
+}
+
+fun parsePresetsConfig(presetsConfig: ApplicationConfig): Map<String, Set<String>> {
+    val presets = mutableMapOf<String, Set<String>>()
+    val configMap = presetsConfig.toMap()
+
+    configMap.keys.forEach { presetName ->
+        val maybeDetectorsList = configMap[presetName]!!
+
+        if (maybeDetectorsList !is List<*>) presets[presetName] = emptySet()
+        else presets[presetName] = maybeDetectorsList.map { it.toString() }.toSet()
+    }
+
+    return presets
 }
