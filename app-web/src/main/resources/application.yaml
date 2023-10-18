@@ -17,7 +17,11 @@ reports:
   presets:
     all:
       - DatabasePerService
+      - SingleServicePerHost
     persistence:
       - DatabasePerService
+    infrastructure:
+      - SingleServicePerHost
     patterns:
       - DatabasePerService
+      - SingleServicePerHost
