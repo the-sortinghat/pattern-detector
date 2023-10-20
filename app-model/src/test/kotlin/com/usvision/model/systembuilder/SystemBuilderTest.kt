@@ -17,6 +17,40 @@ internal class SystemBuilderTest {
     }
 
     @Test
+    fun `it builds an entire system`() {
+        // given
+        val pingsTopicId = "pings-chan-id"
+        val pingsTopicName = "pings"
+        val timelinePgId = "pg-one"
+
+        // when
+        val system = underTest
+            .setName("pingr")
+            .addSubsystems()
+                .setName("backend")
+                .thatHasMicroservices()
+                    .oneNamed("pings")
+                    .exposingRestEndpoint("POST", "/users/{uid}/pings", "create new ping")
+                    .thatPublishesTo(pingsTopicId, pingsTopicName)
+                    .and()
+                    .anotherNamed("timeline")
+                    .exposingRestEndpoint("GET", "/users/{uid}/timeline", "the user's timeline")
+                    .thatIsSubscribedTo(pingsTopicId, pingsTopicName)
+                    .accessingPostgres(timelinePgId)
+                .endMicroservices()
+            .endSubsystems()
+            .build()
+
+        // then
+        assertIs<CompanySystem>(system)
+        assertEquals(1, system.getSubsystemSet().size)
+        val firstLevelSubsys = system.getSubsystemSet().first()
+        assertIs<CompanySystem>(firstLevelSubsys)
+        assertEquals(1, firstLevelSubsys.getSubsystemSet().size)
+        assertIs<Microservice>(firstLevelSubsys.getSubsystemSet().first())
+    }
+
+    @Test
     fun `it defaults to a company system`() {
         // given
         val name = "test"

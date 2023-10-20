@@ -23,19 +23,34 @@ class SystemBuilder(private val parent: SystemBuilder? = null) {
 
     fun setName(name: String) = fluentInterface { rootName = name }
 
-    fun addSubsystems() =
-        fluentInterface(SystemBuilder(this)) { subsystems = mutableSetOf() }
+    fun addSubsystems() = fluentInterface(SystemBuilder(this)) {
+        subsystems = mutableSetOf()
+    }
 
     fun endSubsystems(): SystemBuilder {
         if (parent == null)
             throw SystemBuilderException("Attempted to close an environment that had not being opened")
 
+        if (this::rootName.isInitialized) {
+            val system = build()
+            parent.addSubsystem(system)
+        }
+
         return parent
     }
 
-    fun thatHasMicroservices() = MicroserviceBuilder(this)
+    fun thatHasMicroservices(): MicroserviceBuilder {
+        subsystems = mutableSetOf()
+        return MicroserviceBuilder(this)
+    }
 
-    fun addMicroservice(microservice: Microservice) = fluentInterface {  }
+    fun addSubsystem(system: System) {
+        subsystems.add(system)
+    }
+
+    fun addMicroservice(microservice: Microservice) = fluentInterface {
+        subsystems.add(microservice)
+    }
 
     fun build(): System {
         return CompanySystem(rootName).also { root ->
@@ -45,9 +60,7 @@ class SystemBuilder(private val parent: SystemBuilder? = null) {
     }
 }
 
-class MicroserviceBuilder(
-    private val parent: SystemBuilder? = null
-) {
+class MicroserviceBuilder(private val parent: SystemBuilder? = null) {
     private lateinit var name: String
     private val exposedOperations = mutableSetOf<Operation>()
     private val consumedOperations = mutableSetOf<Operation>()
