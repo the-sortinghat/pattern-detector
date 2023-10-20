@@ -8,16 +8,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Microservice(
-    override val name: String
+    override val name: String,
+    var module: Module = Module.createWithId()
 ) : SystemOfComponents {
     private val exposedOperations: MutableSet<Operation> = mutableSetOf()
     private val consumedOperations: MutableSet<Operation> = mutableSetOf()
     private val databases: MutableSet<Database> = mutableSetOf()
     private val publishChannels: MutableSet<MessageChannel> = mutableSetOf()
     private val subscribedChannels: MutableSet<MessageChannel> = mutableSetOf()
-    var module: Module = Module.createWithId()
-        get() = field
-        set(value) { field = value }
 
     override fun getExposedOperations(): Set<Operation> = exposedOperations
 
