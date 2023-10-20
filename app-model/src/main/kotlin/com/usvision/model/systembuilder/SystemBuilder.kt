@@ -70,9 +70,18 @@ class MicroserviceBuilder(
         return parent
     }
 
+    fun and(): MicroserviceBuilder {
+        endMicroservices()
+        return parent!!.thatHasMicroservices()
+    }
+
     fun named(name: String) = fluentInterface {
         this.name = name
     }
+
+    fun oneNamed(name: String) = named(name)
+
+    fun anotherNamed(name: String) = named(name)
 
     fun exposingRestEndpoint(httpVerb: String, path: String, description: String) = fluentInterface {
         exposedOperations.add(RestEndpoint(httpVerb, path, description))

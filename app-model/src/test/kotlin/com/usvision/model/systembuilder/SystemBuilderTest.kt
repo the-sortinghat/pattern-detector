@@ -220,4 +220,57 @@ internal class MicroserviceBuilderTest {
         assertIs<Microservice>(result)
         assertEquals(channelId, result.getSubscribedChannels().first().id)
     }
+
+    @Test
+    fun `it offers 'oneNamed' as an alias method for named`() {
+        // given
+        val name = "micro"
+        underTest = spyk(underTest)
+
+        // when
+        val result = underTest
+            .oneNamed(name)
+            .build()
+
+        // then
+        assertIs<Microservice>(result)
+        assertEquals(name, result.name)
+        verify { underTest.named(name) }
+    }
+
+    @Test
+    fun `it offers 'anotherNamed' as an alias method for named`() {
+        // given
+        val name = "micro"
+        underTest = spyk(underTest)
+
+        // when
+        val result = underTest
+            .anotherNamed(name)
+            .build()
+
+        // then
+        assertIs<Microservice>(result)
+        assertEquals(name, result.name)
+        verify { underTest.named(name) }
+    }
+
+    @Test
+    fun `it offers 'and' as a convenience for finishing one and beginning another`() {
+        // given
+        val nameOne = "name one"
+        val nameTwo = "name two"
+        val parent = spyk(SystemBuilder())
+
+        // when
+        parent
+            .thatHasMicroservices()
+                .oneNamed(nameOne)
+                .and()
+                .anotherNamed(nameTwo)
+            .endMicroservices()
+
+        // then
+        verify(exactly = 2) { parent.addMicroservice(any()) }
+    }
 }
