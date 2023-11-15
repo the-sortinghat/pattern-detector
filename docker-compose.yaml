@@ -11,13 +11,20 @@ services:
       - mongodb
 
   mongodb:
-    image: mongo
+    image: mongo:latest
+    restart: always
     env_file:
       - ./.env.docker-compose
+    command: ["mongod", "--auth", "--port", "27017", "--bind_ip_all"]
     volumes:
       - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     ports:
       - "27017:27017"
+    environment:
+      - USVISION_DATABASE_NAME
+      - USVISION_DATABASE_USERNAME
+      - USVISION_DATABASE_PASSWORD
 
 volumes:
   mongodb_data:
