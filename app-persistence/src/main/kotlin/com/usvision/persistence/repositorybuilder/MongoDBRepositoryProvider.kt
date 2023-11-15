@@ -61,6 +61,7 @@ class MongoDBRepositoryProvider : DBRepositoryProvider, DBConnectionProvider<Mon
         str += if (hasCredentials()) "$username:$password@" else ""
         str += if (hasSpecificPort()) "$host:$port/" else "$host/"
         str += "?retryWrites=true&w=majority"
+        str += "&authSource=$databaseName"
 
         return str
     }
