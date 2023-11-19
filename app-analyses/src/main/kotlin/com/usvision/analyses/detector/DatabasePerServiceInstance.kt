@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class DatabasePerServiceInstance(
     val microservice: Microservice,
     val database: Database
-) : ArchitectureInsight {
+) : ArchitectureInsight() {
     companion object {
         fun of(pair: Pair<Microservice, Database>) = DatabasePerServiceInstance(
             microservice = pair.first,
