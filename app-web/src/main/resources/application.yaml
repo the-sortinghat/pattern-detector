@@ -16,12 +16,27 @@ reports:
   default_preset_name: all
   presets:
     all:
+      - ApiComposition
+      - AsyncMessaging
+      - Cqrs
       - DatabasePerService
+      - SharedPersistence
       - SingleServicePerHost
     persistence:
       - DatabasePerService
+      - SharedPersistence
     infrastructure:
       - SingleServicePerHost
+    query:
+      - ApiComposition
+      - Cqrs
+    communication:
+      - AsyncMessaging
     patterns:
+      - ApiComposition
+      - AsyncMessaging
+      - Cqrs
       - DatabasePerService
       - SingleServicePerHost
+    smells:
+      - SharedPersistence
