@@ -19,6 +19,7 @@ reports:
       - ApiComposition
       - AsyncMessaging
       - Cqrs
+      - CyclicDependency
       - DatabasePerService
       - SharedPersistence
       - SingleServicePerHost
@@ -32,6 +33,7 @@ reports:
       - Cqrs
     communication:
       - AsyncMessaging
+      - CyclicDependency
     patterns:
       - ApiComposition
       - AsyncMessaging
@@ -39,4 +41,5 @@ reports:
       - DatabasePerService
       - SingleServicePerHost
     smells:
+      - CyclicDependency
       - SharedPersistence
