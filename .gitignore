@@ -76,4 +76,4 @@ outTmp/
 /kotlin-native/dist
 kotlin-ide/
 
-.env*
+.env.*

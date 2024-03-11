@@ -1,15 +1,23 @@
-version: '3.7'
+version: '3.8'
 
 services:
-  db:
-    image: postgres:14.2-alpine3.15
+  web:
+    build: .
     env_file:
-      - .env
+      - ./.env.docker-compose
     ports:
-      - 5432:5432
+      - "8080:8080"
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo
+    env_file:
+      - ./.env.docker-compose
     volumes:
-      - patdet:/var/lib/postgresql/data
-      - ./src/main/kotlin/com/sortinghat/pattern_detector/db/seed.sql:/seed.sql
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
 
 volumes:
-  patdet:
+  mongodb_data:
