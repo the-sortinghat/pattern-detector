@@ -54,12 +54,15 @@ class MongoDBRepositoryProvider : DBRepositoryProvider, DBConnectionProvider<Mon
 
     private fun hasCredentials(): Boolean = username != null && password != null
 
+    private fun hasSpecificDatabase(): Boolean = databaseName != null
+
     private fun connectionString(): String {
         var str = "mongodb"
 
         str += if (!hasSpecificPort()) "+srv://" else "://"
         str += if (hasCredentials()) "$username:$password@" else ""
         str += if (hasSpecificPort()) "$host:$port/" else "$host/"
+        str += if (hasSpecificDatabase()) "$databaseName" else ""
         str += "?retryWrites=true&w=majority"
 
         return str
