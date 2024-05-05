@@ -12,13 +12,14 @@ class SyncDependenciesOfMicroservice : RelationshipsAnalyzer() {
         val dependencies = mutableMapOf<Visitable, MutableSet<Relationship>>()
 
         consumers.keys.forEach { op ->
-            val exposer = producers[op]!!
+            val exposer = producers[op]
+            if (exposer != null) {
+                consumers[op]?.forEach { cons ->
+                    if (cons !in dependencies)
+                        dependencies[cons] = mutableSetOf()
 
-            consumers[op]?.forEach { cons ->
-                if (cons !in dependencies)
-                    dependencies[cons] = mutableSetOf()
-
-                dependencies[cons]?.add(Relationship(with = exposer))
+                    dependencies[cons]?.add(Relationship(with = exposer))
+                }
             }
         }
 
