@@ -2,7 +2,9 @@ package com.usvision.analyses.detector
 
 import com.usvision.model.domain.Microservice
 import com.usvision.model.domain.Module
+import kotlinx.serialization.Serializable
 
+@Serializable
 class SingleServicePerHostInstance(
     val module: Module,
     val microservice: Microservice
