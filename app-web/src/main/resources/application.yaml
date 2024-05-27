@@ -23,6 +23,7 @@ reports:
       - DatabasePerService
       - SharedPersistence
       - SingleServicePerHost
+      - DependentHub
     persistence:
       - DatabasePerService
       - SharedPersistence
@@ -34,6 +35,7 @@ reports:
     communication:
       - AsyncMessaging
       - CyclicDependency
+      - DependentHub
     patterns:
       - ApiComposition
       - AsyncMessaging
@@ -43,3 +45,4 @@ reports:
     smells:
       - CyclicDependency
       - SharedPersistence
+      - DependentHub
