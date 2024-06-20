@@ -159,6 +159,15 @@ internal class MicroserviceBuilderTest {
     }
 
     @Test
+    fun `it throws SystemBuilderException when building a Microservice with no name`() {
+        // given nothing
+        // when ... then
+        assertThrows<SystemBuilderException> {
+            underTest.build()
+        }
+    }
+
+    @Test
     fun `it adds exposed rest endpoints`() {
         // given
         val name = "test"
