@@ -299,6 +299,21 @@ internal class MicroserviceBuilderTest {
     }
 
     @Test
+    fun `it throws SystemBuilderException when calling 'named' method twice`() {
+        // given
+        val name = "micro"
+
+        val result = underTest
+            .named(name)
+
+
+        // when ... then
+        assertThrows<SystemBuilderException> {
+            result.named(name)
+        }
+    }
+
+    @Test
     fun `it offers 'and' as a convenience for finishing one and beginning another`() {
         // given
         val nameOne = "name one"

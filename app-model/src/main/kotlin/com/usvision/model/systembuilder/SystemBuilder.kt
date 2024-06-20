@@ -89,6 +89,10 @@ class MicroserviceBuilder(private val parent: SystemBuilder? = null) {
     }
 
     fun named(name: String) = fluentInterface {
+        this.name?.also {
+            throw SystemBuilderException("Microservice already has a name: $name")
+        }
+
         this.name = name
     }
 
