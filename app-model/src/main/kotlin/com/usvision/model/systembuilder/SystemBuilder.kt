@@ -85,7 +85,7 @@ class MicroserviceBuilder(private val parent: SystemBuilder? = null) {
 
     fun and(): MicroserviceBuilder {
         endMicroservices()
-        return parent!!.thatHasMicroservices()
+        return MicroserviceBuilder(this.parent)
     }
 
     fun named(name: String) = fluentInterface {

@@ -46,7 +46,7 @@ internal class SystemBuilderTest {
         assertEquals(1, system.getSubsystemSet().size)
         val firstLevelSubsys = system.getSubsystemSet().first()
         assertIs<CompanySystem>(firstLevelSubsys)
-        assertEquals(1, firstLevelSubsys.getSubsystemSet().size)
+        assertEquals(2, firstLevelSubsys.getSubsystemSet().size)
         assertIs<Microservice>(firstLevelSubsys.getSubsystemSet().first())
     }
 
