@@ -2,9 +2,11 @@ package com.usvision.analyses.detector
 
 import com.usvision.analyses.analyzer.*
 import com.usvision.model.domain.Microservice
+import com.usvision.model.visitor.Visitable
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -35,7 +37,6 @@ class ApiCompositionTest {
     @Test
     fun `nothing is detected when no sync dep is present`() {
         // given
-        val composer = Microservice(name = "test")
         every { mockSyncDeps.getResults() } returns emptyMap()
         every { mockNops.getResults() } returns emptyMap()
         every { mockNReadingOps.getResults() } returns emptyMap()
@@ -127,4 +128,21 @@ class ApiCompositionTest {
         // then
         assertEquals(0, instances.size)
     }
+
+    @Test
+    fun `accountReadingOps ignores non-Microservice objects`() {
+        // given
+        val nonMicroserviceObject = mockk<Visitable>()
+        every { mockNReadingOps.getResults() } returns mapOf(nonMicroserviceObject to Count(value = 1, type = "Int", unit = "operations"))
+        every { mockNops.getResults() } returns emptyMap()
+        every { mockSyncDeps.getResults() } returns emptyMap()
+
+        // when
+        underTest.run()
+        val instances = underTest.getInstances()
+
+        // then
+        assertEquals(0, instances.size)
+    }
+
 }
