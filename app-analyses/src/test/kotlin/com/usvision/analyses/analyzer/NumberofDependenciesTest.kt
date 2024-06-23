@@ -44,6 +44,43 @@ class NumberOfDependenciesTest {
     }
 
     @Test
+    fun `it gets 1 from a microservice with two operations dependency, but both from the same microservice`() {
+        val sys = CompanySystem(name = "test")
+        val ms = Microservice(name = "microservice")
+        val op1 = RestEndpoint(httpVerb = "GET", path = "/data1", "test1")
+        val op2 = RestEndpoint(httpVerb = "GET", path = "/data2", "test2")
+        ms.consumeOperation(op1)
+        ms.consumeOperation(op2)
+        sys.addSubsystem(ms)
+
+        sys.accept(underTest)
+        val results = underTest.getResults()
+
+        assertEquals(1, results[ms]?.value)
+    }
+
+    @Test
+    fun `it gets 1 from a microservice with two operations dependency and also 1 from a microservice with only one operation dependency`() {
+        val sys = CompanySystem(name = "test")
+        val ms1 = Microservice(name = "microservice1")
+        val ms2 = Microservice(name = "microservice2")
+        val op1 = RestEndpoint(httpVerb = "GET", path = "/data1", "test1")
+        val op2 = RestEndpoint(httpVerb = "GET", path = "/data2", "test2")
+        val op3 = RestEndpoint(httpVerb = "POST", path = "/data3", "test3")
+        ms1.consumeOperation(op1)
+        ms1.consumeOperation(op2)
+        ms2.consumeOperation(op3)
+        sys.addSubsystem(ms1)
+        sys.addSubsystem(ms2)
+
+        sys.accept(underTest)
+        val results = underTest.getResults()
+
+        assertEquals(1, results[ms1]?.value)
+        assertEquals(1, results[ms2]?.value)
+    }
+
+    @Test
     fun `it gets 1 from a microservice with a single channel dependency and this channel with only one publisher`() {
         val sys = CompanySystem(name = "test")
         val ms = Microservice(name = "microservice")

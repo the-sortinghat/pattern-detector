@@ -23,11 +23,13 @@ class NumberOfDependencies : Measurer() {
 
         allMicroservices.forEach { visitable ->
             val microservice = visitable
-            val operationCount = microservice.getConsumedOperations().size
+            val operationMicroservices = microservice.getConsumedOperations().map { operation ->
+                operations[operation]?.firstOrNull()
+            }.filterNotNull().distinct().size
             val producerCount = countProducers(microservice)
             val databaseCount = microservice.getDatabases().size
 
-            val totalCount = operationCount + producerCount + databaseCount
+            val totalCount = operationMicroservices + producerCount + databaseCount
 
             this.results[microservice] = Count(
                 value = totalCount,
