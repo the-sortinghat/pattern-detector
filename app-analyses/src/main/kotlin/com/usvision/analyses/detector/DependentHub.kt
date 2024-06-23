@@ -8,6 +8,10 @@ import com.usvision.model.visitor.Visitable
 class DependentHub(
     private val numberOfDependencies: NumberOfDependencies
 ) : Detector() {
+    companion object {
+        const val DEPENDENCY_THRESHOLD: Int = 3
+    }
+
     private lateinit var dependencyResults: Map<Visitable, Measure>
     private lateinit var instances: Set<DependentHubInstance>
 
@@ -16,9 +20,8 @@ class DependentHub(
     }
 
     override fun combineMetric() {
-        val averageDependencies = dependencyResults.values.map { it.value as Int }.average()
         instances = dependencyResults
-            .filter { (_, measure) -> measure.value as Int > averageDependencies }
+            .filter { (_, measure) -> measure.value as Int > DEPENDENCY_THRESHOLD }
             .map { (ms, measure) -> DependentHubInstance(ms as Microservice, measure.value as Int) }
             .toSet()
     }
