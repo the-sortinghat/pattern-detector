@@ -11,6 +11,7 @@ import io.mockk.impl.annotations.MockK
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class CyclicDependencyTest {
     companion object {
@@ -38,6 +39,27 @@ class CyclicDependencyTest {
     private fun getRandomNumber() = ((MAX - MIN) * Math.random() + MIN).toInt()
 
     private fun getRandomBoolean() = Math.random() > 0.5
+
+    @Test
+    fun `it handles Microservice A not being a parent and generating null`() {
+        // given
+        val A = Microservice(name = "A")
+        val B = Microservice(name = "B")
+        val C = Microservice(name = "C")
+
+        every { mockSync.getResults() } returns mapOf(
+            B to setOf(Relationship(with = A)),
+            C to setOf(Relationship(with = A))
+        )
+        every { mockAsync.getResults() } returns emptyMap()
+
+        // when
+        underTest.run()
+        val instances = underTest.getInstances()
+
+        // then
+        assertTrue(instances.isEmpty())
+    }
 
     @Test
     fun `it detects A sync B`() {

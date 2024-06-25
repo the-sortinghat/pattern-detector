@@ -132,6 +132,7 @@ internal class MicroserviceBuilderTest {
         underTest = MicroserviceBuilder(parent)
 
         // when
+        parent.thatHasMicroservices() //Add as Systembuilder uses lateinit subsystems
         val environment = underTest
             .named("something")
             .endMicroservices()

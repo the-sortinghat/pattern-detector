@@ -2,7 +2,9 @@ package com.usvision.analyses.detector
 
 import com.usvision.analyses.analyzer.Relationship
 import com.usvision.model.domain.Microservice
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ApiCompositionInstance(
     val composer: Microservice,
     val composees: Set<Microservice>

@@ -49,30 +49,33 @@ class ApiComposition(
 
     private fun accountReadingOps(poolOfMicroservices: MutableMap<Microservice, Pair<Int, Int>>) {
         nrdops.keys.forEach { ms ->
-            val micro = ms as Microservice
-
-            val numRds = nrdops[ms]!!.value as Int
-            val pair = poolOfMicroservices[micro]!!
-            poolOfMicroservices[micro] = Pair(pair.first, numRds)
+            if (ms is Microservice) {
+                val micro = ms
+                val numRds = nrdops[ms]!!.value as Int
+                val pair = poolOfMicroservices[micro]!!
+                poolOfMicroservices[micro] = Pair(pair.first, numRds)
+            }
         }
     }
 
     private fun accountNops(poolOfMicroservices: MutableMap<Microservice, Pair<Int, Int>>) {
         nops.keys.forEach { ms ->
-            val micro = ms as Microservice
-
-            val numOps = nops[ms]!!.value as Int
-            val pair = poolOfMicroservices[micro]!!
-            poolOfMicroservices[micro] = Pair(numOps, pair.second)
+            if (ms is Microservice) {
+                val micro = ms
+                val numOps = nops[ms]!!.value as Int
+                val pair = poolOfMicroservices[micro]!!
+                poolOfMicroservices[micro] = Pair(numOps, pair.second)
+            }
         }
     }
 
     private fun initialize(poolOfMicroservices: MutableMap<Microservice, Pair<Int, Int>>) {
         (nops.keys + nrdops.keys).forEach { ms ->
-            val micro = ms as Microservice
-
-            if (micro !in poolOfMicroservices) {
-                poolOfMicroservices[micro] = Pair(0, 0)
+            if (ms is Microservice) {
+                val micro = ms
+                if (micro !in poolOfMicroservices) {
+                    poolOfMicroservices[micro] = Pair(0, 0)
+                }
             }
         }
     }
