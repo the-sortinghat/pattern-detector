@@ -15,11 +15,14 @@ class NumberOfDependents(
     override fun getResults(): Map<Visitable, Measure> = counters
 
     override fun visit(microservice: Microservice) {
-        val asyncDependents = asyncDependenciesOfMicroservice.getResults().filter { (ms, _) ->
+        val asyncResults = asyncDependenciesOfMicroservice.getResults()
+        val syncResults = syncDependenciesOfMicroservice.getResults()
+
+        val asyncDependents = asyncResults.filter { (ms, _) ->
             (ms as Microservice).getSubscribedChannels().any { it in microservice.getPublishChannels() }
         }.count()
 
-        val syncDependents = syncDependenciesOfMicroservice.getResults().filter { (ms, _) ->
+        val syncDependents = syncResults.filter { (ms, _) ->
             (ms as Microservice).getConsumedOperations().any { it in microservice.getExposedOperations() }
         }.count()
 
