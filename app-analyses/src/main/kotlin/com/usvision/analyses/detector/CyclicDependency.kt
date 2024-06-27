@@ -64,22 +64,29 @@ class CyclicDependency(
 
         visited.add(startingFrom)
         deps[startingFrom]?.forEach { neighbor ->
-            parentOf[neighbor] = startingFrom
-            val isFound = findOneCycle(neighbor, visited, parentOf)
-            if (isFound) return true
+            if (!parentOf.containsKey(neighbor)) {
+                parentOf[neighbor] = startingFrom
+                val isFound = findOneCycle(neighbor, visited, parentOf)
+                if (isFound) return true
+            }
         }
 
+        visited.remove(startingFrom)
         return false
     }
 
     private fun findCycles(): Map<Microservice, Map<Microservice, Microservice>> {
         val cycles = mutableMapOf<Microservice, Map<Microservice, Microservice>>()
-        deps.keys.forEach {
+        deps.keys.forEach { microservice ->
             val parents = mutableMapOf<Microservice, Microservice>()
-            val isFound = findOneCycle(startingFrom = it, mutableSetOf(), parents)
-            if (isFound) cycles[it] = parents
+            val visited = mutableSetOf<Microservice>()
+            val isFound = findOneCycle(startingFrom = microservice, visited = visited, parentOf = parents)
+            if (isFound) {
+                cycles[microservice] = parents
+            }
         }
 
         return cycles
     }
+
 }
