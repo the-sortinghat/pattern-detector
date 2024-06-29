@@ -71,7 +71,6 @@ class CyclicDependency(
             }
         }
 
-        visited.remove(startingFrom)
         return false
     }
 
