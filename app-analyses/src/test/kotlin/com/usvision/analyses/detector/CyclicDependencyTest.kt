@@ -100,6 +100,50 @@ class CyclicDependencyTest {
     }
 
     @Test
+    fun `it detects A sync B, B sync C and C sync A`() {
+        // given
+        val A = Microservice(name = "A")
+        val B = Microservice(name = "B")
+        val C = Microservice(name = "C")
+        every { mockSync.getResults() } returns mapOf(
+            A to setOf(Relationship(with = B)),
+            B to setOf(Relationship(with = C)),
+            C to setOf(Relationship(with = A))
+        )
+        every { mockAsync.getResults() } returns emptyMap()
+
+        // when
+        underTest.run()
+        val instances = underTest.getInstances()
+
+        // then
+        assertEquals(1, instances.size)
+    }
+
+    @Test
+    fun `it detects two instances - first A sync B, B sync C and C sync A __ second A sync D`() {
+        // given
+        val A = Microservice(name = "A")
+        val B = Microservice(name = "B")
+        val C = Microservice(name = "C")
+        val D = Microservice(name = "D")
+        every { mockSync.getResults() } returns mapOf(
+            A to setOf(Relationship(with = B), Relationship(with = D)),
+            B to setOf(Relationship(with = C)),
+            C to setOf(Relationship(with = A)),
+            D to setOf(Relationship(with = A))
+        )
+        every { mockAsync.getResults() } returns emptyMap()
+
+        // when
+        underTest.run()
+        val instances = underTest.getInstances()
+
+        // then
+        assertEquals(2, instances.size)
+    }
+
+    @Test
     fun `it detects A sync-to B, B async-to A`() {
         // given
         val A = Microservice(name = "A")
