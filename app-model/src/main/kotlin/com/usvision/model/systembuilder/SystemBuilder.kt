@@ -61,7 +61,7 @@ class SystemBuilder(private val parent: SystemBuilder? = null) {
 }
 
 class MicroserviceBuilder(private val parent: SystemBuilder? = null) {
-    private lateinit var name: String
+    private var name: String? = null
     private val exposedOperations = mutableSetOf<Operation>()
     private val consumedOperations = mutableSetOf<Operation>()
     private val databases = mutableSetOf<Database>()
@@ -85,10 +85,14 @@ class MicroserviceBuilder(private val parent: SystemBuilder? = null) {
 
     fun and(): MicroserviceBuilder {
         endMicroservices()
-        return parent!!.thatHasMicroservices()
+        return MicroserviceBuilder(this.parent)
     }
 
     fun named(name: String) = fluentInterface {
+        this.name?.also {
+            throw SystemBuilderException("Microservice already has a name: $name")
+        }
+
         this.name = name
     }
 
@@ -117,12 +121,14 @@ class MicroserviceBuilder(private val parent: SystemBuilder? = null) {
     }
 
     fun build(): Microservice {
-        return Microservice(name).also { msvc ->
-            exposedOperations.forEach(msvc::exposeOperation)
-            consumedOperations.forEach(msvc::consumeOperation)
-            databases.forEach(msvc::addDatabaseConnection)
-            channelsPublished.forEach(msvc::addPublishChannel)
-            channelsSubscribed.forEach(msvc::addSubscribedChannel)
-        }
+        return this.name?.let { name ->
+            Microservice(name).also { msvc ->
+                exposedOperations.forEach(msvc::exposeOperation)
+                consumedOperations.forEach(msvc::consumeOperation)
+                databases.forEach(msvc::addDatabaseConnection)
+                channelsPublished.forEach(msvc::addPublishChannel)
+                channelsSubscribed.forEach(msvc::addSubscribedChannel)
+            }
+        } ?: throw SystemBuilderException("Attempted to build a Microservice with no name")
     }
 }

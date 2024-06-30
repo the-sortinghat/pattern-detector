@@ -46,7 +46,7 @@ internal class SystemBuilderTest {
         assertEquals(1, system.getSubsystemSet().size)
         val firstLevelSubsys = system.getSubsystemSet().first()
         assertIs<CompanySystem>(firstLevelSubsys)
-        assertEquals(1, firstLevelSubsys.getSubsystemSet().size)
+        assertEquals(2, firstLevelSubsys.getSubsystemSet().size)
         assertIs<Microservice>(firstLevelSubsys.getSubsystemSet().first())
     }
 
@@ -113,7 +113,11 @@ internal class MicroserviceBuilderTest {
 
     @BeforeTest
     fun `create clean, new instance of MicroserviceBuilder`() {
-        underTest = MicroserviceBuilder()
+        val parent = spyk(SystemBuilder())
+
+        // when
+        underTest = parent
+            .thatHasMicroservices()
     }
 
     @Test
@@ -129,7 +133,8 @@ internal class MicroserviceBuilderTest {
     fun `it returns its parent when closing a properly opened microservice env`() {
         // given
         val parent = spyk(SystemBuilder())
-        underTest = MicroserviceBuilder(parent)
+        underTest = parent
+            .thatHasMicroservices()
 
         // when
         parent.thatHasMicroservices() //Add as Systembuilder uses lateinit subsystems
@@ -157,6 +162,15 @@ internal class MicroserviceBuilderTest {
         assertIs<Microservice>(result)
         assertEquals(name, result.name)
         assertNotNull(result.module)
+    }
+
+    @Test
+    fun `it throws SystemBuilderException when building a Microservice with no name`() {
+        // given nothing
+        // when ... then
+        assertThrows<SystemBuilderException> {
+            underTest.build()
+        }
     }
 
     @Test
@@ -288,6 +302,40 @@ internal class MicroserviceBuilderTest {
         assertIs<Microservice>(result)
         assertEquals(name, result.name)
         verify { underTest.named(name) }
+    }
+
+    @Test
+    fun `it throws SystemBuilderException when calling 'named' method twice`() {
+        // given
+        val name = "micro"
+
+        // when
+        val result = underTest
+            .named(name)
+
+
+         //then
+        assertThrows<SystemBuilderException> {
+            result.named(name)
+        }
+    }
+
+
+    @Test
+    fun `it throws SystemBuilderException when calling 'and' method twice without setting a name for the second microservice`() {
+        // given
+        val name = "micro"
+
+        // when
+        val result = underTest
+            .named(name)
+            .and()
+
+
+        //then
+        assertThrows<SystemBuilderException> {
+            result.and()
+        }
     }
 
     @Test
