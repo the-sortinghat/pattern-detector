@@ -13,34 +13,41 @@ class SystemBuilderException(message: String)
     : RuntimeException(message)
 
 class SystemBuilder(private val parent: SystemBuilder? = null) {
-    private lateinit var rootName: String
-    private lateinit var subsystems: MutableSet<System>
+    private var rootName: String? = null
+    private var subsystems: MutableSet<System> = mutableSetOf()
 
     private fun fluentInterface(instance: SystemBuilder = this, implementation: SystemBuilder.() -> Unit): SystemBuilder {
         implementation()
         return instance
     }
 
-    fun setName(name: String) = fluentInterface { rootName = name }
+    fun setName(name: String) = fluentInterface {
+        this.rootName?.also {
+            throw SystemBuilderException("System already has a name: $rootName")
+        }
+        rootName = name
+    }
 
-    fun addSubsystems() = fluentInterface(SystemBuilder(this)) {
-        subsystems = mutableSetOf()
+    fun addSubsystems(): SystemBuilder {
+        return SystemBuilder(this)
+    }
+
+    fun and(): SystemBuilder {
+        endSubsystems()
+        return SystemBuilder(this.parent)
     }
 
     fun endSubsystems(): SystemBuilder {
         if (parent == null)
             throw SystemBuilderException("Attempted to close an environment that had not being opened")
 
-        if (this::rootName.isInitialized) {
-            val system = build()
-            parent.addSubsystem(system)
-        }
+        val system = build()
+        parent.addSubsystem(system)
 
         return parent
     }
 
     fun thatHasMicroservices(): MicroserviceBuilder {
-        subsystems = mutableSetOf()
         return MicroserviceBuilder(this)
     }
 
@@ -53,10 +60,11 @@ class SystemBuilder(private val parent: SystemBuilder? = null) {
     }
 
     fun build(): System {
-        return CompanySystem(rootName).also { root ->
-            if (this::subsystems.isInitialized)
+        return this.rootName?.let { rootName ->
+            CompanySystem(rootName).also { root ->
                 subsystems.forEach(root::addSubsystem)
-        }
+            }
+        } ?: throw SystemBuilderException("Attempted to build a System with no name")
     }
 }
 

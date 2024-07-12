@@ -50,6 +50,34 @@ internal class SystemBuilderTest {
         assertIs<Microservice>(firstLevelSubsys.getSubsystemSet().first())
     }
 
+
+    @Test
+    fun `it builds a system with two subsystems`() {
+
+        // given ... when
+        val system = underTest
+            .setName("Bank")
+            .addSubsystems()
+                .setName("Bank subsystem one")
+                .thatHasMicroservices()
+                    .oneNamed("Balance API")
+                    .exposingRestEndpoint("GET", "/account/balance", "account balance")
+                .endMicroservices()
+            .and()
+                .setName("Bank subsystem two")
+            .endSubsystems()
+            .build()
+
+        // then
+        assertIs<CompanySystem>(system)
+        assertEquals(2, system.getSubsystemSet().size)
+        val firstLevelSubsys = system.getSubsystemSet().first()
+        assertIs<CompanySystem>(firstLevelSubsys)
+        assertEquals(1, firstLevelSubsys.getSubsystemSet().size)
+        assertIs<Microservice>(firstLevelSubsys.getSubsystemSet().first())
+    }
+
+
     @Test
     fun `it defaults to a company system`() {
         // given
@@ -66,7 +94,7 @@ internal class SystemBuilderTest {
     }
 
     @Test
-    fun `opening and closing a subsystem environment gives an empty subsys set`() {
+    fun `it throws SystemBuilderException when endSubsystems without setting a name for the subsystem`() {
         // given
         val name = "test"
 
@@ -74,12 +102,11 @@ internal class SystemBuilderTest {
         val result = underTest
             .setName(name)
             .addSubsystems()
-            .endSubsystems()
-            .build()
 
         // then
-        assertIs<CompanySystem>(result)
-        assertContentEquals(listOf(), result.getSubsystemSet())
+        assertThrows<SystemBuilderException> {
+            result.endSubsystems()
+        }
     }
 
     @Test
