@@ -1,6 +1,7 @@
 package com.usvision.analyses.analyzer
 
 import com.usvision.model.domain.Microservice
+import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.MessageChannel
 import com.usvision.model.visitor.Visitable
 
@@ -11,6 +12,7 @@ class CoincidenceOfMicroservices (
     private val msCoincidences: MutableMap<Visitable, MutableList<Relationship>> = mutableMapOf()
     private val publishers: MutableMap<MessageChannel, MutableList<Microservice>> = mutableMapOf()
     private val subscribers: MutableMap<MessageChannel, MutableList<Microservice>> = mutableMapOf()
+    private val msDatabase: MutableMap<Database, MutableList<Microservice>> = mutableMapOf()
 
     override fun getResults(): Map<Visitable, Relationship> {
         return msCoincidences.mapValues { entry ->
@@ -20,7 +22,6 @@ class CoincidenceOfMicroservices (
 
     override fun visit(microservice: Microservice) {
         val syncResults = syncDependenciesOfMicroservice.getResults()
-        //val asyncResults = asyncDependenciesOfMicroservice.getResults()
         val operationConsumers: MutableMap<String, MutableList<Microservice>> = mutableMapOf()
 
         // Check coincidences between microservices in the scope of sync dependencies
@@ -72,6 +73,24 @@ class CoincidenceOfMicroservices (
                     microservices.filter { it != subscriber }.forEach { otherSubscriber ->
                         val relationship = Relationship(with = otherSubscriber)
                         msCoincidences.getOrPut(subscriber) { mutableListOf() }.add(relationship)
+                    }
+                }
+            }
+        }
+
+        // Check coincidences between microservices in the scope of database dependencies
+        microservice.getDatabases().forEach { database ->
+            if (database !in this.msDatabase) {
+                this.msDatabase[database] = mutableListOf()
+            }
+            this.msDatabase[database]?.add(microservice)
+        }
+        msDatabase.forEach { (_, microservices) ->
+            if (microservices.size > 1) {
+                microservices.forEach { database ->
+                    microservices.filter { it != database }.forEach { otherDatabase ->
+                        val relationship = Relationship(with = otherDatabase)
+                        msCoincidences.getOrPut(database) { mutableListOf() }.add(relationship)
                     }
                 }
             }
