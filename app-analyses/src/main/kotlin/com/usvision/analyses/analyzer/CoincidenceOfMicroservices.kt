@@ -9,14 +9,20 @@ import com.usvision.model.visitor.Visitable
 class CoincidenceOfMicroservices (
     private val syncDependenciesOfMicroservice: SyncDependenciesOfMicroservice,
 ) : RelationshipAnalyzer() {
-    private val msCoincidences: MutableMap<Visitable, MutableList<Relationship>> = mutableMapOf()
+    private val msCoincidences: MutableMap<Visitable, MutableList<Pair<Relationship, String>>> = mutableMapOf()
     private val publishers: MutableMap<MessageChannel, MutableList<Microservice>> = mutableMapOf()
     private val subscribers: MutableMap<MessageChannel, MutableList<Microservice>> = mutableMapOf()
     private val msDatabase: MutableMap<Database, MutableList<Microservice>> = mutableMapOf()
 
     override fun getResults(): Map<Visitable, Relationship> {
         return msCoincidences.mapValues { entry ->
-            entry.value.first()
+            entry.value.first().first
+        }
+    }
+
+    fun getDetailedResults(): Map<Visitable, List<Pair<Relationship, String>>> {
+        return msCoincidences.mapValues { entry ->
+            entry.value.toList()
         }
     }
 
@@ -35,7 +41,7 @@ class CoincidenceOfMicroservices (
                 microservices.forEach { consumer ->
                     microservices.filter { it != consumer }.forEach { otherConsumer ->
                         val relationship = Relationship(with = otherConsumer)
-                        msCoincidences.getOrPut(consumer) { mutableListOf() }.add(relationship)
+                        msCoincidences.getOrPut(consumer) { mutableListOf() }.add(Pair(relationship, "sync"))
                     }
                 }
             }
@@ -48,31 +54,28 @@ class CoincidenceOfMicroservices (
             }
             this.publishers[channel]?.add(microservice)
         }
-
+        publishers.forEach { (_, microservices) ->
+            if (microservices.size > 1) {
+                microservices.forEach { publisher ->
+                    microservices.filter { it != publisher }.forEach { otherPublisher ->
+                        val relationship = Relationship(with = otherPublisher)
+                        msCoincidences.getOrPut(publisher) { mutableListOf() }.add(Pair(relationship, "async"))
+                    }
+                }
+            }
+        }
         microservice.getSubscribedChannels().forEach { channel ->
             if (channel !in this.subscribers) {
                 this.subscribers[channel] = mutableListOf()
             }
             this.subscribers[channel]?.add(microservice)
         }
-
-        publishers.forEach { (_, microservices) ->
-            if (microservices.size > 1) {
-                microservices.forEach { publisher ->
-                    microservices.filter { it != publisher }.forEach { otherPublisher ->
-                        val relationship = Relationship(with = otherPublisher)
-                        msCoincidences.getOrPut(publisher) { mutableListOf() }.add(relationship)
-                    }
-                }
-            }
-        }
-
         subscribers.forEach { (_, microservices) ->
             if (microservices.size > 1) {
                 microservices.forEach { subscriber ->
                     microservices.filter { it != subscriber }.forEach { otherSubscriber ->
                         val relationship = Relationship(with = otherSubscriber)
-                        msCoincidences.getOrPut(subscriber) { mutableListOf() }.add(relationship)
+                        msCoincidences.getOrPut(subscriber) { mutableListOf() }.add(Pair(relationship, "async"))
                     }
                 }
             }
@@ -90,7 +93,7 @@ class CoincidenceOfMicroservices (
                 microservices.forEach { database ->
                     microservices.filter { it != database }.forEach { otherDatabase ->
                         val relationship = Relationship(with = otherDatabase)
-                        msCoincidences.getOrPut(database) { mutableListOf() }.add(relationship)
+                        msCoincidences.getOrPut(database) { mutableListOf() }.add(Pair(relationship, "database"))
                     }
                 }
             }

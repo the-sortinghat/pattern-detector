@@ -9,31 +9,37 @@ class SimilarService(
     private val coincidenceAnalyser: CoincidenceOfMicroservices
 ) : Detector() {
     companion object {
-        const val NUM_SYNC_COINCIDENCES_THRESHOLD: Int = 1
+        const val NUM_COINCIDENCES_THRESHOLD: Int = 3
     }
 
     private var instances: Set<SimilarServiceInstance> = emptySet()
-    private lateinit var syncDepResults: Map<Visitable, Relationship>
+    private lateinit var DepResults: Map<Visitable, List<Pair<Relationship, String>>>
     private var microservicePairs = mutableSetOf<Pair<Microservice, Microservice>>()
+    private var coincidenceTypes = mutableMapOf<Pair<Microservice, Microservice>, MutableSet<String>>()
 
     override fun collectMetrics() {
-        syncDepResults = coincidenceAnalyser.getResults()
+        DepResults = coincidenceAnalyser.getDetailedResults()
     }
 
     override fun combineMetric() {
-        syncDepResults.forEach { (visitable, relationship) ->
-            if (visitable is Microservice && relationship.with is Microservice) {
-                microservicePairs.add(Pair(visitable, relationship.with))
+        DepResults.forEach { (visitable, relationships) ->
+            if (visitable is Microservice) {
+                relationships.forEach { (relationship, type) ->
+                    if (relationship.with is Microservice) {
+                        val pair = Pair(visitable, relationship.with)
+                        microservicePairs.add(pair)
+                        coincidenceTypes.getOrPut(pair) { mutableSetOf() }.add(type)
+                    }
+                }
             }
         }
 
-        val coincidences = microservicePairs.groupBy { it }
-            .filter { (_, pairs) -> pairs.size >= NUM_SYNC_COINCIDENCES_THRESHOLD }
-            .flatMap { it.value }
-            .toSet()
+        val coincidences = microservicePairs.filter { pair ->
+            (coincidenceTypes[pair]?.size ?: 0) >= NUM_COINCIDENCES_THRESHOLD
+        }.toSet()
 
         instances = coincidences.map { (microservice1, microservice2) ->
-            SimilarServiceInstance(setOf(microservice1, microservice2))
+            SimilarServiceInstance(setOf(microservice1, microservice2), coincidenceTypes[Pair(microservice1, microservice2)] ?: emptySet())
         }.toSet()
     }
 
