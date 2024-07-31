@@ -3,13 +3,14 @@ package com.usvision.analyses.analyzer
 import com.usvision.model.domain.Microservice
 import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.MessageChannel
+import com.usvision.model.domain.operations.Operation
 import com.usvision.model.visitor.Visitable
 
 
-class CoincidenceOfMicroservices (
-    private val syncDependenciesOfMicroservice: SyncDependenciesOfMicroservice,
-) : RelationshipAnalyzer() {
+class CoincidenceOfMicroservices : RelationshipAnalyzer() {
     private val msCoincidences: MutableMap<Visitable, MutableList<Pair<Relationship, String>>> = mutableMapOf()
+    private val producers = mutableMapOf<Operation, MutableList<Microservice>>()
+    private val consumers = mutableMapOf<Operation, MutableList<Microservice>>()
     private val publishers: MutableMap<MessageChannel, MutableList<Microservice>> = mutableMapOf()
     private val subscribers: MutableMap<MessageChannel, MutableList<Microservice>> = mutableMapOf()
     private val msDatabase: MutableMap<Database, MutableList<Microservice>> = mutableMapOf()
@@ -27,21 +28,35 @@ class CoincidenceOfMicroservices (
     }
 
     override fun visit(microservice: Microservice) {
-        val syncResults = syncDependenciesOfMicroservice.getResults()
-        val operationConsumers: MutableMap<String, MutableList<Microservice>> = mutableMapOf()
-
         // Check coincidences between microservices in the scope of sync dependencies
-        syncResults.keys.filterIsInstance<Microservice>().forEach { ms ->
-            ms.getConsumedOperations().forEach { operation ->
-                operationConsumers.getOrPut(operation.toString()) { mutableListOf() }.add(ms)
+        microservice.getConsumedOperations().forEach { op ->
+            if (op !in consumers) {
+                consumers[op] = mutableListOf()
             }
+            consumers[op]?.add(microservice)
         }
-        operationConsumers.forEach { (_, microservices) ->
+        consumers.forEach { (_, microservices) ->
             if (microservices.size > 1) {
                 microservices.forEach { consumer ->
                     microservices.filter { it != consumer }.forEach { otherConsumer ->
                         val relationship = Relationship(with = otherConsumer)
                         msCoincidences.getOrPut(consumer) { mutableListOf() }.add(Pair(relationship, "sync"))
+                    }
+                }
+            }
+        }
+        microservice.getExposedOperations().forEach { op ->
+            if (op !in producers) {
+                producers[op] = mutableListOf()
+            }
+            producers[op]?.add(microservice)
+        }
+        producers.forEach { (_, microservices) ->
+            if (microservices.size > 1) {
+                microservices.forEach { producer ->
+                    microservices.filter { it != producer }.forEach { otherProducer ->
+                        val relationship = Relationship(with = otherProducer)
+                        msCoincidences.getOrPut(producer) { mutableListOf() }.add(Pair(relationship, "sync"))
                     }
                 }
             }
