@@ -25,6 +25,7 @@ reports:
       - SingleServicePerHost
       - DependentHub
       - CentralizedService
+      - SimilarService
     persistence:
       - DatabasePerService
       - SharedPersistence
@@ -38,6 +39,7 @@ reports:
       - CyclicDependency
       - DependentHub
       - CentralizedService
+      - SimilarService
     patterns:
       - ApiComposition
       - AsyncMessaging
@@ -49,3 +51,4 @@ reports:
       - SharedPersistence
       - DependentHub
       - CentralizedService
+      - SimilarService
