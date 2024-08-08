@@ -8,12 +8,12 @@ import io.mockk.verify
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.*
 
-internal class SystemBuilderTest {
-    private lateinit var underTest: SystemBuilder
+internal class CompanySystemBuilderTest {
+    private lateinit var underTest: CompanySystemBuilder
 
     @BeforeTest
     fun `create clean, new instance of SystemBuilder`() {
-        underTest = SystemBuilder()
+        underTest = CompanySystemBuilder()
     }
 
     @Test
@@ -140,7 +140,7 @@ internal class MicroserviceBuilderTest {
 
     @BeforeTest
     fun `create clean, new instance of MicroserviceBuilder`() {
-        val parent = spyk(SystemBuilder())
+        val parent = spyk(CompanySystemBuilder())
 
         // when
         underTest = parent
@@ -159,7 +159,7 @@ internal class MicroserviceBuilderTest {
     @Test
     fun `it returns its parent when closing a properly opened microservice env`() {
         // given
-        val parent = spyk(SystemBuilder())
+        val parent = spyk(CompanySystemBuilder())
         underTest = parent
             .thatHasMicroservices()
 
@@ -169,7 +169,7 @@ internal class MicroserviceBuilderTest {
             .endMicroservices()
 
         // then
-        assertIs<SystemBuilder>(environment)
+        assertIs<CompanySystemBuilder>(environment)
         assertEquals(parent, environment)
         verify { parent.addMicroservice(any()) }
     }
@@ -369,7 +369,7 @@ internal class MicroserviceBuilderTest {
         // given
         val nameOne = "name one"
         val nameTwo = "name two"
-        val parent = spyk(SystemBuilder())
+        val parent = spyk(CompanySystemBuilder())
 
         // when
         parent

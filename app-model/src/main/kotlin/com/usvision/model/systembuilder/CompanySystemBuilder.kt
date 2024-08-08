@@ -12,11 +12,11 @@ import com.usvision.model.systemcomposite.System
 class SystemBuilderException(message: String)
     : RuntimeException(message)
 
-class SystemBuilder(private val parent: SystemBuilder? = null) {
+class CompanySystemBuilder(private val parent: CompanySystemBuilder? = null) {
     private var rootName: String? = null
     private var subsystems: MutableSet<System> = mutableSetOf()
 
-    private fun fluentInterface(instance: SystemBuilder = this, implementation: SystemBuilder.() -> Unit): SystemBuilder {
+    private fun fluentInterface(instance: CompanySystemBuilder = this, implementation: CompanySystemBuilder.() -> Unit): CompanySystemBuilder {
         implementation()
         return instance
     }
@@ -28,16 +28,16 @@ class SystemBuilder(private val parent: SystemBuilder? = null) {
         rootName = name
     }
 
-    fun addSubsystems(): SystemBuilder {
-        return SystemBuilder(this)
+    fun addSubsystems(): CompanySystemBuilder {
+        return CompanySystemBuilder(this)
     }
 
-    fun and(): SystemBuilder {
+    fun and(): CompanySystemBuilder {
         endSubsystems()
-        return SystemBuilder(this.parent)
+        return CompanySystemBuilder(this.parent)
     }
 
-    fun endSubsystems(): SystemBuilder {
+    fun endSubsystems(): CompanySystemBuilder {
         if (parent == null)
             throw SystemBuilderException("Attempted to close an environment that had not being opened")
 
@@ -68,7 +68,7 @@ class SystemBuilder(private val parent: SystemBuilder? = null) {
     }
 }
 
-class MicroserviceBuilder(private val parent: SystemBuilder? = null) {
+class MicroserviceBuilder(private val parent: CompanySystemBuilder? = null) {
     private var name: String? = null
     private val exposedOperations = mutableSetOf<Operation>()
     private val consumedOperations = mutableSetOf<Operation>()
@@ -81,7 +81,7 @@ class MicroserviceBuilder(private val parent: SystemBuilder? = null) {
         return this
     }
 
-    fun endMicroservices(): SystemBuilder {
+    fun endMicroservices(): CompanySystemBuilder {
         if (parent == null)
             throw SystemBuilderException("Attempted to close an environment that had not being opened")
 
