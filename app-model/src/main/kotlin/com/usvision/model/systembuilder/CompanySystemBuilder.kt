@@ -9,10 +9,12 @@ import com.usvision.model.domain.operations.Operation
 import com.usvision.model.domain.operations.RestEndpoint
 import com.usvision.model.systemcomposite.System
 
+interface SystemBuilder
+
 class SystemBuilderException(message: String)
     : RuntimeException(message)
 
-class CompanySystemBuilder(private val parent: CompanySystemBuilder? = null) {
+class CompanySystemBuilder(private val parent: CompanySystemBuilder? = null): SystemBuilder {
     private var rootName: String? = null
     private var subsystems: MutableSet<System> = mutableSetOf()
 
@@ -68,7 +70,7 @@ class CompanySystemBuilder(private val parent: CompanySystemBuilder? = null) {
     }
 }
 
-class MicroserviceBuilder(private val parent: CompanySystemBuilder? = null) {
+class MicroserviceBuilder(private val parent: CompanySystemBuilder? = null): SystemBuilder  {
     private var name: String? = null
     private val exposedOperations = mutableSetOf<Operation>()
     private val consumedOperations = mutableSetOf<Operation>()
