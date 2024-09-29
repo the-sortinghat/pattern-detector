@@ -5,17 +5,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SimilarServiceInstance(
-    val members: Set<Microservice>,
-    val coincidenceType: Set<String>
+    val memberNames: Set<String>,
+    val coincidenceType: Set<String>,
+    val members: Set<Microservice>
 ) : ArchitectureInsight {
     companion object {
-        fun fromCoincidences(
-            coincidences: Set<Pair<Microservice, Microservice>>,
-            coincidenceType: Set<String>
-        ): Set<SimilarServiceInstance> {
-            return coincidences.map { (microservice1, microservice2) ->
-                SimilarServiceInstance(setOf(microservice1, microservice2), coincidenceType)
-            }.toSet()
-        }
+        fun of(pair: Pair<Microservice, Microservice>) = SimilarServiceInstance(
+            memberNames = setOf(pair.first.name, pair.second.name),
+            coincidenceType = emptySet(),
+            members = setOf(pair.first, pair.second)
+        )
     }
 }

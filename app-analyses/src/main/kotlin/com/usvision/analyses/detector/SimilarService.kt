@@ -39,7 +39,11 @@ class SimilarService(
         }.toSet()
 
         instances = coincidences.map { (microservice1, microservice2) ->
-            SimilarServiceInstance(setOf(microservice1, microservice2), coincidenceTypes[Pair(microservice1, microservice2)] ?: emptySet())
+            SimilarServiceInstance(
+                memberNames = setOf(microservice1.name, microservice2.name),
+                coincidenceType = coincidenceTypes[Pair(microservice1, microservice2)] ?: emptySet(),
+                members = setOf(microservice1, microservice2)
+            )
         }.toSet()
     }
 
