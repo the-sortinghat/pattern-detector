@@ -6,7 +6,6 @@ import com.usvision.model.domain.MessageChannel
 import com.usvision.model.domain.operations.Operation
 import com.usvision.model.visitor.Visitable
 
-
 class CoincidenceOfMicroservices : RelationshipAnalyzer() {
     private val msCoincidences: MutableMap<Visitable, MutableList<Pair<Relationship, String>>> = mutableMapOf()
     private val producers = mutableMapOf<Operation, MutableList<Microservice>>()
@@ -28,91 +27,34 @@ class CoincidenceOfMicroservices : RelationshipAnalyzer() {
     }
 
     override fun visit(microservice: Microservice) {
-        // Check coincidences between microservices in the scope of sync dependencies
-        microservice.getConsumedOperations().forEach { op ->
-            if (op !in consumers) {
-                consumers[op] = mutableListOf()
-            }
-            consumers[op]?.add(microservice)
-        }
-        consumers.forEach { (_, microservices) ->
-            if (microservices.size > 1) {
-                microservices.forEach { consumer ->
-                    microservices.filter { it != consumer }.forEach { otherConsumer ->
-                        val relationship = Relationship(with = otherConsumer)
-                        msCoincidences.getOrPut(consumer) { mutableListOf() }.add(Pair(relationship, "sync"))
-                    }
-                }
-            }
-        }
-        microservice.getExposedOperations().forEach { op ->
-            if (op !in producers) {
-                producers[op] = mutableListOf()
-            }
-            producers[op]?.add(microservice)
-        }
-        producers.forEach { (_, microservices) ->
-            if (microservices.size > 1) {
-                microservices.forEach { producer ->
-                    microservices.filter { it != producer }.forEach { otherProducer ->
-                        val relationship = Relationship(with = otherProducer)
-                        msCoincidences.getOrPut(producer) { mutableListOf() }.add(Pair(relationship, "sync"))
-                    }
-                }
-            }
-        }
+        checkCoincidences(microservice, { it.getConsumedOperations().toList() }, consumers, "sync")
+        checkCoincidences(microservice, { it.getExposedOperations().toList() }, producers, "sync")
+        checkCoincidences(microservice, { it.getPublishChannels().toList() }, publishers, "async")
+        checkCoincidences(microservice, { it.getSubscribedChannels().toList() }, subscribers, "async")
+        checkCoincidences(microservice, { it.getDatabases().toList() }, msDatabase, "database")
+    }
 
-        // Check coincidences between microservices in the scope of async dependencies
-        microservice.getPublishChannels().forEach { channel ->
-            if (channel !in this.publishers) {
-                this.publishers[channel] = mutableListOf()
+    private fun <T> checkCoincidences(
+        microservice: Microservice,
+        getDependencies: (Microservice) -> List<T>,
+        dependenciesMap: MutableMap<T, MutableList<Microservice>>,
+        relationshipType: String
+    ) {
+        getDependencies(microservice).forEach { dependency ->
+            if (dependency !in dependenciesMap) {
+                dependenciesMap[dependency] = mutableListOf()
             }
-            this.publishers[channel]?.add(microservice)
+            dependenciesMap[dependency]?.add(microservice)
         }
-        publishers.forEach { (_, microservices) ->
+        dependenciesMap.forEach { (_, microservices) ->
             if (microservices.size > 1) {
-                microservices.forEach { publisher ->
-                    microservices.filter { it != publisher }.forEach { otherPublisher ->
-                        val relationship = Relationship(with = otherPublisher)
-                        msCoincidences.getOrPut(publisher) { mutableListOf() }.add(Pair(relationship, "async"))
+                microservices.forEach { ms ->
+                    microservices.filter { it != ms }.forEach { otherMs ->
+                        val relationship = Relationship(with = otherMs)
+                        msCoincidences.getOrPut(ms) { mutableListOf() }.add(Pair(relationship, relationshipType))
                     }
                 }
             }
         }
-        microservice.getSubscribedChannels().forEach { channel ->
-            if (channel !in this.subscribers) {
-                this.subscribers[channel] = mutableListOf()
-            }
-            this.subscribers[channel]?.add(microservice)
-        }
-        subscribers.forEach { (_, microservices) ->
-            if (microservices.size > 1) {
-                microservices.forEach { subscriber ->
-                    microservices.filter { it != subscriber }.forEach { otherSubscriber ->
-                        val relationship = Relationship(with = otherSubscriber)
-                        msCoincidences.getOrPut(subscriber) { mutableListOf() }.add(Pair(relationship, "async"))
-                    }
-                }
-            }
-        }
-
-        // Check coincidences between microservices in the scope of database dependencies
-        microservice.getDatabases().forEach { database ->
-            if (database !in this.msDatabase) {
-                this.msDatabase[database] = mutableListOf()
-            }
-            this.msDatabase[database]?.add(microservice)
-        }
-        msDatabase.forEach { (_, microservices) ->
-            if (microservices.size > 1) {
-                microservices.forEach { database ->
-                    microservices.filter { it != database }.forEach { otherDatabase ->
-                        val relationship = Relationship(with = otherDatabase)
-                        msCoincidences.getOrPut(database) { mutableListOf() }.add(Pair(relationship, "database"))
-                    }
-                }
-            }
-        }
-
     }
 }
