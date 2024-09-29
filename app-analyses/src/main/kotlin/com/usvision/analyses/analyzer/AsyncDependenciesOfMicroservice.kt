@@ -9,18 +9,17 @@ class AsyncDependenciesOfMicroservice : RelationshipsAnalyzer() {
     private val subscribers: MutableMap<MessageChannel, MutableSet<Microservice>> = mutableMapOf()
 
     override fun getResults(): Map<Visitable, Set<Relationship>> {
-        val dependencies = mutableMapOf<Visitable, MutableSet<Relationship>>()
+        val dependencies = mutableMapOf<Visitable, Set<Relationship>>()
 
         this.subscribers.keys.forEach { channel ->
             val dependents = this.subscribers[channel]!!
-            val publishers = this.publishers[channel] ?: emptySet()
+            val msDependencies = this.publishers[channel] ?: emptySet()
 
-            dependents.forEach { dependent ->
-                publishers.forEach { publisher ->
-                    val relationship = Relationship(with = publisher)
-                    dependencies.getOrPut(dependent) { mutableSetOf() }.add(relationship)
-                }
-            }
+            if (msDependencies.isEmpty())
+                return@forEach
+
+            val relationships = msDependencies.map { Relationship(with = it) }.toSet()
+            dependents.forEach { dependencies[it] = relationships }
         }
 
         return dependencies
