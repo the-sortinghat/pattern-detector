@@ -13,40 +13,35 @@ typealias MicroserviceDTO = Microservice
 typealias DatabaseDTO = Database
 
 class SystemCreator(
-    private val systemRepository: SystemRepository
+    private val systemAggregateStorage: SystemAggregateStorage
 ) {
 
     fun createCompanySystem(companySystem: CompanySystemDTO): CompanySystemDTO {
         checkIfSystemAlreadyExists(companySystem.name)
-        return systemRepository.save(companySystem) as CompanySystemDTO
+        return systemAggregateStorage.save(companySystem)
     }
 
-    fun createSubsystem(system: SystemDTO, fatherSystemName: String? = null): SystemDTO {
-        checkIfSystemAlreadyExists(system.name)
+    fun createMicroservice(microservice: MicroserviceDTO, fatherSystemName: String? = null): SystemDTO {
+        checkIfSystemAlreadyExists(microservice.name)
 
         fatherSystemName?.also {
-            val fatherSystem = systemRepository.getSystemOfSystems(fatherSystemName)
+            val fatherSystem = systemAggregateStorage.getCompanySystem(fatherSystemName)
 
-            return@createSubsystem fatherSystem?.let {
-                fatherSystem.addSubsystem(system)
-                systemRepository.save(fatherSystem)
+            return@createMicroservice fatherSystem?.let {
+                fatherSystem.addSubsystem(microservice)
+                systemAggregateStorage.save(fatherSystem)
             } ?: throw Exception("A System Of Systems with name $fatherSystemName does not exist")
         }
 
-        return systemRepository.save(system)
+        return systemAggregateStorage.save(microservice)
     }
-
-    fun createMicroservice(
-        microservice: MicroserviceDTO,
-        fatherSystemName: String? = null
-    ) = createSubsystem(microservice, fatherSystemName) as MicroserviceDTO
 
     fun addNewDatabaseConnectionToMicroservice(
         database: DatabaseDTO,
         microserviceName: String
     ) = getExistingMicroservice(microserviceName).let {
         it.addDatabaseConnection(database)
-        systemRepository.save(it)
+        systemAggregateStorage.save(it)
     }
 
     fun addExposedOperationsToMicroservice(
@@ -56,7 +51,7 @@ class SystemCreator(
         exposedOperations.forEach {
             operation ->  it.exposeOperation(operation)
         }
-        systemRepository.save(it)
+        systemAggregateStorage.save(it)
     }
 
 
@@ -67,7 +62,7 @@ class SystemCreator(
         exposedOperations.forEach {
             operation ->  it.exposeOperation(operation)
         }
-        systemRepository.save(it)
+        systemAggregateStorage.save(it)
     }
 
 
@@ -78,7 +73,7 @@ class SystemCreator(
         messageChannels.forEach {
             operation ->  it.addPublishChannel(operation)
         }
-        systemRepository.save(it)
+        systemAggregateStorage.save(it)
     }
 
     fun addSubscribedChannelsOperationsToMicroservice(
@@ -88,17 +83,17 @@ class SystemCreator(
         messageChannels.forEach {
             operation ->  it.addSubscribedChannel(operation)
         }
-        systemRepository.save(it)
+        systemAggregateStorage.save(it)
     }
 
     private fun getExistingMicroservice(
         microserviceName: String
-    ) = systemRepository.getSystem(
+    ) = systemAggregateStorage.getSystem(
         microserviceName
     ) as MicroserviceDTO? ?: throw Exception("A Microservice with name $microserviceName does not exist")
 
     private fun checkIfSystemAlreadyExists(name: String) {
-        systemRepository.getSystem(name)?.also {
+        systemAggregateStorage.getSystem(name)?.also {
             throw Exception("A system with name $name already exists")
         }
     }
