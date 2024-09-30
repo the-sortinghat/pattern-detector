@@ -8,7 +8,7 @@ import com.usvision.model.domain.CompanySystem
 import com.usvision.model.domain.Microservice
 import com.usvision.model.systemcomposite.System
 import com.usvision.persistence.documents.SystemDocument
-import com.usvision.persistence.documents.toDocument
+import com.usvision.persistence.documents.toSystemDocument
 import com.usvision.persistence.exceptions.SystemNotFoundException
 import com.usvision.reports.SystemRepository
 import kotlinx.coroutines.flow.firstOrNull
@@ -41,7 +41,7 @@ class MongoSystemRepository(db: MongoDatabase) : SystemRepository, SystemAggrega
 
     override fun save(companySystem: CompanySystem): CompanySystem = runBlocking {
         val insertedId = systemCollection.insertOne(
-            companySystem.toDocument()
+            companySystem.toSystemDocument()
         ).insertedId ?: throw SystemNotFoundException(companySystem.name)
 
         getSystemById(ObjectId(insertedId.toString())) as CompanySystem
@@ -49,7 +49,7 @@ class MongoSystemRepository(db: MongoDatabase) : SystemRepository, SystemAggrega
 
     override fun save(microservice: Microservice): Microservice = runBlocking {
         val insertedId = systemCollection.insertOne(
-            microservice.toDocument()
+            microservice.toSystemDocument()
         ).insertedId ?: throw SystemNotFoundException(microservice.name)
 
         getSystemById(ObjectId(insertedId.toString())) as Microservice
