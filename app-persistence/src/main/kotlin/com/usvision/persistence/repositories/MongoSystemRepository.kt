@@ -44,7 +44,7 @@ class MongoSystemRepository(db: MongoDatabase) : SystemRepository, SystemAggrega
             companySystem.toSystemDocument()
         ).insertedId ?: throw SystemNotFoundException(companySystem.name)
 
-        getSystemById(ObjectId(insertedId.toString())) as CompanySystem
+        getSystemById(insertedId.asObjectId().value) as CompanySystem
     }
 
     override fun save(microservice: Microservice): Microservice = runBlocking {
@@ -52,7 +52,7 @@ class MongoSystemRepository(db: MongoDatabase) : SystemRepository, SystemAggrega
             microservice.toSystemDocument()
         ).insertedId ?: throw SystemNotFoundException(microservice.name)
 
-        getSystemById(ObjectId(insertedId.toString())) as Microservice
+        getSystemById(insertedId.asObjectId().value) as Microservice
     }
 
 
