@@ -54,27 +54,21 @@ class SystemCreator(
         systemAggregateStorage.save(it)
     }
 
-    fun addExposedOperationsToMicroservice(
+    fun addOperationsToMicroservice(
         exposedOperations: List<Operation>,
+        consumedOperations: List<Operation>,
         microserviceName: String
     ) = getExistingMicroservice(microserviceName).let {
         exposedOperations.forEach {
             operation ->  it.exposeOperation(operation)
         }
-        systemAggregateStorage.save(it)
-    }
 
-
-    fun addConsumedOperationsToMicroservice(
-        exposedOperations: List<Operation>,
-        microserviceName: String
-    ) = getExistingMicroservice(microserviceName).let {
-        exposedOperations.forEach {
-            operation ->  it.exposeOperation(operation)
+        consumedOperations.forEach {
+            operation -> it.consumeOperation(operation)
         }
+
         systemAggregateStorage.save(it)
     }
-
 
     fun addPublishChannelsToMicroservice(
         messageChannels: List<MessageChannel>,
