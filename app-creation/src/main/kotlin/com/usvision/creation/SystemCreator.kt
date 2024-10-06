@@ -16,8 +16,18 @@ class SystemCreator(
     private val systemAggregateStorage: SystemAggregateStorage
 ) {
 
-    fun createCompanySystem(companySystem: CompanySystemDTO): CompanySystemDTO {
+    fun createCompanySystem(companySystem: CompanySystemDTO, fatherSystemName: String? = null): CompanySystemDTO {
         checkIfSystemAlreadyExists(companySystem.name)
+
+        fatherSystemName?.also {
+            val fatherSystem = systemAggregateStorage.getCompanySystem(fatherSystemName)
+
+            return@createCompanySystem fatherSystem?.let {
+                fatherSystem.addSubsystem(companySystem)
+                systemAggregateStorage.save(fatherSystem)
+            } ?: throw Exception("A System Of Systems with name $fatherSystemName does not exist")
+        }
+
         return systemAggregateStorage.save(companySystem)
     }
 
