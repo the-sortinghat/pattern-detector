@@ -1,4 +1,4 @@
-package com.usvision.web.configuration
+package com.usvision.web.dto
 
 import com.usvision.model.domain.MessageChannel
 

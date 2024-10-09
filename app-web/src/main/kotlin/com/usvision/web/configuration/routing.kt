@@ -1,11 +1,9 @@
 package com.usvision.web.configuration
 
-import com.usvision.creation.CompanySystemDTO
-import com.usvision.creation.DatabaseDTO
-import com.usvision.creation.MicroserviceDTO
 import com.usvision.creation.SystemCreator
+import com.usvision.model.domain.databases.PostgreSQL
 import com.usvision.reports.ReportSupervisor
-import com.usvision.web.dto.RestEndpointsRequestDTO
+import com.usvision.web.dto.*
 import com.usvision.web.exceptions.MissingRequiredPathParameterException
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -19,11 +17,11 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
     routing {
         route("/microservice") {
             post {
-                val microservice = call.receive<MicroserviceDTO>()
+                val microservice = call.receive<SystemRequestDTO>().toMicroservice()
                 val createMicroserviceResult = systemCreator.createMicroservice(microservice)
 
                 call.respond(
-                    message = createMicroserviceResult,
+                    message = createMicroserviceResult.toMicroserviceResponseDTO(),
                     status = HttpStatusCode.Created
                 )
             }
@@ -31,11 +29,11 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                 val microserviceName: String = call.parameters["name"]
                     ?: throw MissingRequiredPathParameterException("name", "String")
 
-                val databaseDTO = call.receive<DatabaseDTO>()
+                val databaseDTO = call.receive<PostgreSQL>()
                 val addDatabaseResult = systemCreator.addNewDatabaseConnectionToMicroservice(databaseDTO, microserviceName)
 
                 call.respond(
-                    message = addDatabaseResult,
+                    message = addDatabaseResult.toMicroserviceResponseDTO(),
                     status = HttpStatusCode.Created
                 )
             }
@@ -52,7 +50,7 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                 )
 
                 call.respond(
-                    message = addOperationsResult,
+                    message = addOperationsResult.toMicroserviceResponseDTO(),
                     status = HttpStatusCode.Created
                 )
             }
@@ -71,7 +69,7 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                 )
 
                 call.respond(
-                    message = addMessageChannelsResult,
+                    message = addMessageChannelsResult.toMicroserviceResponseDTO(),
                     status = HttpStatusCode.Created
                 )
             }
@@ -79,11 +77,11 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
 
         route("/systems") {
             post {
-                val companySystem = call.receive<CompanySystemDTO>()
+                val companySystem = call.receive<SystemRequestDTO>().toCompanySystem()
                 val createCompanySystemResult = systemCreator.createCompanySystem(companySystem)
 
                 call.respond(
-                    message = createCompanySystemResult,
+                    message = createCompanySystemResult.toCompanySystemResponseDTO(),
                     status = HttpStatusCode.Created
                 )
             }
@@ -92,11 +90,11 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                 val systemName: String = call.parameters["name"]
                     ?: throw MissingRequiredPathParameterException("name", "String")
 
-                val microservice = call.receive<MicroserviceDTO>()
+                val microservice = call.receive<SystemRequestDTO>().toMicroservice()
                 val createMicroserviceResult = systemCreator.createMicroservice(microservice, systemName)
 
                 call.respond(
-                    message = createMicroserviceResult,
+                    message = createMicroserviceResult.toMicroserviceResponseDTO(),
                     status = HttpStatusCode.Created
                 )
             }
@@ -105,11 +103,11 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                 val systemName: String = call.parameters["name"]
                     ?: throw MissingRequiredPathParameterException("name", "String")
 
-                val companySystem = call.receive<CompanySystemDTO>()
-                val createMicroserviceResult = systemCreator.createCompanySystem(companySystem, systemName)
+                val companySystem = call.receive<SystemRequestDTO>().toCompanySystem()
+                val createCompanySystemResult = systemCreator.createCompanySystem(companySystem, systemName)
 
                 call.respond(
-                    message = createMicroserviceResult,
+                    message = createCompanySystemResult.toCompanySystemResponseDTO(),
                     status = HttpStatusCode.Created
                 )
             }
