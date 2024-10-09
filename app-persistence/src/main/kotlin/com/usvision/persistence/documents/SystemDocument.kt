@@ -8,8 +8,8 @@ import com.usvision.model.domain.databases.Database
 import com.usvision.model.domain.operations.Operation
 import com.usvision.model.domain.operations.RestEndpoint
 import com.usvision.model.systemcomposite.System
-import com.usvision.persistence.exceptions.UnknownOperationClassException
-import com.usvision.persistence.exceptions.UnknownSystemClassException
+import com.usvision.model.exceptions.UnknownOperationClassException
+import com.usvision.model.exceptions.UnknownSystemClassException
 import org.bson.Document
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
@@ -72,7 +72,7 @@ private fun System.toSystemDocument(
         this.toSystemDocument(id)
     }
     else -> {
-        throw UnknownSystemClassException(this.name)
+        throw UnknownSystemClassException(this.name, "SystemDocument")
     }
 }
 
@@ -98,7 +98,7 @@ private fun Module.toModuleDocument() = ModuleDocument(id = ObjectId(this.id), u
 
 private fun Operation.toDocument() = when (this) {
     is RestEndpoint -> this.toDocument()
-    else -> throw UnknownOperationClassException()
+    else -> throw UnknownOperationClassException("SystemDocument")
 }
 
 private fun Database.toDatabaseDocument() = DatabaseDocument(id = ObjectId(this.id), description = this.description)
