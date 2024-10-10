@@ -15,7 +15,8 @@ import com.usvision.model.systemcomposite.System
 import kotlinx.serialization.Serializable
 
 
-interface SystemResponseDTO
+@Serializable
+sealed interface SystemResponseDTO
 
 @Serializable
 data class CompanySystemResponseDTO(
