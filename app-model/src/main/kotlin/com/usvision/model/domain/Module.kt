@@ -7,7 +7,7 @@ import java.util.UUID
 
 @Serializable
 data class Module(
-    val id: String?
+    val id: String
 ) : Visitable {
     companion object {
         fun createWithId() = Module(id = UUID.randomUUID().toString())
