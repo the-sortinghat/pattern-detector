@@ -3,6 +3,7 @@ plugins {
     kotlin("jvm")
     id("io.ktor.plugin") version "2.3.5"
     id("com.github.johnrengelman.shadow") version "7.0.0"
+    kotlin("plugin.serialization")
 }
 
 group = "com.usvision.web"
