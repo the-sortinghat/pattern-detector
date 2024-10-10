@@ -94,7 +94,7 @@ private fun Set<MessageChannel>.toMessageChannelDocumentSet(): Set<MessageChanne
 
 private fun MessageChannel.toMessageChannelDocument(id: ObjectId = ObjectId()) = MessageChannelDocument(id = id, name)
 
-private fun Module.toModuleDocument() = ModuleDocument(id = ObjectId(this.id), uuid = id)
+private fun Module.toModuleDocument() = ModuleDocument(id = ObjectId(), uuid = id)
 
 private fun Operation.toDocument() = when (this) {
     is RestEndpoint -> this.toDocument()
