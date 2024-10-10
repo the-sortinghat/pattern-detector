@@ -12,19 +12,21 @@ import com.usvision.model.exceptions.UnknownOperationClassException
 import com.usvision.model.exceptions.UnknownSystemClassException
 import com.usvision.model.exceptions.UnknownDatabaseClassException
 import com.usvision.model.systemcomposite.System
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
 @Serializable
 sealed interface SystemResponseDTO
 
+@SerialName("CompanySystem")
 @Serializable
 data class CompanySystemResponseDTO(
     val name: String,
     val subsystems: Set<SystemResponseDTO>? = setOf(),
 ): SystemResponseDTO
 
-
+@SerialName("Microservice")
 @Serializable
 data class MicroserviceResponseDTO(
     val name: String,
