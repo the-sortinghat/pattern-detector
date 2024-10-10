@@ -21,7 +21,7 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                 val createMicroserviceResult = systemCreator.createMicroservice(microservice)
 
                 call.respond(
-                    message = createMicroserviceResult.toMicroserviceResponseDTO(),
+                    message = createMicroserviceResult.toSystemResponseDTO(),
                     status = HttpStatusCode.Created
                 )
             }
@@ -94,7 +94,7 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                 val createMicroserviceResult = systemCreator.createMicroservice(microservice, systemName)
 
                 call.respond(
-                    message = createMicroserviceResult.toMicroserviceResponseDTO(),
+                    message = createMicroserviceResult.toSystemResponseDTO(),
                     status = HttpStatusCode.Created
                 )
             }

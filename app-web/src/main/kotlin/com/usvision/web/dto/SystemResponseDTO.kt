@@ -50,6 +50,12 @@ fun Microservice.toMicroserviceResponseDTO() = MicroserviceResponseDTO(
     subscribedChannels = this.getSubscribedChannels()
 )
 
+fun System.toSystemResponseDTO(): SystemResponseDTO = when (this) {
+    is Microservice -> this.toMicroserviceResponseDTO()
+    is CompanySystem -> this.toCompanySystemResponseDTO()
+    else -> throw UnknownSystemClassException(this.name, "SystemResponseDTO")
+}
+
 private fun Set<Database>.toPostgreSQLSet(): Set<PostgreSQL> = this.map { database ->
     when (database) {
         is PostgreSQL -> database
@@ -64,11 +70,5 @@ private fun Set<Operation>.toRestEndpointSet(): Set<RestEndpoint> = this.map { o
     }
 }.toSet()
 
-private fun  Set<System>.toSystemResponseDTOSet(): Set<SystemResponseDTO> = this.map { system ->
-    when (system) {
-        is CompanySystem -> system.toCompanySystemResponseDTO()
-        is Microservice -> system.toMicroserviceResponseDTO()
-        else -> throw UnknownSystemClassException(system.name, "SystemResponseDTO")
-    }
-}.toSet()
+private fun  Set<System>.toSystemResponseDTOSet(): Set<SystemResponseDTO> = this.map { it.toSystemResponseDTO() }.toSet()
 
