@@ -80,7 +80,7 @@ class SystemCreator(
         }
 
         subscribedMessageChannels.forEach {
-            operation ->  it.addPublishChannel(operation)
+            operation ->  it.addSubscribedChannel(operation)
         }
 
         systemAggregateStorage.save(it)
