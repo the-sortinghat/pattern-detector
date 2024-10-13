@@ -1,15 +1,15 @@
 package com.usvision.creation
 
+import com.usvision.model.domain.MessageChannel
+import com.usvision.model.domain.databases.PostgreSQL
+import com.usvision.model.domain.operations.RestEndpoint
 import com.usvision.model.systemcomposite.System
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
+import kotlin.test.*
 
 internal class SystemCreatorTest {
     private val systemAggregateStorage = mockk<SystemAggregateStorage>()
@@ -208,6 +208,234 @@ internal class SystemCreatorTest {
             systemAggregateStorage.getCompanySystem(any())
             systemAggregateStorage.save(any<CompanySystemDTO>())
             systemAggregateStorage.save(any<MicroserviceDTO>())
+        }
+    }
+
+    @Test
+    fun `it adds rest endpoints to Microservice and saves it`() {
+        val microserviceName = "name"
+        val microservice = MicroserviceDTO(microserviceName)
+
+        val consumedRestEndpoints = listOf(
+            RestEndpoint(httpVerb = "GET", path = "/test")
+        )
+
+        val exposedRestEndpoints = listOf(
+            RestEndpoint(httpVerb = "POST", path = "/test")
+        )
+
+        every { systemAggregateStorage.getMicroservice(microserviceName) } returns microservice
+        every { systemAggregateStorage.save(microservice) } returns microservice
+
+        val addRestEndpointsResult = assertDoesNotThrow {
+            systemCreator.addOperationsToMicroservice(
+                exposedOperations = exposedRestEndpoints,
+                consumedOperations = consumedRestEndpoints,
+                microserviceName = microserviceName
+            )
+        }
+
+        verify(exactly = 1) {
+            systemAggregateStorage.getMicroservice(microserviceName)
+            systemAggregateStorage.save(microservice)
+        }
+
+        verify(exactly = 0) {
+            systemAggregateStorage.getCompanySystem(any())
+            systemAggregateStorage.save(any<CompanySystemDTO>())
+        }
+
+        assertContains(addRestEndpointsResult.getExposedOperations(), exposedRestEndpoints.first())
+        assertContains(addRestEndpointsResult.getConsumedOperations(), consumedRestEndpoints.first())
+
+        assertTrue {
+            addRestEndpointsResult.getExposedOperations().all {
+                operation -> operation != consumedRestEndpoints.first()
+            }
+        }
+
+        assertTrue {
+            addRestEndpointsResult.getConsumedOperations().all {
+                operation -> operation != exposedRestEndpoints.first()
+            }
+        }
+    }
+
+    @Test
+    fun `it throws exception when attempting to add rest endpoints to non-existent Microservice`() {
+        val microserviceName = "name"
+        val microservice = MicroserviceDTO(microserviceName)
+
+        val consumedRestEndpoints = listOf(
+            RestEndpoint(httpVerb = "GET", path = "/test")
+        )
+
+        val exposedRestEndpoints = listOf(
+            RestEndpoint(httpVerb = "POST", path = "/test")
+        )
+
+        every { systemAggregateStorage.getMicroservice(microserviceName) } returns null
+
+        assertThrows<Exception> {
+            systemCreator.addOperationsToMicroservice(
+                exposedOperations = exposedRestEndpoints,
+                consumedOperations = consumedRestEndpoints,
+                microserviceName = microserviceName
+            )
+        }
+
+        verify(exactly = 1) {
+            systemAggregateStorage.getMicroservice(microserviceName)
+        }
+
+        verify(exactly = 0) {
+            systemAggregateStorage.save(microservice)
+            systemAggregateStorage.getCompanySystem(any())
+            systemAggregateStorage.save(any<CompanySystemDTO>())
+        }
+    }
+
+    @Test
+    fun `it adds message channels to Microservice and saves it`() {
+        val microserviceName = "name"
+        val microservice = MicroserviceDTO(microserviceName)
+
+        val publishMessageChannels = listOf(
+            MessageChannel(name="publish.test")
+        )
+
+        val subscribedMessageChannels = listOf(
+            MessageChannel(name="subscribe.test")
+        )
+
+        every { systemAggregateStorage.getMicroservice(microserviceName) } returns microservice
+        every { systemAggregateStorage.save(microservice) } returns microservice
+
+        val addRestEndpointsResult = assertDoesNotThrow {
+            systemCreator.addMessageChannelsToMicroservice(
+                publishMessageChannels = publishMessageChannels,
+                subscribedMessageChannels = subscribedMessageChannels,
+                microserviceName = microserviceName
+            )
+        }
+
+        verify(exactly = 1) {
+            systemAggregateStorage.getMicroservice(microserviceName)
+            systemAggregateStorage.save(microservice)
+        }
+
+        verify(exactly = 0) {
+            systemAggregateStorage.getCompanySystem(any())
+            systemAggregateStorage.save(any<CompanySystemDTO>())
+        }
+
+        assertContains(addRestEndpointsResult.getPublishChannels(), publishMessageChannels.first())
+        assertContains(addRestEndpointsResult.getSubscribedChannels(), subscribedMessageChannels.first())
+
+        assertTrue {
+            addRestEndpointsResult.getPublishChannels().all {
+                    operation -> operation != subscribedMessageChannels.first()
+            }
+        }
+
+        assertTrue {
+            addRestEndpointsResult.getSubscribedChannels().all {
+                    operation -> operation != publishMessageChannels.first()
+            }
+        }
+    }
+
+    @Test
+    fun `it throws exception when attempting to add message channels to non-existent Microservice`() {
+        val microserviceName = "name"
+        val microservice = MicroserviceDTO(microserviceName)
+
+        val publishMessageChannels = listOf(
+            MessageChannel(name="publish.test")
+        )
+
+        val subscribedMessageChannels = listOf(
+            MessageChannel(name="subscribe.test")
+        )
+
+
+        every { systemAggregateStorage.getMicroservice(microserviceName) } returns null
+
+
+        assertThrows<Exception> {
+            systemCreator.addMessageChannelsToMicroservice(
+                publishMessageChannels = publishMessageChannels,
+                subscribedMessageChannels = subscribedMessageChannels,
+                microserviceName = microserviceName
+            )
+        }
+
+        verify(exactly = 1) {
+            systemAggregateStorage.getMicroservice(microserviceName)
+        }
+
+        verify(exactly = 0) {
+            systemAggregateStorage.save(microservice)
+            systemAggregateStorage.getCompanySystem(any())
+            systemAggregateStorage.save(any<CompanySystemDTO>())
+        }
+    }
+
+    @Test
+    fun `it adds a database to Microservice and saves it`() {
+        val microserviceName = "name"
+        val microservice = MicroserviceDTO(microserviceName)
+
+        val database = PostgreSQL()
+
+        every { systemAggregateStorage.getMicroservice(microserviceName) } returns microservice
+        every { systemAggregateStorage.save(microservice) } returns microservice
+
+
+        val addRestEndpointsResult = assertDoesNotThrow {
+            systemCreator.addNewDatabaseConnectionToMicroservice(
+                database = database,
+                microserviceName = microserviceName
+            )
+        }
+
+        verify(exactly = 1) {
+            systemAggregateStorage.getMicroservice(microserviceName)
+            systemAggregateStorage.save(microservice)
+        }
+
+        verify(exactly = 0) {
+            systemAggregateStorage.getCompanySystem(any())
+            systemAggregateStorage.save(any<CompanySystemDTO>())
+        }
+
+        assertContains(addRestEndpointsResult.getDatabases(), database)
+    }
+
+    @Test
+    fun `it throws exception when attempting to add a database to non-existent Microservice`() {
+        val microserviceName = "name"
+        val microservice = MicroserviceDTO(microserviceName)
+
+        val database = PostgreSQL()
+
+        every { systemAggregateStorage.getMicroservice(microserviceName) } returns null
+
+        assertThrows<Exception> {
+            systemCreator.addNewDatabaseConnectionToMicroservice(
+                database = database,
+                microserviceName = microserviceName
+            )
+        }
+
+        verify(exactly = 1) {
+            systemAggregateStorage.getMicroservice(microserviceName)
+        }
+
+        verify(exactly = 0) {
+            systemAggregateStorage.save(microservice)
+            systemAggregateStorage.getCompanySystem(any())
+            systemAggregateStorage.save(any<CompanySystemDTO>())
         }
     }
 }
