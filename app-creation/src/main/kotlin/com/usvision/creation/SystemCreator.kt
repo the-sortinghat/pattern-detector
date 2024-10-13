@@ -88,9 +88,8 @@ class SystemCreator(
 
     private fun getExistingMicroservice(
         microserviceName: String
-    ) = systemAggregateStorage.getSystem(
-        microserviceName
-    ) as MicroserviceDTO? ?: throw Exception("A Microservice with name $microserviceName does not exist")
+    ) = systemAggregateStorage.getMicroservice(microserviceName)
+        ?: throw Exception("A Microservice with name $microserviceName does not exist")
 
     private fun checkIfSystemAlreadyExists(name: String) {
         systemAggregateStorage.getSystem(name)?.also {

@@ -9,4 +9,5 @@ interface SystemAggregateStorage {
     fun save(microservice: Microservice): Microservice
     fun save(companySystem: CompanySystem): CompanySystem
     fun getCompanySystem(name: String): CompanySystem?
+    fun getMicroservice(name: String): Microservice?
 }

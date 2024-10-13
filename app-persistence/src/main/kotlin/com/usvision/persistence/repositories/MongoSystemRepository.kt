@@ -58,6 +58,8 @@ class MongoSystemRepository(db: MongoDatabase) : SystemRepository, SystemAggrega
 
     override fun getCompanySystem(name: String): CompanySystem? = getSystem(name = name) as CompanySystem?
 
+    override fun getMicroservice(name: String): Microservice? = getSystem(name = name) as Microservice?
+
     fun getSystemById(id: ObjectId): System?  = runBlocking {
         systemCollection
             .find(Filters.eq("_id", id))
