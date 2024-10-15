@@ -21,5 +21,4 @@ dependencies {
     implementation(project(":app-model"))
     testImplementation("io.mockk:mockk:${mockk_version}")
     testImplementation(kotlin("test"))
-    implementation(project(":app-model"))
 }
