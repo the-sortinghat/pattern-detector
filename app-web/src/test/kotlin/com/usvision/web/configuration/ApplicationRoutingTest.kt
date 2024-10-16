@@ -42,7 +42,7 @@ internal class ApplicationRoutingTest {
         every { systemCreator.createMicroservice(any()) } returns createdMicroservice
 
         val response = client.postRequest(
-            "/microservice",
+            "/microservices",
             microserviceRequest
         )
 
@@ -76,7 +76,7 @@ internal class ApplicationRoutingTest {
         every { systemCreator.addNewDatabaseConnectionToMicroservice(any(), any()) } returns updatedMicroservice
 
         val response = client.postRequest(
-            "/microservice/$microserviceName/database",
+            "/microservices/$microserviceName/databases",
             databaseRequest
         )
 
@@ -114,7 +114,7 @@ internal class ApplicationRoutingTest {
         every { systemCreator.addOperationsToMicroservice(any(), any(), any()) } returns updatedMicroservice
 
         val response = client.postRequest(
-            "/microservice/$microserviceName/rest-endpoints",
+            "/microservices/$microserviceName/rest-endpoints",
             restEndpointsRequest
         )
 
@@ -156,7 +156,7 @@ internal class ApplicationRoutingTest {
         every { systemCreator.addMessageChannelsToMicroservice(any(), any(), any()) } returns updatedMicroservice
 
         val response = client.postRequest(
-            "/microservice/$microserviceName/message-channels",
+            "/microservices/$microserviceName/message-channels",
             messageChannelsRequest
         )
 
@@ -231,7 +231,7 @@ internal class ApplicationRoutingTest {
         every { systemCreator.createMicroservice(any(), any()) } returns createdCompanySystem
 
         val response = client.postRequest(
-            "/systems/$companySystemName/microservice",
+            "/systems/$companySystemName/microservices",
             microserviceRequest
         )
 
@@ -269,7 +269,7 @@ internal class ApplicationRoutingTest {
         every { systemCreator.createCompanySystem(any(), any()) } returns createdFatherCompanySystem
 
         val response = client.postRequest(
-            "/systems/$fatherCompanySystemName/companySubsystem",
+            "/systems/$fatherCompanySystemName/companySubsystems",
             companySystemRequest
         )
 
