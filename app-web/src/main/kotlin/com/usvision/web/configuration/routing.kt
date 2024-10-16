@@ -15,7 +15,7 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
     val defaultPreset = environment.config.property("reports.default_preset_name").getString()
 
     routing {
-        route("/microservice") {
+        route("/microservices") {
             post {
                 val microservice = call.receive<SystemRequestDTO>().toMicroservice()
                 val createMicroserviceResult = systemCreator.createMicroservice(microservice)
@@ -25,7 +25,7 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                     status = HttpStatusCode.Created
                 )
             }
-            post("/{name}/database") {
+            post("/{name}/databases") {
                 val microserviceName: String = call.parameters["name"]
                     ?: throw MissingRequiredPathParameterException("name", "String")
 
@@ -86,7 +86,7 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                 )
             }
 
-            post("/{name}/microservice") {
+            post("/{name}/microservices") {
                 val systemName: String = call.parameters["name"]
                     ?: throw MissingRequiredPathParameterException("name", "String")
 
@@ -99,7 +99,7 @@ fun Application.configureRouting(reportSupervisor: ReportSupervisor, systemCreat
                 )
             }
 
-            post("/{name}/companySubsystem") {
+            post("/{name}/companySubsystems") {
                 val systemName: String = call.parameters["name"]
                     ?: throw MissingRequiredPathParameterException("name", "String")
 
