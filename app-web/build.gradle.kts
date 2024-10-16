@@ -1,3 +1,5 @@
+val mockk_version: String by project
+
 plugins {
     application
     kotlin("jvm")
@@ -43,4 +45,9 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages-jvm")
     implementation("io.ktor:ktor-server-config-yaml")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    testImplementation("io.mockk:mockk:${mockk_version}")
+    testImplementation("io.ktor:ktor-server-test-host")
+    testImplementation("io.ktor:ktor-client-content-negotiation")
+    testImplementation(kotlin("test"))
 }
