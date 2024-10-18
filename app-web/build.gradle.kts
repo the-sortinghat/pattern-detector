@@ -1,8 +1,12 @@
+val mockk_version: String by project
+val kotlinx_serialization_version: String by project
+
 plugins {
     application
     kotlin("jvm")
     id("io.ktor.plugin") version "2.3.5"
     id("com.github.johnrengelman.shadow") version "7.0.0"
+    kotlin("plugin.serialization")
 }
 
 group = "com.usvision.web"
@@ -26,6 +30,8 @@ repositories {
 
 dependencies {
     implementation(project(":app-reports"))
+    implementation(project(":app-creation"))
+    implementation(project(":app-model"))
     implementation(project(":app-persistence"))
 
     implementation("io.ktor:ktor-server-core")
@@ -39,4 +45,10 @@ dependencies {
     implementation("io.ktor:ktor-server-host-common-jvm")
     implementation("io.ktor:ktor-server-status-pages-jvm")
     implementation("io.ktor:ktor-server-config-yaml")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlinx_serialization_version}")
+
+    testImplementation("io.mockk:mockk:${mockk_version}")
+    testImplementation("io.ktor:ktor-server-test-host")
+    testImplementation("io.ktor:ktor-client-content-negotiation")
+    testImplementation(kotlin("test"))
 }

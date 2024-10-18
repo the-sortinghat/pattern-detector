@@ -2,6 +2,7 @@ package com.usvision.persistence.repositorybuilder
 
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import com.usvision.creation.SystemAggregateStorage
 import com.usvision.persistence.repositories.MongoSystemRepository
 
 class MongoDBRepositoryProvider : DBRepositoryProvider, DBConnectionProvider<MongoDatabase> {
@@ -38,7 +39,11 @@ class MongoDBRepositoryProvider : DBRepositoryProvider, DBConnectionProvider<Mon
         return this
     }
 
-    override fun getRepository(): MongoSystemRepository {
+    override fun getRepository() = getMongoSystemRepository()
+
+    override fun getAggregateStorage(): SystemAggregateStorage = getMongoSystemRepository()
+
+    private fun getMongoSystemRepository(): MongoSystemRepository {
         doConnect()
         return MongoSystemRepository(db!!)
     }
