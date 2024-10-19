@@ -4,8 +4,11 @@ import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import com.usvision.model.domain.CompanySystem
+import com.usvision.model.domain.MessageChannel
 import com.usvision.model.domain.Microservice
+import com.usvision.model.domain.databases.PostgreSQL
 import com.usvision.model.domain.operations.RestEndpoint
+import com.usvision.model.systemcomposite.System
 import com.usvision.persistence.documents.*
 import com.usvision.persistence.exceptions.MalformedSystemDocumentException
 import com.usvision.persistence.repositorybuilder.MongoDBRepositoryProvider
@@ -14,7 +17,11 @@ import kotlinx.coroutines.runBlocking
 import org.bson.Document
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.util.*
+import java.util.stream.Stream
 import kotlin.test.*
 
 internal class MongoSystemRepositoryTest {
@@ -166,6 +173,158 @@ internal class MongoSystemRepositoryTest {
         assertTrue { system.getSubscribedChannels().isNotEmpty() }
     }
 
+    @Test
+    fun `it saves a CompanySystem and returns it`() {
+        val companySystem = CompanySystem(
+            name = "companySystem"
+        ).apply {
+            addSubsystem(CompanySystem(name = "childCompanySystem"))
+            addSubsystem(Microservice(name = "childMicroservice"))
+        }
+
+        val createdSystem = underTest.save(companySystem)
+
+        assertEquals(companySystem, createdSystem)
+    }
+
+    @Test
+    fun `it saves a Microservice and returns it`() {
+        val microservice = Microservice(
+            name = "microservice"
+        ).apply {
+            addDatabaseConnection(PostgreSQL())
+            addPublishChannel(MessageChannel("publishChannel"))
+            addSubscribedChannel(MessageChannel("subscribeChannel"))
+            consumeOperation(RestEndpoint("GET", "/test"))
+            exposeOperation(RestEndpoint("POST", "/test"))
+        }
+
+        val createdSystem = underTest.save(microservice)
+
+        assertEquals(microservice, createdSystem)
+    }
+
+    @Test
+    fun `it returns a CompanySystem when it exists`()  {
+        val companySystemName = "companySystemName"
+
+        val companySystem = CompanySystem(
+            name = companySystemName
+        ).apply {
+            addSubsystem(CompanySystem(name = "childCompanySystem"))
+            addSubsystem(Microservice(name = "childMicroservice"))
+        }
+
+        underTest.save(companySystem)
+
+        val returnedSystem = underTest.getCompanySystem(companySystemName)
+
+        assertEquals(companySystem, returnedSystem)
+    }
+
+    @Test
+    fun `it returns null when no such name is found while trying to get a CompanySystem`() {
+        assertNull(underTest.getCompanySystem("companySystemName"))
+    }
+
+    @Test
+    fun `it returns null when given name is from a Microservice while trying to get a CompanySystem`() {
+        val microserviceName = "microserviceName"
+
+        underTest.save(Microservice(name = microserviceName))
+
+        assertNull(underTest.getCompanySystem(microserviceName))
+    }
+
+    @Test
+    fun `it returns a Microservice when it exists`() {
+        val microserviceName = "microserviceName"
+
+        val microservice = Microservice(
+            name = microserviceName
+        ).apply {
+            addDatabaseConnection(PostgreSQL())
+            addPublishChannel(MessageChannel("publishChannel"))
+            addSubscribedChannel(MessageChannel("subscribeChannel"))
+            consumeOperation(RestEndpoint("GET", "/test"))
+            exposeOperation(RestEndpoint("POST", "/test"))
+        }
+        underTest.save(microservice)
+
+        val returnedSystem = underTest.getMicroservice(microserviceName)
+
+        assertEquals(microservice, returnedSystem)
+    }
+
+    @Test
+    fun `it returns null when no such name is found while trying to get a Microservice`() {
+        assertNull(underTest.getMicroservice("microserviceName"))
+    }
+
+    @Test
+    fun `it returns null when given name is from a CompanySystem while trying to get a Microservice`() {
+        val companySystemName = "companySystemName"
+
+        underTest.save(CompanySystem(name = companySystemName))
+
+        assertNull(underTest.getMicroservice(companySystemName))
+    }
+
+    @ParameterizedTest
+    @MethodSource("systemProvider")
+    fun `it returns a System when it exists`(system: System) {
+        when (system) {
+            is Microservice -> underTest.save(system)
+            is CompanySystem -> underTest.save(system)
+        }
+
+        assertEquals(system, underTest.getSystem(system.name))
+    }
+
+    @Test
+    fun `it returns null when no such name is found while trying to get a System`() {
+        assertNull(underTest.getSystem("systemName"))
+    }
+
+    @Test
+    fun `it updates existing CompanySystem`() {
+        val companySystem = CompanySystem(
+            name = "companySystemName"
+        )
+
+        underTest.save(companySystem)
+
+        val updatedCompanySystem = companySystem.copy().apply {
+            addSubsystem(Microservice(name = "microserviceName"))
+        }
+
+        underTest.save(updatedCompanySystem)
+
+        assertEquals(updatedCompanySystem, underTest.getCompanySystem("companySystemName"))
+    }
+
+    @Test
+    fun `it updates existing Microservice`() {
+        val microservice = Microservice(
+            name = "microserviceName"
+        )
+
+        underTest.save(microservice)
+
+        val updatedMicroservice = microservice.copy().apply {
+            addDatabaseConnection(PostgreSQL())
+            addPublishChannel(MessageChannel("publishChannel"))
+            addSubscribedChannel(MessageChannel("subscribeChannel"))
+            consumeOperation(RestEndpoint("GET", "/test"))
+            exposeOperation(RestEndpoint("POST", "/test"))
+        }
+
+        underTest.save(updatedMicroservice)
+
+        assertEquals(updatedMicroservice, underTest.getMicroservice("microserviceName"))
+    }
+
+
     private fun createSystemWithoutSubsysNorModule(name: String) = runBlocking {
         systemsCollection.insertOne(
             SystemDocument(
@@ -303,6 +462,14 @@ internal class MongoSystemRepositoryTest {
                 name = name,
                 subsystems = emptySet()
             )
+        )
+    }
+
+    companion object {
+        @JvmStatic
+        fun systemProvider(): Stream<Arguments> = Stream.of(
+            Arguments.of(Microservice(name = "microserviceName")),
+            Arguments.of(CompanySystem(name = "companySystemName"))
         )
     }
 }

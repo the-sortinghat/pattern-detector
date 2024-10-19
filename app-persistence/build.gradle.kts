@@ -28,4 +28,5 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:$mockk_version")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
 }
