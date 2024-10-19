@@ -55,12 +55,19 @@ class MongoSystemRepository(db: MongoDatabase) : SystemRepository, SystemAggrega
         getSystemById(insertedId.asObjectId().value) as Microservice
     }
 
+    override fun getCompanySystem(name: String): CompanySystem? = try {
+        getSystem(name = name) as CompanySystem?
+    } catch (ex: ClassCastException) {
+        null
+    }
 
-    override fun getCompanySystem(name: String): CompanySystem? = getSystem(name = name) as CompanySystem?
+    override fun getMicroservice(name: String): Microservice? = try {
+        getSystem(name = name) as Microservice?
+    } catch (ex: ClassCastException) {
+        null
+    }
 
-    override fun getMicroservice(name: String): Microservice? = getSystem(name = name) as Microservice?
-
-    fun getSystemById(id: ObjectId): System?  = runBlocking {
+    private fun getSystemById(id: ObjectId): System?  = runBlocking {
         systemCollection
             .find(Filters.eq("_id", id))
             .firstOrNull()
