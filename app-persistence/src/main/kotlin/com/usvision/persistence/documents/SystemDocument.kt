@@ -101,4 +101,7 @@ private fun Operation.toDocument() = when (this) {
     else -> throw UnknownOperationClassException("SystemDocument")
 }
 
-private fun Database.toDatabaseDocument() = DatabaseDocument(id = ObjectId(this.id), description = this.description)
+private fun Database.toDatabaseDocument() = DatabaseDocument(
+    id = this.id?.let { ObjectId(this.id) } ?: ObjectId(),
+    description = this.description
+)
