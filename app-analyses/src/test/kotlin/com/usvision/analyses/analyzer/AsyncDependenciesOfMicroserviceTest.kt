@@ -2,7 +2,6 @@ package com.usvision.analyses.analyzer
 
 import com.usvision.model.domain.CompanySystem
 import com.usvision.model.domain.MessageChannel
-import com.usvision.model.domain.Module
 import kotlin.test.*
 import com.usvision.model.domain.Microservice as Microservice
 
@@ -35,6 +34,34 @@ class AsyncDependenciesOfMicroserviceTest {
         assertTrue { cons in results }
         assertEquals(1, results[cons]!!.size)
         assertTrue { Relationship(with = prod) in results[cons]!! }
+    }
+
+    @Test
+    fun `it connects two producers to a single consumer`() {
+        // given
+        val sys = CompanySystem(name = "test")
+        val prod1 = Microservice(name = "producer1")
+        val prod2 = Microservice(name = "producer2")
+        val cons = Microservice(name = "consumer")
+        val channel = MessageChannel(name = "topic", id = "1234-abcd")
+        sys.addSubsystem(prod1)
+        sys.addSubsystem(prod2)
+        sys.addSubsystem(cons)
+        prod1.addPublishChannel(channel)
+        prod2.addPublishChannel(channel)
+        cons.addSubscribedChannel(channel)
+
+        // when
+        sys.accept(underTest)
+        val results = underTest.getResults()
+
+        // then
+        assertFalse { prod1 in results }
+        assertFalse { prod2 in results }
+        assertTrue { cons in results }
+        assertEquals(2, results[cons]!!.size)
+        assertTrue { Relationship(with = prod1) in results[cons]!! }
+        assertTrue { Relationship(with = prod2) in results[cons]!! }
     }
 
     @Test
