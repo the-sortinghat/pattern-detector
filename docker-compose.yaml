@@ -1,24 +1,41 @@
 version: '3.8'
 
 services:
-  web:
+  us_vision:
     build: .
     env_file:
       - ./.env.docker-compose
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
-      - mongodb
+      - us_vision_mongodb
 
-  mongodb:
+  us_vision_mongodb:
     image: mongo
     env_file:
       - ./.env.docker-compose
     volumes:
-      - mongodb_data:/data/db
+      - us_vision_mongodb_data:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     ports:
+      - "27018:27017"
+
+  sorting_hat_mongodb:
+    image: mongo:4.2-bionic
+    ports:
       - "27017:27017"
+    volumes:
+      - sorting_hat_mongodb_data:/data/db
+
+  sorting_hat:
+    build: ./sorting-hat
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./sorting-hat/.env
+    depends_on:
+      - sorting_hat_mongodb
 
 volumes:
-  mongodb_data:
+  us_vision_mongodb_data:
+  sorting_hat_mongodb_data:
