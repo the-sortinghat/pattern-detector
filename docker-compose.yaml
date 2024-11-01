@@ -40,8 +40,6 @@ services:
     image: confluentinc/cp-zookeeper:7.2.2
     hostname: zookeeper
     container_name: zookeeper
-    networks:
-      - localnet
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -52,8 +50,6 @@ services:
     container_name: broker
     depends_on:
       - zookeeper
-    networks:
-      - localnet
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
@@ -72,8 +68,6 @@ services:
     container_name: schema-registry
     depends_on:
       - broker
-    networks:
-      - localnet
     ports:
       - "3081:8081"
     environment:
@@ -94,8 +88,6 @@ services:
     depends_on:
       - zookeeper
       - broker
-    networks:
-      - localnet
     environment:
       KAFKA_JMX_PORT: 35000
       KAFKA_JMX_HOSTNAME: localhost
@@ -121,7 +113,3 @@ services:
 volumes:
   us_vision_mongodb_data:
   sorting_hat_mongodb_data:
-
-networks:
-  localnet:
-    attachable: true
