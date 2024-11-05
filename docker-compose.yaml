@@ -67,10 +67,12 @@ services:
     container_name: broker
     depends_on:
       - zookeeper
+    ports:
+      - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_LISTENERS: PLAINTEXT://broker:29092,LISTENER_2://broker:9092
+      KAFKA_LISTENERS: PLAINTEXT://broker:29092,LISTENER_2://localhost:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,LISTENER_2://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_2:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
