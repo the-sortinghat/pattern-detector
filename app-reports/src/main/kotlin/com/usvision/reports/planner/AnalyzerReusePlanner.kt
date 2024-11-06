@@ -36,7 +36,7 @@ class AnalyzerReusePlanner : Planner {
             .primaryConstructor!!
             .parameters
             .map { it.type.toKClass() }
-            .forEach { prepareStack(it) }
+            .forEach { prepareStack(it) } //inicializa as dependências dos construtores de cada classe
     }
 
     private fun getFromCache(kClass: KClass<out Any>): Any? {
@@ -71,17 +71,17 @@ class AnalyzerReusePlanner : Planner {
             val instance = getFromCache(kClass)
                 ?: instantiate(kClass).also { addToCache(it) }
 
-            if (!plan.contains(instance)) plan.addStep(instance)
+            if (!plan.contains(instance)) plan.addStep(instance) //adiciona a instância no plano
         }
 
         return plan
     }
 
     override fun plan(reportRequest: ReportRequest): ExecutablePlan {
-        initialize()
+        initialize() //inicializa a pilha de classses
 
-        reportRequest.detectors.forEach { prepareStack(it) }
+        reportRequest.detectors.forEach { prepareStack(it) } //inicializa a pilha de classes
 
-        return createPlan()
+        return createPlan() //Cria um plano executável
     }
 }

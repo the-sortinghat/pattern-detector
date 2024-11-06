@@ -3,7 +3,8 @@ package com.usvision.model.domain
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MessageChannel(
+data class MessageChannel( //Ele é muito flexível porque pode ser usado sem a necessidade de alteração de código, já está pronto para uso
+    //flexibilidade: pronto para diversas situações, é versátil
     val name: String,
     val id: String? = null
 ) {

@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Microservice(
     override val name: String,
-    var module: Module = Module.createWithId()
+    var module: Module = Module.createWithId() //Nesse contexto, é um agrupamento de microsserviços que precisam fazer o deploy em conjunto (acoplamento)
 ) : SystemOfComponents {
     private val exposedOperations: MutableSet<Operation> = mutableSetOf()
     private val consumedOperations: MutableSet<Operation> = mutableSetOf()

@@ -16,7 +16,19 @@ import kotlinx.coroutines.runBlocking
 import org.bson.types.ObjectId
 
 
-class MongoSystemRepository(db: MongoDatabase) : SystemRepository {
+//Entidade: se distingue por um identificador, possui unicidade: uma pessoa é uma entidade
+//Mesmo que a pessoa mude de nome, continue sendo a mesma pessoa. Precisa de um id.
+//
+//Endereço é um value-object: é um objeto que se caracteriza valor = se mudou o valor, mudou o objeto
+//
+//Repository x aggregate
+//
+//Repository lida com mais de uma instância dessa hierarquia, podendo trazê-las como resultado
+//
+//O agregado se preocupa com a transação, de um único agregado, trazer o agregado do estado 1 para o estado 2. O resultado da consulta ou operação se refere a um único agregado.
+//Observação: enxerga outros agregados para determinadas validações (garantir a unicidade de um campo que é alterado do estado 1 para o estado 2). São operações unitárias.
+
+
 class MongoSystemRepository(db: MongoDatabase) : SystemRepository, SystemAggregateStorage {
     companion object {
         const val COLLECTION_NAME = "systems"

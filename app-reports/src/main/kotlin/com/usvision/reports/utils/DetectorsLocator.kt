@@ -2,11 +2,11 @@ package com.usvision.reports.utils
 
 import com.usvision.analyses.detector.Detector
 
-class DetectorsLocator {
+class DetectorsLocator { //Classe responsável por buscar os Detectors
     private val detectors: Set<String?>
 
     init {
-        this.detectors = Detector::class
+        this.detectors = Detector::class //uso de reflection para buscar implementações
             .sealedSubclasses
             .map { it.qualifiedName }
             .toSet()

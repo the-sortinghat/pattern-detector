@@ -22,6 +22,7 @@ COPY --chown=gradle:gradle  app-reports/build.gradle.kts        app-reports/grad
 COPY --chown=gradle:gradle  app-web/build.gradle.kts            app-web/gradle.properties           ./app-web/
 COPY --chown=gradle:gradle  app-creation/build.gradle.kts       app-creation/gradle.properties      ./app-creation
 
+# cada comando gera uma imagem nova, docker faz cache de todas as imagens => cada comando gera um registro de cache
 
 # PRE-INSTALL JUST THE DEPENDENCIES -- THIS SHALL SPEEDUP FUTURE BUILDS
 RUN gradle clean build
@@ -40,6 +41,7 @@ FROM dependencies AS builder
 
 # BUILD THE FAT JAR
 RUN gradle :app-web:shadowJar
+# shadowJar contém o manifesto da classe principal
 
 
 
@@ -49,6 +51,7 @@ RUN gradle :app-web:shadowJar
 # RUNNER IMAGE
 ############################
 FROM eclipse-temurin:17-jdk AS web
+# pq n JVM
 
 WORKDIR /usvision
 

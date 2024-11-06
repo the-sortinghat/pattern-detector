@@ -20,8 +20,8 @@ class SequentialPlanExecutioner : PlanExecutioner {
         while (plan.hasNextStep()) {
             val step = plan.getNextStep()
             when (step) {
-                is Analyzer<*> -> system.accept(step)
-                is Detector -> runDetector(step)
+                is Analyzer<*> -> system.accept(step) //Faz o analyser (Visitor) entrar dentro do sistema
+                is Detector -> runDetector(step) // roda o detector
             }
         }
 
@@ -39,6 +39,6 @@ class SequentialPlanExecutioner : PlanExecutioner {
         detector.run()
         detector
             .getInstances()
-            .forEach { insights.add(it) }
+            .forEach { insights.add(it) } //para cada detector rodado, adiciona insights para dentro do conjunto de insights
     }
 }

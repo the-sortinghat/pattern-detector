@@ -25,9 +25,9 @@ class ReportSupervisor(
     class ReportRequestGenerator(private val packageName: String = "com.usvision.analyses.detector") {
         fun generate(detectorsNames: Set<String>) = detectorsNames
             .map(this::parse)
-            .let { ReportRequest(detectors = it.toSet()) }
+            .let { ReportRequest(detectors = it.toSet()) } //converte a string para classes
 
-        fun parse(qualifiedName: String): KClass<Detector> {
+        fun parse(qualifiedName: String): KClass<Detector> { //Aqui tem reflection, busca as classes
             val isRightPackage = qualifiedName.contains(this.packageName)
 
             if (!isRightPackage)
@@ -39,13 +39,13 @@ class ReportSupervisor(
         }
 
         private fun ensureIsDetector(detectorKClass: KClass<out Any>) {
-            val givenIsDetector = Detector::class.isSuperclassOf(detectorKClass)
+            val givenIsDetector = Detector::class.isSuperclassOf(detectorKClass) //Aqui também tem reflexão
 
             if (!givenIsDetector)
                 throw ClassIsNotDetectorException(detectorKClass.qualifiedName.toString())
         }
 
-        private fun getKClass(qualifiedName: String): KClass<out Any> = try {
+        private fun getKClass(qualifiedName: String): KClass<out Any> = try { //Busca a classe
             Class.forName(qualifiedName).kotlin
         } catch (cnf: ClassNotFoundException) {
             throw DetectorNotFoundException(qualifiedName)
@@ -53,10 +53,10 @@ class ReportSupervisor(
     }
 
     fun generateReport(detectorsNames: Set<String>, systemName: String): Report {
-        val detectorsQualifiedNames = parseAllToQualifiedName(detectorsNames)
-        val reportRequest = ReportRequestGenerator().generate(detectorsQualifiedNames)
-        val plan = planner.plan(reportRequest)
-        val system = systemRepository.load(systemName)
+        val detectorsQualifiedNames = parseAllToQualifiedName(detectorsNames) //Pega os qualified names
+        val reportRequest = ReportRequestGenerator().generate(detectorsQualifiedNames) //monta uma requisição de reports, contendo as classes de Detectors
+        val plan = planner.plan(reportRequest) //cria instâncias dos detectores e suas dependências e cria um plano com elas
+        val system = systemRepository.load(systemName) // Carrega o sistema
         return planExecutioner.execute(plan, system)
     }
 
@@ -74,7 +74,7 @@ class ReportSupervisor(
     private fun parseAllToQualifiedName(simpleNames: Set<String>): Set<String> {
         return simpleNames
             .map { this.detectorsLocator.parseToQualifiedName(it)!! }
-            .toSet()
+            .toSet() //obtém os qualifiedNames
     }
 
     private fun resolvePreset(presetName: String): Set<String> {
