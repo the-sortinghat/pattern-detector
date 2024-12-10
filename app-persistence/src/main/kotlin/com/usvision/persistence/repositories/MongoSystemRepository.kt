@@ -16,7 +16,6 @@ import kotlinx.coroutines.runBlocking
 import org.bson.types.ObjectId
 
 
-class MongoSystemRepository(db: MongoDatabase) : SystemRepository {
 class MongoSystemRepository(db: MongoDatabase) : SystemRepository, SystemAggregateStorage {
     companion object {
         const val COLLECTION_NAME = "systems"
