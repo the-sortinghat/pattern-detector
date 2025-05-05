@@ -21,10 +21,12 @@ tasks.test {
 dependencies {
     implementation(project(":app-model"))
     implementation(project(":app-reports"))
+    implementation(project(":app-creation"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutine_version")
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongodb_version")
 
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:$mockk_version")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
 }

@@ -5,7 +5,7 @@ FROM gradle:7.4.2-jdk17 AS dependencies
 
 WORKDIR /home/gradle/usvision
 
-RUN mkdir app-analyses app-model app-persistence app-reports app-web \
+RUN mkdir app-analyses app-model app-persistence app-reports app-web app-creation \
     && chown gradle:gradle . -R
 
 USER gradle
@@ -20,6 +20,7 @@ COPY --chown=gradle:gradle  app-model/build.gradle.kts          app-model/gradle
 COPY --chown=gradle:gradle  app-persistence/build.gradle.kts    app-persistence/gradle.properties   ./app-persistence/
 COPY --chown=gradle:gradle  app-reports/build.gradle.kts        app-reports/gradle.properties       ./app-reports/
 COPY --chown=gradle:gradle  app-web/build.gradle.kts            app-web/gradle.properties           ./app-web/
+COPY --chown=gradle:gradle  app-creation/build.gradle.kts       app-creation/gradle.properties      ./app-creation
 
 
 # PRE-INSTALL JUST THE DEPENDENCIES -- THIS SHALL SPEEDUP FUTURE BUILDS
